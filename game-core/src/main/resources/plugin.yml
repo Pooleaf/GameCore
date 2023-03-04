@@ -1,0 +1,5 @@
+name: $pluginName
+version: $version
+main: $main
+depend:
+  - Core

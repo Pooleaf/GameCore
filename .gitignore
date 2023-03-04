@@ -1,0 +1,8 @@
+# Project exclude paths
+/.gradle/
+/game-core/build/
+/game-core/build/classes/kotlin/main/
+/game-history/build/
+/game-history/build/classes/kotlin/main/
+/game-replay/build/
+/game-replay/build/classes/kotlin/main/
