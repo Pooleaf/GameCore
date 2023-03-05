@@ -1,14 +1,12 @@
 package net.pooleaf.gamehistory
 
 import net.pooleaf.core.modules.commonevent.CommonEventModule
-import net.pooleaf.core.modules.commonevent.common.CommonEventHandler
-import net.pooleaf.core.modules.commonevent.common.CommonEventListener
 import net.pooleaf.core.modules.support.common.CommonChatColor
 import net.pooleaf.core.modules.support.common.logger.Logger
 import net.pooleaf.core.plugin.BukkitCorePlugin
-import net.pooleaf.gamecore.events.GameCoreInitializedEvent
+import org.bukkit.Bukkit
 
-class GameHistoryPlugin : BukkitCorePlugin(), CommonEventListener {
+class GameHistoryPlugin : BukkitCorePlugin() {
 
     companion object {
         lateinit var instance: GameHistoryPlugin
@@ -22,11 +20,14 @@ class GameHistoryPlugin : BukkitCorePlugin(), CommonEventListener {
         color = CommonChatColor.RED
         registerLoggerPrefix()
 
-        CommonEventModule.registerListener(this, this)
+        if (Bukkit.getPluginManager().getPlugin("GameCore") == null) {
+            init()
+        } else {
+            CommonEventModule.registerListener(this, GameHistoryGameCoreBootstrap())
+        }
     }
 
-    @CommonEventHandler
-    fun onGameCoreInitialized(event: GameCoreInitializedEvent) {
+    internal fun init() {
         GameHistoryApi.init()
 
         GameHistoryApi.unsafe.sqlManager.connect()

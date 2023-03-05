@@ -3,7 +3,6 @@ plugins {
 }
 
 allprojects {
-
     apply(plugin = "kotlin")
 
     repositories {
@@ -18,7 +17,7 @@ allprojects {
 
     dependencies {
         compileOnly("io.papermc:paper:1.8.8")
-        compileOnly("net.pooleaf:core:0.0.47")
+        compileOnly("net.pooleaf:core:1.49.0")
 
         compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
 

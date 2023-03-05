@@ -1,7 +1,7 @@
 package net.pooleaf.gamereplay.replay.virtual.worldborder
 
 import net.pooleaf.gamereplay.GameReplayApi
-import net.pooleaf.gamereplay.data.game.GameWorldBorderChangeData
+import net.pooleaf.gamereplay.data.datas.game.GameWorldBorderChangeData
 import net.pooleaf.gamereplay.replay.virtual.VirtualHistory
 import org.bukkit.entity.Player
 

@@ -1,14 +1,12 @@
 package net.pooleaf.gamereplay
 
 import net.pooleaf.core.modules.commonevent.CommonEventModule
-import net.pooleaf.core.modules.commonevent.common.CommonEventHandler
-import net.pooleaf.core.modules.commonevent.common.CommonEventListener
 import net.pooleaf.core.modules.support.common.CommonChatColor
 import net.pooleaf.core.modules.support.common.logger.Logger
 import net.pooleaf.core.plugin.BukkitCorePlugin
-import net.pooleaf.gamecore.events.GameCoreInitializedEvent
+import org.bukkit.Bukkit
 
-class GameReplayPlugin : BukkitCorePlugin(), CommonEventListener {
+class GameReplayPlugin : BukkitCorePlugin() {
 
     companion object {
         lateinit var instance: GameReplayPlugin
@@ -22,11 +20,14 @@ class GameReplayPlugin : BukkitCorePlugin(), CommonEventListener {
         color = CommonChatColor.RED
         registerLoggerPrefix()
 
-        CommonEventModule.registerListener(this, this)
+        if (Bukkit.getPluginManager().getPlugin("GameCore") == null) {
+            init()
+        } else {
+            CommonEventModule.registerListener(this, GameReplayGameCoreBootstrap())
+        }
     }
 
-    @CommonEventHandler
-    fun onGameCoreInitialized(event: GameCoreInitializedEvent) {
+    internal fun init() {
         GameReplayApi.init()
 
         GameReplayApi.unsafe.sqlManager.connect()

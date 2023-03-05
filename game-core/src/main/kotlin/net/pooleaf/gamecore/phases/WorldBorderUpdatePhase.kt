@@ -6,8 +6,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.support.bukkit.particle.Particle
+import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import net.pooleaf.core.modules.support.common.CommonChatColor
-import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.phase.Phase
 import net.pooleaf.gamecore.utils.StringUtil
@@ -66,9 +66,9 @@ abstract class WorldBorderUpdatePhase(): Phase() {
 
             val updateTime = StringUtil.buildTimeStringWithColor(getUpdateWaitSeconds() * 1000L, CommonChatColor.WHITE, CommonChatColor.YELLOW)
 
-            Broadcaster.broadcast("")
-            Broadcaster.broadcast("${updateTime} §e후 맵의 경계가 ${updateMessage}.")
-            Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
+            BukkitBroadcaster.broadcast("")
+            BukkitBroadcaster.broadcast("${updateTime} §e후 맵의 경계가 ${updateMessage}.")
+            BukkitBroadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
 
             startParticleTimer()
         } ?: error("currentMap cannot be null")
@@ -90,8 +90,8 @@ abstract class WorldBorderUpdatePhase(): Phase() {
                 if (count <= 5) {
                     val updateTime = StringUtil.buildTimeStringWithColor(count * 1000L, CommonChatColor.WHITE, CommonChatColor.YELLOW)
 
-                    Broadcaster.broadcast("${updateTime} §e후 맵의 경계가 ${updateMessage}.")
-                    Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
+                    BukkitBroadcaster.broadcast("${updateTime} §e후 맵의 경계가 ${updateMessage}.")
+                    BukkitBroadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
                 }
 
                 GameCore.unsafe.sideBarManager.sideBar?.let { it.update() }
@@ -104,8 +104,8 @@ abstract class WorldBorderUpdatePhase(): Phase() {
             updateDurationSeconds = currentMap.updateWorldBorder(getNewWorldBorderSize(), getUpdateSizePerSeconds())
             val updateDurationTime = StringUtil.buildTimeStringWithColor(updateDurationSeconds!! * 1000L, CommonChatColor.WHITE, CommonChatColor.YELLOW)
 
-            Broadcaster.broadcast("§e맵의 경계가 ${updateMessage}.")
-            Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
+            BukkitBroadcaster.broadcast("§e맵의 경계가 ${updateMessage}.")
+            BukkitBroadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
 
             delay(updateDurationSeconds!! * 1000L)
             updateDurationSeconds = null

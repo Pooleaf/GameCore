@@ -8,8 +8,8 @@ import net.pooleaf.core.modules.commonsender.common.CommonCommandSender
 import net.pooleaf.core.modules.commonsender.common.CommonPlayer
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
+import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import net.pooleaf.core.modules.support.common.CommonChatColor
-import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.GameCorePermission
 import org.bukkit.command.CommandSender
@@ -43,7 +43,7 @@ class GameCommand {
 
             GameCore.game.start(sender.platformSender)
 
-            Broadcaster.broadcast("${sender.displayName} §b님께서 게임을 시작시켰습니다.")
+            BukkitBroadcaster.broadcast("${sender.displayName} §b님께서 게임을 시작시켰습니다.")
         }
     }
 
@@ -62,7 +62,7 @@ class GameCommand {
 
         BukkitAsyncScope.launch {
             GameCore.game.cancel(sender.platformSender, "${sender.displayName} 님께서 게임을 중단시켰습니다.")
-            Broadcaster.broadcastWarning("${sender.displayName} §c님께서 게임을 중단시켰습니다.")
+            BukkitBroadcaster.broadcastWarning("${sender.displayName} §c님께서 게임을 중단시켰습니다.")
         }
     }
 
@@ -85,7 +85,7 @@ class GameCommand {
             // 관전 모드로 전환
             if (!gamePlayer.isSpectator) {
                 GameCore.unsafe.playerService.enableSpectatorMode(gamePlayer)
-                Broadcaster.broadcast("${gamePlayer.displayName} §b님께서 관전을 시작했습니다.")
+                BukkitBroadcaster.broadcast("${gamePlayer.displayName} §b님께서 관전을 시작했습니다.")
             }
             // 관전 모드 해제
             else {
@@ -96,7 +96,7 @@ class GameCommand {
                 }
 
                 GameCore.unsafe.playerService.disableSpectatorMode(gamePlayer)
-                Broadcaster.broadcast("${gamePlayer.displayName} §b님께서 관전을 종료했습니다.")
+                BukkitBroadcaster.broadcast("${gamePlayer.displayName} §b님께서 관전을 종료했습니다.")
             }
         }
     }

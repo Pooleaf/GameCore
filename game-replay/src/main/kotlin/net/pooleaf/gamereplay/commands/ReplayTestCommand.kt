@@ -27,17 +27,24 @@ class ReplayTestCommand {
         description = "start record",
         permission = GameReplayPermission.ADMIN
     )
-    fun replay_test_startRecord(sender: CommandSender, result: CommandResult) {
+    fun replay_test_startRecord(player: Player, result: CommandResult) {
         if (GameReplayApi.unsafe.recordManager.isRecording()) {
-            sender.sendWarning("이미 녹화 중입니다.")
+            player.sendWarning("이미 녹화 중입니다.")
             return
         }
 
         val uuid = UUID.randomUUID()
-        val targetPlayerUuid = GameCore.unsafe.playerManager.getJoinedPlayers().map { it.uuid }
-        GameReplayApi.unsafe.recordManager.startRecord(uuid, targetPlayerUuid)
+        val targetPlayerUuids = GameCore.unsafe.playerManager.getJoinedPlayers().map { it.uuid }
+        GameReplayApi.unsafe.recordManager.startRecord(
+            uuid,
+            targetPlayerUuids,
+            player.world.name,
+            player.location.x,
+            player.location.y,
+            player.location.z
+        )
 
-        sender.sendMessage("${uuid} 녹화를 시작했습니다.")
+        player.sendMessage("${uuid} 녹화를 시작했습니다.")
     }
 
     @Command(

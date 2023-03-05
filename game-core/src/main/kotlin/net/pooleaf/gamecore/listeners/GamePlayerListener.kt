@@ -5,7 +5,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
-import net.pooleaf.gamecore.Broadcaster
+import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.player.GamePlayerJoinEvent
 import net.pooleaf.gamecore.events.player.GamePlayerQuitEvent
@@ -99,8 +99,8 @@ class GamePlayerListener: Listener {
                         gamePlayer.reconnectJob = BukkitAsyncScope.launch {
                             delay(GameCore.gameConfig.reconnectAllowSeconds * 1000L)
                             GameCore.unsafe.playerService.defeatPlayer(gamePlayer)
-                            Broadcaster.broadcast("§c${gamePlayer.displayName} 님께서 재접속하지 않아 탈락했습니다.")
-                            Broadcaster.broadcastSound(XSound.BLOCK_NOTE_BLOCK_BASS)
+                            BukkitBroadcaster.broadcast("§c${gamePlayer.displayName} 님께서 재접속하지 않아 탈락했습니다.")
+                            BukkitBroadcaster.broadcastSound(XSound.BLOCK_NOTE_BLOCK_BASS)
                         }
                     }
 

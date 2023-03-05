@@ -5,8 +5,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
+import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import net.pooleaf.core.modules.support.common.util.toMillis
-import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.phase.Phase
 import net.pooleaf.gamecore.utils.FireworkUtil
@@ -32,10 +32,10 @@ open class EndPhase(): Phase() {
             val winnerPlayerNames = winnerPlayers?.joinToString { it.displayName } ?: "?"
 
             // 우승 타이틀
-            Broadcaster.broadcastTitle("§e우승", "§f${winnerPlayerNames}", 10 * 20)
+            BukkitBroadcaster.broadcastTitle("§e우승", "§f${winnerPlayerNames}", 10 * 20)
 
             // 사운드
-            Broadcaster.broadcastSound(XSound.ENTITY_PLAYER_LEVELUP, 0.4F, 0.5F)
+            BukkitBroadcaster.broadcastSound(XSound.ENTITY_PLAYER_LEVELUP, 0.4F, 0.5F)
 
             // 우승자 주변에 폭죽 날리기
             winnerPlayers?.forEach { gamePlayer ->
@@ -55,11 +55,11 @@ open class EndPhase(): Phase() {
             for (count in 15 downTo 1) {
                 when (count) {
                     in 4..10 -> {
-                        Broadcaster.broadcastActionBar("§e${count}§c초 후 게임이 다시 시작됩니다.")
+                        BukkitBroadcaster.broadcastActionBar("§e${count}§c초 후 게임이 다시 시작됩니다.")
                     }
                     in 1..3 -> {
-                        Broadcaster.broadcastActionBar("§e${count}§c초 후 게임이 다시 시작됩니다.")
-                        Broadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
+                        BukkitBroadcaster.broadcastActionBar("§e${count}§c초 후 게임이 다시 시작됩니다.")
+                        BukkitBroadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
                     }
                 }
 
@@ -69,7 +69,7 @@ open class EndPhase(): Phase() {
     }
 
     override fun onEnd() {
-        Broadcaster.removeActionBar()
+        BukkitBroadcaster.removeActionBar()
 
         // 게임 리셋
         BukkitAsyncScope.launch {

@@ -1,17 +1,12 @@
 package net.pooleaf.gamereplay.record
 
-import com.comphenix.protocol.ProtocolLibrary
 import net.pooleaf.core.modules.support.common.logger.Logger
-import net.pooleaf.gamecore.GameCore
-import net.pooleaf.gamereplay.events.RecordTickEvent
 import net.pooleaf.gamereplay.GameReplayApi
-import net.pooleaf.gamereplay.data.block.BlockChangeDataRecordListener
-import net.pooleaf.gamereplay.data.block.MultiBlockChangeDataRecordListener
-import net.pooleaf.gamereplay.data.entity.*
-import net.pooleaf.gamereplay.data.player.PlayerMetaDataDataRecordListener
-import net.pooleaf.gamereplay.data.player.PlayerMoveData
+import net.pooleaf.gamereplay.GameReplayPlugin
+import net.pooleaf.gamereplay.data.datas.player.PlayerMoveData
 import net.pooleaf.gamereplay.events.RecordStartEvent
 import net.pooleaf.gamereplay.events.RecordStopEvent
+import net.pooleaf.gamereplay.events.RecordTickEvent
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
@@ -25,24 +20,6 @@ class RecordManager {
     var recordTickCalculateTask: BukkitTask? = null
 
 
-    fun registerRecordListeners() {
-//        ProtocolLibrary.getProtocolManager().addPacketListener(TestPacketListener()) // TODO remove
-
-        // Block
-        ProtocolLibrary.getProtocolManager().addPacketListener(BlockChangeDataRecordListener())
-        ProtocolLibrary.getProtocolManager().addPacketListener(MultiBlockChangeDataRecordListener())
-
-        // Entity
-        ProtocolLibrary.getProtocolManager().addPacketListener(CollectDataRecordListener())
-        ProtocolLibrary.getProtocolManager().addPacketListener(EntityDestroyDataRecordListener())
-        ProtocolLibrary.getProtocolManager().addPacketListener(EntityVelocityDataRecordListener())
-        ProtocolLibrary.getProtocolManager().addPacketListener(ItemMetaDataDataRecordListener())
-        ProtocolLibrary.getProtocolManager().addPacketListener(SpawnEntityDataRecordListener())
-
-        // Player
-        ProtocolLibrary.getProtocolManager().addPacketListener(PlayerMetaDataDataRecordListener())
-    }
-
     /**
      * 녹화 중 여부를 반환합니다.
      */
@@ -53,10 +30,17 @@ class RecordManager {
     /**
      * 녹화를 시작합니다.
      */
-    fun startRecord(gameUuid: UUID, recordTargetPlayers: List<UUID>) {
+    fun startRecord(
+        gameUuid: UUID,
+        recordTargetPlayers: List<UUID>,
+        worldName: String,
+        x: Double,
+        y: Double,
+        z: Double
+    ) {
         if (isRecording()) error("Recording already started")
 
-        record = Record(gameUuid, recordTargetPlayers)
+        record = Record(gameUuid, recordTargetPlayers, worldName, x, y, z)
         record?.let { record ->
             record.isRecording = true
             record.replay.createdAt = LocalDateTime.now()
@@ -70,17 +54,17 @@ class RecordManager {
 
                 val playerMoveData = PlayerMoveData().apply {
                     playerUuid = uuid
-                    worldName = location.world.name
-                    x = location.x
-                    y = location.y
-                    z = location.z
+                    this.worldName = location.world.name
+                    this.x = location.x
+                    this.y = location.y
+                    this.z = location.z
                     yaw = location.yaw
                     pitch = location.pitch
                 }
                 record.addRecordData(playerMoveData)
             }
 
-            recordTickCalculateTask = Bukkit.getScheduler().runTaskTimer(GameCore.gamePlugin, {
+            recordTickCalculateTask = Bukkit.getScheduler().runTaskTimer(GameReplayPlugin.instance, {
                 if (!isRecording()) return@runTaskTimer
 
                 // 이벤트

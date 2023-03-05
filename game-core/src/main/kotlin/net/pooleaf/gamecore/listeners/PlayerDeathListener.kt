@@ -1,7 +1,7 @@
 package net.pooleaf.gamecore.listeners
 
 import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageEvent
-import net.pooleaf.gamecore.Broadcaster
+import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.player.GamePlayerDeathEvent
 import org.bukkit.Bukkit
@@ -44,9 +44,9 @@ class PlayerDeathListener : Listener {
 
         // 메시지
         if (killerGamePlayer == null) {
-            Broadcaster.broadcast("§c${deadGamePlayer.displayName} §c님이 죽었습니다.")
+            BukkitBroadcaster.broadcast("§c${deadGamePlayer.displayName} §c님이 죽었습니다.")
         } else {
-            Broadcaster.broadcast("§c${killerGamePlayer.displayName} §c님이 §c${deadGamePlayer.displayName} §c님을 죽였습니다.")
+            BukkitBroadcaster.broadcast("§c${killerGamePlayer.displayName} §c님이 §c${deadGamePlayer.displayName} §c님을 죽였습니다.")
         }
 
         // 이벤트

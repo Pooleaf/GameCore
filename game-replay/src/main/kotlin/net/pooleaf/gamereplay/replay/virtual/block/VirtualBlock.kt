@@ -1,7 +1,7 @@
 package net.pooleaf.gamereplay.replay.virtual.block
 
 import net.pooleaf.gamereplay.GameReplayApi
-import net.pooleaf.gamereplay.data.block.BlockDamageData
+import net.pooleaf.gamereplay.data.datas.block.BlockDamageData
 import net.pooleaf.gamereplay.replay.virtual.VirtualLocation
 import org.bukkit.entity.Player
 

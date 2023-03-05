@@ -7,9 +7,10 @@ import net.pooleaf.core.modules.channel.ChannelModule
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.gui.GuiModule
+import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
 import net.pooleaf.core.modules.support.common.util.toMillis
-import net.pooleaf.gamecore.Broadcaster
+import net.pooleaf.gamecore.GameBroadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.game.*
 import net.pooleaf.gamecore.phases.EndPhase
@@ -74,7 +75,7 @@ class GameManager {
         GameCore.currentMap?.let { map ->
             // 언로드 실패 시 서버 재부팅
             if (!map.unloadWorld()) {
-                Broadcaster.broadcastTitle("§c오류", "§c게임 초기화에 실패하여 서버가 재부팅됩니다.", 10 * 20)
+                BukkitBroadcaster.broadcastTitle("§c오류", "§c게임 초기화에 실패하여 서버가 재부팅됩니다.", 10 * 20)
 
                 // 10초 후 서버 종료
                 BukkitAsyncScope.launch {
@@ -112,7 +113,7 @@ class GameManager {
         }
 
         // 대기 액션바
-        Broadcaster.broadcastWaitingActionBar(GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size, GameCore.gameConfig.startPlayerCount)
+        GameBroadcaster.broadcastWaitingActionBar(GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size, GameCore.gameConfig.startPlayerCount)
 
         // 투표 초기화
         GameCore.unsafe.startVoteManager.initVote()
@@ -168,12 +169,12 @@ class GameManager {
                 }
             } ?: run {
                 // 맵 없으면 중단
-                Broadcaster.broadcastTitle(
+                BukkitBroadcaster.broadcastTitle(
                     "§c시작 실패",
                     "§c사용할 수 있는 맵이 없어 게임을 시작할 수 없습니다.",
                     5 * 20
                 )
-                Broadcaster.broadcastSound(XSound.ENTITY_ITEM_BREAK)
+                BukkitBroadcaster.broadcastSound(XSound.ENTITY_ITEM_BREAK, 0.4F, 1.0F)
                 return@launch
             }
 
@@ -181,7 +182,7 @@ class GameManager {
             game.gameId = UUID.randomUUID()
 
             // 액션바 제거
-            Broadcaster.removeActionBar()
+            BukkitBroadcaster.removeActionBar()
 
             // 대기 퀵바 업데이트 (관전 슬롯 제거)
             GameCore.unsafe.quickBarManager.waitingQuickBar.updateAsynchronously()
@@ -211,7 +212,7 @@ class GameManager {
         game.startedAt = LocalDateTime.now()
 
         // 액션바 제거
-        Broadcaster.removeActionBar()
+        BukkitBroadcaster.removeActionBar()
 
         // 퀵바 제거
         Bukkit.getOnlinePlayers().forEach { GuiModule.getQuickBarManager().removeTo(it) }
@@ -271,7 +272,7 @@ class GameManager {
         // 게임 시작 전 중단
         if (!GameCore.game.isGameStarted && GameCore.unsafe.playerManager.getOnlinePlayingPlayers().size <= GameCore.teamConfig.playerCountPerTeam) {
             cancelGame(null, "인원이 적어 게임이 중단됩니다.")
-            Broadcaster.broadcast("§c인원이 적어 게임이 중단되었습니다.")
+            BukkitBroadcaster.broadcast("§c인원이 적어 게임이 중단되었습니다.")
         }
 
         // 플레이 중인 팀이 한팀 남았으면 게임 종료
@@ -279,8 +280,8 @@ class GameManager {
             // 우승 시간 안됐을 때 중단
             if (System.currentTimeMillis() - GameCore.game.startedAt!!.toMillis() < GameCore.gameConfig.winAllowSeconds) {
                 cancelGame(null, "게임 진행 시간이 적어 우승할 수 없습니다.")
-                Broadcaster.broadcast("§c게임 진행 시간이 적어 승자가 결정되지 않았습니다.")
-                Broadcaster.broadcast("§c더 많은 시간을 플레이해야 게임이 정상적으로 종료됩니다.")
+                BukkitBroadcaster.broadcast("§c게임 진행 시간이 적어 승자가 결정되지 않았습니다.")
+                BukkitBroadcaster.broadcast("§c더 많은 시간을 플레이해야 게임이 정상적으로 종료됩니다.")
             }
             // 아무도 없을 경우
             else if (GameCore.unsafe.teamManager.getNotDefeatedOnlineTeams().isEmpty()) {
@@ -358,8 +359,8 @@ class GameManager {
         resetGame()
 
         // 타이틀
-        Broadcaster.broadcastTitle("§c게임 중단", "§c${cancelCause}", 5 * 20)
-        Broadcaster.broadcastSound(XSound.ENTITY_ITEM_BREAK, 1.0F, 1.0F)
+        BukkitBroadcaster.broadcastTitle("§c게임 중단", "§c${cancelCause}", 5 * 20)
+        BukkitBroadcaster.broadcastSound(XSound.ENTITY_ITEM_BREAK, 1.0F, 1.0F)
 
         // 이벤트
         Bukkit.getPluginManager().callEvent(GameCancelledEvent(cancelSender, cancelCause))
@@ -389,7 +390,7 @@ class GameManager {
             }.join()
 
             // 액션바
-            Broadcaster.broadcastActionBar("${map.displayName} §e맵으로 이동되었습니다.")
+            BukkitBroadcaster.broadcastActionBar("${map.displayName} §e맵으로 이동되었습니다.")
 
             // 게임 정보 업데이트
             game.isTeleportedToMap = true

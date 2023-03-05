@@ -5,8 +5,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.annoconfig.AnnoConfigModule
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
+import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import net.pooleaf.core.modules.support.common.component.SimpleComponentBuilder
-import net.pooleaf.gamecore.Broadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.utils.FireworkUtil
 import org.bukkit.Bukkit
@@ -110,14 +110,14 @@ class SupplyService {
         GameCore.unsafe.supplyManager.createdSupply.add(supplyBlock)
 
         // 메시지
-        Broadcaster.broadcast("§b[X: §f${location.x.toInt()}§b, Y: §f${location.y.toInt()}§b, Z: §f${location.z.toInt()}§b] 위치에 보급품이 생성되었습니다.")
-        Broadcaster.broadcast(
+        BukkitBroadcaster.broadcast("§b[X: §f${location.x.toInt()}§b, Y: §f${location.y.toInt()}§b, Z: §f${location.z.toInt()}§b] 위치에 보급품이 생성되었습니다.")
+        BukkitBroadcaster.broadcast(
             SimpleComponentBuilder("§b보급품 위치는 §f'/보급품 기록' §b명령어로 다시 확인할 수 있습니다.")
                 .hoverShowText("클릭 시 보급품 기록을 확인합니다.")
                 .clickRunCommand("/보급품 기록")
                 .build()
         )
-        Broadcaster.broadcastSound(XSound.ENTITY_ITEM_PICKUP, 0.4F, 1.0F)
+        BukkitBroadcaster.broadcastSound(XSound.ENTITY_ITEM_PICKUP, 0.4F, 1.0F)
     }
 
     /**

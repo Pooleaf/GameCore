@@ -32,7 +32,10 @@ tasks {
 
     register<Copy>("copyToServerWindows") {
         from(shadowJar)
-        into("D:\\서버\\1.8.9 테스트 서버\\update")
+//        into("D:\\서버\\1.8.9 테스트 서버\\update")
+        into("D:\\서버\\1.8.9 LeafServer S6\\lobby.1\\update")
+//        into("D:\\서버\\1.8.9 LeafServer S6\\replay.1\\update")
+//        into("D:\\서버\\1.8.9 LeafServer S6\\city.ability.pf.1\\update")
     }
 }
 

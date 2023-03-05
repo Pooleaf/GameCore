@@ -2,7 +2,7 @@ package net.pooleaf.gamecore.vote.start
 
 import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
-import net.pooleaf.gamecore.Broadcaster
+import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.player.GamePlayer
 
@@ -94,7 +94,7 @@ class StartVoteManager {
         val agreeCount = startVote.agreePlayers.size
         val disagreeCount = startVote.disagreePlayers.size
 
-        Broadcaster.broadcast("§e게임 시작 투표를 진행 중입니다.. §a찬성: ${agreeCount}§a명 §c반대: ${disagreeCount}§c명")
+        BukkitBroadcaster.broadcast("§e게임 시작 투표를 진행 중입니다.. §a찬성: ${agreeCount}§a명 §c반대: ${disagreeCount}§c명")
     }
 
 }

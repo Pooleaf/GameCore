@@ -5,8 +5,9 @@ import com.comphenix.protocol.events.ListenerPriority
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamereplay.GameReplayPlugin
 
-class TestPacketListener: PacketAdapter(GameCore.gamePlugin, ListenerPriority.NORMAL, PacketType.Play.Server.getInstance().values()) {
+class TestPacketListener: PacketAdapter(GameReplayPlugin.instance, ListenerPriority.NORMAL, PacketType.Play.Server.getInstance().values()) {
 
     override fun onPacketSending(event: PacketEvent) {
 

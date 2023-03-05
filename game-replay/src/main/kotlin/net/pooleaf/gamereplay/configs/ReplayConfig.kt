@@ -7,10 +7,10 @@ import java.io.File
 
 class ReplayConfig(file: File?) : SimpleAnnoConfig(file) {
 
+    @ConfigName("리플레이 기록 서버.활성화")
+    var isRecordServer: Boolean = (Bukkit.getPluginManager().getPlugin("GameCore") != null)
+
     @ConfigName("리플레이 재생 서버.활성화")
     var isReplayPlayServer: Boolean = (Bukkit.getPluginManager().getPlugin("GameCore") == null)
-
-    @ConfigName("리플레이 기록 서버.활성화")
-    var isReplayServer: Boolean = (Bukkit.getPluginManager().getPlugin("GameCore") != null)
 
 }

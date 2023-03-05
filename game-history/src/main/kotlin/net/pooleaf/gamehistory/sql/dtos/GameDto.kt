@@ -1,7 +1,5 @@
 package net.pooleaf.gamehistory.sql.dtos
 
-import net.pooleaf.core.modules.channel.ChannelModule
-import net.pooleaf.gamecore.game.Game
 import java.time.LocalDateTime
 
 data class GameDto(
@@ -12,15 +10,4 @@ data class GameDto(
     var endedAt: LocalDateTime? = null,
     var cancelYn: String? = null
 ) {
-}
-
-fun Game.toDto(): GameDto {
-    return GameDto(
-        this.gameId?.toString() ?: error("gameId cannot be null"),
-        this.gameTypeId,
-        ChannelModule.getCurrentChannelName(),
-        this.startedAt,
-        this.endedAt,
-        if (this.isCancelled) "Y" else "N"
-    )
 }

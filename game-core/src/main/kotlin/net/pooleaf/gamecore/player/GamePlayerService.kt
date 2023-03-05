@@ -4,7 +4,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.gui.GuiModule
-import net.pooleaf.gamecore.Broadcaster
+import net.pooleaf.gamecore.GameBroadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.player.*
 import net.pooleaf.gamecore.events.team.TeamDefeatEvent
@@ -104,7 +104,7 @@ class GamePlayerService {
         // 대기 중이라면
         if (!GameCore.game.isRunning) {
             // 대기 액션바
-            Broadcaster.broadcastWaitingActionBar(GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size, GameCore.gameConfig.startPlayerCount)
+            GameBroadcaster.broadcastWaitingActionBar(GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size, GameCore.gameConfig.startPlayerCount)
 
             // 게임 시작
             BukkitSyncScope.launch {
@@ -134,7 +134,7 @@ class GamePlayerService {
         // 대기 중이라면
         if (!GameCore.game.isRunning) {
             // 대기 액션바
-            Broadcaster.broadcastWaitingActionBar(GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size, GameCore.gameConfig.startPlayerCount)
+            GameBroadcaster.broadcastWaitingActionBar(GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size, GameCore.gameConfig.startPlayerCount)
 
             // 게임 시작
             if (GameCore.unsafe.gameManager.canAutoStart()) {

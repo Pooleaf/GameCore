@@ -2,8 +2,8 @@ package net.pooleaf.gamereplay.replay
 
 import net.pooleaf.core.modules.support.common.logger.Logger
 import net.pooleaf.core.modules.support.common.util.GsonUtil
-import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamereplay.GameReplayApi
+import net.pooleaf.gamereplay.GameReplayPlugin
 import net.pooleaf.gamereplay.data.RecordData
 import net.pooleaf.gamereplay.sql.dtos.ReplayDto
 import net.pooleaf.gamereplay.sql.dtos.toDto
@@ -15,7 +15,7 @@ import java.util.*
 
 class ReplayService {
 
-    val replayFolder = File(GameCore.gamePlugin.dataFolder, "replay")
+    val replayFolder = File(GameReplayPlugin.instance.dataFolder, "replay")
 
     val gson = GsonUtil.gsonBuilder
         .registerTypeHierarchyAdapter(RecordData::class.java, RecordDataDeserializer())

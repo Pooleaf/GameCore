@@ -6,6 +6,8 @@ import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.game.GameBeforeResetEvent
 import net.pooleaf.gamecore.events.game.GameStartedEvent
 import net.pooleaf.gamereplay.GameReplayApi
+import net.pooleaf.gamereplay.GameReplayPlugin
+import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
@@ -13,18 +15,22 @@ class GameRecordListener : Listener {
 
     @EventHandler
     fun onGameStarted(event: GameStartedEvent) {
-        if (!GameReplayApi.replayConfig.isReplayServer) return
-        if (GameReplayApi.unsafe.recordManager.isRecording()) return
+        Bukkit.getScheduler().runTaskLater(GameReplayPlugin.instance, {
+            if (!GameReplayApi.replayConfig.isRecordServer) return@runTaskLater
+            if (GameReplayApi.unsafe.recordManager.isRecording()) return@runTaskLater
 
-        val gameId = GameCore.game.gameId ?: return
-        val targetPlayers = GameCore.unsafe.playerManager.getJoinedPlayers().map { it.uuid }
+            val gameId = GameCore.game.gameId ?: return@runTaskLater
+            val targetPlayers = GameCore.unsafe.playerManager.getJoinedPlayers().map { it.uuid }
 
-        GameReplayApi.unsafe.recordManager.startRecord(gameId, targetPlayers)
+            val map = GameCore.currentMap ?: return@runTaskLater
+
+            GameReplayApi.unsafe.recordManager.startRecord(gameId, targetPlayers, map.centerWorldName!!, map.centerX, map.centerY, map.centerZ)
+        }, 1L)
     }
 
     @EventHandler
     fun onGameBeforeReset(event: GameBeforeResetEvent) {
-        if (!GameReplayApi.replayConfig.isReplayServer) return
+        if (!GameReplayApi.replayConfig.isRecordServer) return
         if (!GameReplayApi.unsafe.recordManager.isRecording()) return
 
         BukkitAsyncScope.launch {

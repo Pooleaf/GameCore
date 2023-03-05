@@ -2,7 +2,7 @@ package net.pooleaf.gamereplay.replay.virtual.entity
 
 import net.pooleaf.gamereplay.GameReplayApi
 import net.pooleaf.gamereplay.data.RecordData
-import net.pooleaf.gamereplay.data.entity.*
+import net.pooleaf.gamereplay.data.datas.entity.*
 import net.pooleaf.gamereplay.replay.virtual.VirtualHistory
 import org.bukkit.entity.Player
 
@@ -82,8 +82,8 @@ data class VirtualEntity(
         getLastData(ItemMetaDataData::class.java, newTick)?.let { datas.add(it) }
 
         datas.forEach { data ->
-            val playerHandler = GameReplayApi.unsafe.recordDataManager.get(data.javaClass) ?: return
-            playerHandler.onPlay(data, viewer)
+            val replayHandler = GameReplayApi.unsafe.recordDataManager.get(data.javaClass) ?: return
+            replayHandler.onPlay(data, viewer)
         }
     }
 

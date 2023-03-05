@@ -19,7 +19,8 @@ class RecordDataDeserializer : JsonDeserializer<RecordData> {
         if (!jsonObject.has("type")) return null
 
         val type = jsonObject.get("type").asString
-        val recordDataClass = GameReplayApi.unsafe.recordDataManager.getRecordDataClassByType(type) ?: return null
+        val recordDataClass = GameReplayApi.unsafe.recordDataManager.getRecordDataClassByType(type)
+            ?: error("Cannot deserialize RecordData type ${type}")
 
         val recordData = recordDataClass.newInstance()
         GsonUtil.loadFromJson(jsonObject.toString(), recordData)

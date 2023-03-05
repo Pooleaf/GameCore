@@ -1,22 +1,24 @@
 package net.pooleaf.gamereplay.replay
 
+import kotlinx.coroutines.launch
 import net.citizensnpcs.api.trait.trait.Owner
 import net.citizensnpcs.trait.GameModeTrait
 import net.citizensnpcs.trait.Gravity
 import net.citizensnpcs.trait.SkinTrait
 import net.pooleaf.core.modules.commonsender.CommonSenderModule
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
+import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
-import net.pooleaf.gamecore.Broadcaster
-import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamereplay.GameReplayApi
+import net.pooleaf.gamereplay.GameReplayPlugin
+import net.pooleaf.gamereplay.data.datas.block.*
+import net.pooleaf.gamereplay.data.datas.entity.*
+import net.pooleaf.gamereplay.data.datas.game.GameWorldBorderChangeData
+import net.pooleaf.gamereplay.data.datas.player.*
 import net.pooleaf.gamereplay.events.ReplayExitEvent
 import net.pooleaf.gamereplay.events.ReplayInitEvent
 import net.pooleaf.gamereplay.events.ReplayJumpToEvent
 import net.pooleaf.gamereplay.events.ReplayPlayStartEvent
-import net.pooleaf.gamereplay.GameReplayApi
-import net.pooleaf.gamereplay.data.block.*
-import net.pooleaf.gamereplay.data.entity.*
-import net.pooleaf.gamereplay.data.game.GameWorldBorderChangeData
-import net.pooleaf.gamereplay.data.player.*
 import net.pooleaf.gamereplay.replay.virtual.VirtualLocation
 import net.pooleaf.gamereplay.replay.virtual.block.VirtualBlock
 import net.pooleaf.gamereplay.replay.virtual.block.VirtualBlockManager
@@ -89,14 +91,14 @@ class ReplayPlayer(
                 it is BlockChangeData
                         || it is BlockDamageData
                         || it is EntityChangeBlockData
-                        || it is EntityExplodeData
+                        || it is ExplodeData
                         || it is MultiBlockChangeData
             }.forEach { data ->
                 val virtualLocations = when (data) {
                     is BlockChangeData -> listOf(VirtualLocation(data.x.toDouble(), data.y.toDouble(), data.z.toDouble()))
                     is BlockDamageData -> listOf(VirtualLocation(data.x.toDouble(), data.y.toDouble(), data.z.toDouble()))
                     is EntityChangeBlockData -> listOf(VirtualLocation(data.x.toDouble(), data.y.toDouble(), data.z.toDouble()))
-                    is EntityExplodeData -> data.blockInfos.map { VirtualLocation(it.x.toDouble(), it.y.toDouble(), it.z.toDouble()) }
+                    is ExplodeData -> data.blockInfos.map { VirtualLocation(it.x.toDouble(), it.y.toDouble(), it.z.toDouble()) }
                     is MultiBlockChangeData -> data.blockChangeInfos.map { VirtualLocation(it.x.toDouble(), it.y.toDouble(), it.z.toDouble()) }
                     else -> return@forEach
                 }
@@ -130,7 +132,7 @@ class ReplayPlayer(
                             virtualBlockHistory.typeId = data.blockTypeId
                             virtualBlockHistory.typeData = data.blockData
                         }
-                        is EntityExplodeData -> {
+                        is ExplodeData -> {
                             virtualBlockHistory.typeId = 0
                             virtualBlockHistory.typeData = 0
                         }
@@ -185,7 +187,7 @@ class ReplayPlayer(
         replay.recordedPlayers.forEach { uuid ->
             val commonPlayer = CommonSenderModule.getPlayer(uuid)
 
-            val npcName = commonPlayer?.displayName ?: "Unknown"
+            val npcName = commonPlayer?.name ?: "Unknown"
             val citizensNpc = virtualPlayerManager.npcRegistry.createNPC(EntityType.PLAYER, npcName)
             citizensNpc.isProtected = true
             citizensNpc.getOrAddTrait(Owner::class.java).setOwner(viewer)
@@ -213,6 +215,8 @@ class ReplayPlayer(
                         || it is PlayerMetaDataData
                         || it is PlayerMoveData
                         || it is PlayerTeleportData
+                        || it is PlayerHideData
+                        || it is PlayerShowData
             }.forEach { data ->
                 val playerUuid: UUID = when (data) {
                     is PlayerAnimationData -> data.playerUuid!!
@@ -223,6 +227,8 @@ class ReplayPlayer(
                     is PlayerMetaDataData -> data.playerUuid!!
                     is PlayerMoveData -> data.playerUuid!!
                     is PlayerTeleportData -> data.playerUuid!!
+                    is PlayerHideData -> data.playerUuid!!
+                    is PlayerShowData -> data.playerUuid!!
                     else -> return@forEach
                 }
 
@@ -244,6 +250,9 @@ class ReplayPlayer(
             }
         }
 
+        // 플레이어 텔레포트
+        TeleportUtil.teleport(viewer, replay.startLocation)
+
         // 이벤트
         Bukkit.getPluginManager().callEvent(ReplayInitEvent(this))
     }
@@ -257,7 +266,7 @@ class ReplayPlayer(
         replayTask = object : BukkitRunnable() {
             override fun run() {
                 if (currentTick.toInt() % 20 == 0) { // TODO remove
-                    Broadcaster.broadcast("§b리플레이: §f${(currentTick.toFloat() / 20).toLong()}§b초")
+                    BukkitBroadcaster.broadcast("§b리플레이: §f${(currentTick.toFloat() / 20).toLong()}§b초")
                 }
 
                 val toTick = currentTick.toLong()
@@ -277,7 +286,7 @@ class ReplayPlayer(
                     pause()
                 }
             }
-        }.runTaskTimer(GameCore.gamePlugin, 0L, 1L)
+        }.runTaskTimer(GameReplayPlugin.instance, 0L, 1L)
 
         // 이벤트
         Bukkit.getPluginManager().callEvent(ReplayPlayStartEvent(this))
@@ -319,36 +328,32 @@ class ReplayPlayer(
         currentTick = tick.toFloat()
         lastPlayedTick = tick - 1
 
-        // 블럭
-        virtualBlockManager.values().forEach {
-            it.timeMachine(tick)
+        BukkitSyncScope.launch {
+            viewer.sendTitle("", "")
+
+            // 블럭
+            virtualBlockManager.values().forEach {
+                it.timeMachine(tick)
+            }
+
+            virtualBlockManager.showToBulk(virtualBlockManager.values().toList(), viewer)
+
+            // 엔티티
+            virtualEntityManager.values().forEach {
+                it.timeMachine(beforeTick.toLong(), tick, viewer)
+            }
+
+            // 플레이어
+            virtualPlayerManager.values().forEach {
+                it.timeMachine(tick, viewer)
+            }
+
+            // 경계선
+            virtualWorldBorder.timeMachine(tick, viewer)
+
+            // 이벤트
+            Bukkit.getPluginManager().callEvent(ReplayJumpToEvent(this@ReplayPlayer, beforeTick, tick))
         }
-
-        virtualBlockManager.showToBulk(virtualBlockManager.values().toList(), viewer)
-
-        // 청크 업데이트
-//        for (x in 0..Bukkit.getViewDistance()) {
-//            for (z in 0..Bukkit.getViewDistance()) {
-//                viewer.world.refreshChunk(viewer.location.chunk.x + x, viewer.location.chunk.z + z)
-//                viewer.world.refreshChunk(viewer.location.chunk.x - x, viewer.location.chunk.z - z)
-//            }
-//        }
-
-        // 엔티티
-        virtualEntityManager.values().forEach {
-            it.timeMachine(beforeTick.toLong(), tick, viewer)
-        }
-
-        // 플레이어
-        virtualPlayerManager.values().forEach {
-            it.timeMachine(tick, viewer)
-        }
-
-        // 경계선
-        virtualWorldBorder.timeMachine(tick, viewer)
-
-        // 이벤트
-        Bukkit.getPluginManager().callEvent(ReplayJumpToEvent(this, beforeTick, tick))
     }
 
     /**
@@ -366,7 +371,7 @@ class ReplayPlayer(
         virtualPlayerManager.values().forEach { it.citizensNpc.destroy() }
 
         // 뷰어 텔레포트
-        GameCore.spawnConfig.spawnLocation?.let { spawnLocation -> TeleportUtil.teleport(viewer, spawnLocation) }
+        GameReplayApi.spawnConfig.spawnLocation?.let { spawnLocation -> TeleportUtil.teleport(viewer, spawnLocation) }
 
         // 이벤트
         Bukkit.getPluginManager().callEvent(ReplayExitEvent(this))
