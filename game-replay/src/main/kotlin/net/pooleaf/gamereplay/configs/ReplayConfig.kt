@@ -13,4 +13,7 @@ class ReplayConfig(file: File?) : SimpleAnnoConfig(file) {
     @ConfigName("리플레이 재생 서버.활성화")
     var isReplayPlayServer: Boolean = (Bukkit.getPluginManager().getPlugin("GameCore") == null)
 
+    @ConfigName("건너뛰기 단위(초)")
+    var replaySkipSeconds: Int = 10
+
 }
