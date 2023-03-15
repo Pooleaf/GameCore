@@ -1,5 +1,6 @@
 package net.pooleaf.gamereplay
 
+import net.pooleaf.gamereplay.channel.ChannelManager
 import net.pooleaf.gamereplay.configs.ReplayConfig
 import net.pooleaf.gamereplay.configs.SpawnConfig
 import net.pooleaf.gamereplay.record.RecordManager
@@ -21,6 +22,8 @@ object GameReplayApi {
 
         lateinit var replayPlayerManager: ReplayPlayerManager
 
+        lateinit var channelManager: ChannelManager
+
         lateinit var sqlManager: GameReplaySqlManager
 
 
@@ -32,9 +35,6 @@ object GameReplayApi {
             SpawnConfig(File(GameReplayPlugin.instance.dataFolder, "spawn-config.yml"))
         }
 
-        const val REPLAY_CHANNEL_GROUP: String = "replay"
-
-
         fun init() {
             recordManager = RecordManager()
             recordDataManager = RecordDataManager()
@@ -43,6 +43,8 @@ object GameReplayApi {
             replayService = ReplayService()
 
             replayPlayerManager = ReplayPlayerManager()
+
+            channelManager = ChannelManager()
 
             sqlManager = GameReplaySqlManager()
 

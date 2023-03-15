@@ -18,13 +18,13 @@ allprojects {
 
     dependencies {
         compileOnly("io.papermc:paper:1.8.8")
-        compileOnly("net.pooleaf:core:1.49.0")
+        compileOnly("net.pooleaf:core:1.49.1")
 
         compileOnly("com.grinderwolf:slimeworldmanager-api:2.2.1")
 
         compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
 
-        compileOnly("com.arcaniax:HeadDatabase-API:1.3.0")
+        compileOnly("com.arcaniax:HeadDatabase-API:1.3.1")
 
         compileOnly("net.citizensnpcs:citizens-main:2.0.30-SNAPSHOT") {
             exclude(group = "*", module = "*")

@@ -44,7 +44,7 @@ class ReplayService {
         Logger.log("${replay.gameId} 녹화를 DB에 저장했습니다.")
     }
 
-    fun playReplay(viewer: Player, replayUuid: UUID) {
+    fun playReplay(viewer: Player, replayUuid: UUID): ReplayPlayer {
         if (isPlayingReplay(viewer)) error("Player already watching replay")
 
         val replay = GameReplayApi.unsafe.replayManager.get(replayUuid) ?: error("Replay ${replayUuid} is not exist")
@@ -54,6 +54,8 @@ class ReplayService {
         replayPlayer.play()
 
         GameReplayApi.unsafe.replayPlayerManager.set(viewer.uniqueId, replayPlayer)
+
+        return replayPlayer
     }
 
     fun exitReplay(viewer: Player) {

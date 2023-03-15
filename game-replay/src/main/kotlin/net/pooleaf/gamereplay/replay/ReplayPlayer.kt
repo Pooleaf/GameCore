@@ -7,6 +7,7 @@ import net.citizensnpcs.trait.Gravity
 import net.citizensnpcs.trait.SkinTrait
 import net.pooleaf.core.modules.commonsender.CommonSenderModule
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
+import net.pooleaf.core.modules.gui.GuiModule
 import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
 import net.pooleaf.gamereplay.GameReplayApi
@@ -19,6 +20,7 @@ import net.pooleaf.gamereplay.events.ReplayExitEvent
 import net.pooleaf.gamereplay.events.ReplayInitEvent
 import net.pooleaf.gamereplay.events.ReplayJumpToEvent
 import net.pooleaf.gamereplay.events.ReplayPlayStartEvent
+import net.pooleaf.gamereplay.quickbar.ReplayQuickBar
 import net.pooleaf.gamereplay.replay.virtual.VirtualLocation
 import net.pooleaf.gamereplay.replay.virtual.block.VirtualBlock
 import net.pooleaf.gamereplay.replay.virtual.block.VirtualBlockManager
@@ -288,6 +290,9 @@ class ReplayPlayer(
             }
         }.runTaskTimer(GameReplayPlugin.instance, 0L, 1L)
 
+        // 퀵바
+        ReplayQuickBar(this).setTo(viewer)
+
         // 이벤트
         Bukkit.getPluginManager().callEvent(ReplayPlayStartEvent(this))
     }
@@ -323,6 +328,12 @@ class ReplayPlayer(
     fun jumpTo(tick: Long) {
         if (tick < 0) error("jumpTo tick cannot lower than 0")
         if (tick > replay.endTick) error("jumpTo tick cannot higher than endTick")
+        if (tick.toFloat() == currentTick) return
+
+        val isRunning = isRunning()
+        if (isRunning) {
+            pause()
+        }
 
         val beforeTick = currentTick
         currentTick = tick.toFloat()
@@ -354,6 +365,10 @@ class ReplayPlayer(
             // 이벤트
             Bukkit.getPluginManager().callEvent(ReplayJumpToEvent(this@ReplayPlayer, beforeTick, tick))
         }
+
+        if (isRunning) {
+            play()
+        }
     }
 
     /**
@@ -369,6 +384,9 @@ class ReplayPlayer(
 
         // NPC 제거
         virtualPlayerManager.values().forEach { it.citizensNpc.destroy() }
+
+        // 퀵바 제거
+        GuiModule.getQuickBarManager().removeTo(viewer)
 
         // 뷰어 텔레포트
         GameReplayApi.spawnConfig.spawnLocation?.let { spawnLocation -> TeleportUtil.teleport(viewer, spawnLocation) }
