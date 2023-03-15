@@ -1,5 +1,6 @@
 # Project exclude paths
 /.gradle/
+/.idea/
 /game-core/build/
 /game-core/build/classes/kotlin/main/
 /game-history/build/
