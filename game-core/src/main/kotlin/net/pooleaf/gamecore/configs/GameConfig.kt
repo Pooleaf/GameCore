@@ -10,12 +10,15 @@ class GameConfig(file: File?) : SimpleAnnoConfig(file) {
     var startPlayerCount: Int = 2
 
     @ConfigName("재접속 허용 시간(초)")
-    var reconnectAllowSeconds: Int = 180
+    var reconnectAllowSeconds: Int = 60 * 3
 
     @ConfigName("우승 허용 시간(초)")
     var winAllowSeconds: Int = 30
 
     @ConfigName("킬 유효 시간(초)")
     var killValidSeconds: Int = 10
+
+    @ConfigName("게임 최대 시간(초)")
+    var gameMaxSeconds: Int = 60 * 60
 
 }

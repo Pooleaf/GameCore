@@ -5,8 +5,10 @@ import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.game.GameEndEvent
 import net.pooleaf.gamecore.events.player.GamePlayerDeathEvent
+import net.pooleaf.gamecore.events.player.GamePlayerDefeatEvent
 import net.pooleaf.gamehistory.GameHistoryApi
 import net.pooleaf.gamehistory.sql.dtos.GameKillDto
+import net.pooleaf.gamehistory.sql.dtos.toDto
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import java.time.LocalDateTime
@@ -44,6 +46,13 @@ class GamePlayerStatsListener : Listener {
             GameHistoryApi.unsafe.sqlManager.gameDao.addGamePlayerStatsDeathCount(deadPlayer.uuid, gameTypeId, 1)
 
             // TODO 어시스트 저장
+        }
+    }
+
+    @EventHandler
+    fun onPlayerDefeat(event: GamePlayerDefeatEvent) {
+        BukkitAsyncScope.launch {
+            GameHistoryApi.unsafe.sqlManager.gameDao.updateGameParticipantDefeat(event.gamePlayer.toDto())
         }
     }
 

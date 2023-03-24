@@ -4,6 +4,7 @@ import net.pooleaf.core.modules.sqllib.common.AbstractSqlManager
 import net.pooleaf.core.modules.sqllib.common.SqlDao
 import net.pooleaf.core.modules.sqllib.common.SqlTable
 import net.pooleaf.gamehistory.sql.dtos.*
+import java.time.LocalDateTime
 import java.util.*
 
 class GameDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
@@ -15,7 +16,7 @@ class GameDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
         "started_at DATETIME",
         "ended_at DATETIME",
         "cancel_yn VARCHAR(1)"
-        )
+    )
 
     val gameTypeTable = SqlTable(sqlManager, "game_types",
         "game_type_id INT PRIMARY KEY",
@@ -26,6 +27,7 @@ class GameDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
         "game_id VARCHAR(36)",
         "team_id INT",
         "player_uuid VARCHAR(36)",
+        "defeat_yn VARCHAR(1)",
         "PRIMARY KEY(game_id, player_uuid)"
     )
 
@@ -80,6 +82,45 @@ class GameDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
             .execute(GameDto::class.java)
     }
 
+    fun selectRecentGameIdByPlayerUuid(playerUuid: String, count: Int = 1): List<String> {
+        return sqlManager.getResult("""
+            SELECT game.game_id
+            FROM ${gameTable.name} game, ${gameParticipantTable.name} part
+            WHERE game.game_id = part.game_id
+            AND part.player_uuid = ?
+            ORDER BY game.started_at DESC
+            LIMIT ${count}
+        """.trimIndent(), playerUuid).rows.map { it.getString("game_id") }
+    }
+
+    /**
+     * 서버가 강제 종료되어 종료 처리되지 않은 게임을 종료 처리합니다.
+     */
+    fun updateNotEndedGame(channelName: String) {
+        gameTable.update()
+            .set("cancel_yn = 'Y'")
+            .where("channel_name = ? AND ended_at IS NULL")
+            .parameters(channelName)
+            .execute()
+    }
+
+    /**
+     * 게임에 참여 중이고 탈락하지 않은 게임 ID를 반환합니다.
+     */
+    fun selectPlayingGameIdByPlayerUuid(playerUuid: String): String? {
+        return sqlManager.getResult("""
+            SELECT game.game_id
+            FROM ${gameTable.name} game, ${gameParticipantTable.name} part
+            WHERE game.game_id = part.game_id
+            AND game.ended_at IS NULL
+            AND game.cancel_yn != 'Y'
+            AND part.player_uuid = ?
+            AND part.defeat_yn != 'Y'
+            ORDER BY game.started_at DESC
+            LIMIT 1
+        """.trimIndent(), playerUuid).rows.map { it.getString("game_id") }.firstOrNull()
+    }
+
     /**
      * GameType
      */
@@ -104,6 +145,14 @@ class GameDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
         val context = gameParticipantTable.insertInto()
         gameParticipantDtos.forEach { context.valuesByObject(it) }
         context.execute()
+    }
+
+    fun updateGameParticipantDefeat(gameParticipantDto: GameParticipantDto) {
+        gameParticipantTable.update()
+            .set("defeat_yn = ?")
+            .where("player_uuid = ?")
+            .parameters(gameParticipantDto.defeatYn, gameParticipantDto.playerUuid)
+            .execute()
     }
 
     fun selectGameParticipantsByGameId(gameId: String, count: Int, offset: Int = 0): List<GameParticipantDto> {

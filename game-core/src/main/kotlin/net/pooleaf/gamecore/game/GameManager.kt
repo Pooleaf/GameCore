@@ -1,14 +1,17 @@
 package net.pooleaf.gamecore.game
 
 import com.cryptomorin.xseries.XSound
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.channel.ChannelModule
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitNewAsyncScope
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.gui.GuiModule
 import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
+import net.pooleaf.core.modules.support.common.util.StringUtil
 import net.pooleaf.core.modules.support.common.util.toMillis
 import net.pooleaf.gamecore.GameBroadcaster
 import net.pooleaf.gamecore.GameCore
@@ -21,11 +24,14 @@ import org.bukkit.command.CommandSender
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
+import kotlin.math.max
 
 class GameManager {
 
     lateinit var game: Game
         internal set
+
+    private var maxTimeStopJob: Job? = null
 
 
     /**
@@ -136,6 +142,9 @@ class GameManager {
             GameCore.unsafe.supplyManager.stopSupplyParticleTimer()
         }
 
+        // 게임 최대 시간 타이머 중단
+        stopMaxTimeStopTimer()
+
         // 이벤트
         Bukkit.getPluginManager().callEvent(GameResetEvent())
 
@@ -194,6 +203,9 @@ class GameManager {
 
             // Phase 시작
             game.phasePipeline.runPhases()
+
+            // 게임 최대 시간 타이머 시작
+            startMaxTimeStopTimer()
 
             // 이벤트
             Bukkit.getPluginManager().callEvent(GameStartEvent(starterSender))
@@ -415,6 +427,36 @@ class GameManager {
                 }
             }
         }.join()
+    }
+
+    private fun startMaxTimeStopTimer() {
+        maxTimeStopJob = BukkitNewAsyncScope.launch {
+            var seconds = GameCore.gameConfig.gameMaxSeconds
+
+            while (seconds > 0) {
+                when (seconds) {
+                    60 * 5,
+                    60 * 3,
+                    60,
+                    in 1..10 -> {
+                        val remainingTime = StringUtil.buildTimeStringFromSeconds(seconds.toLong())
+                        BukkitBroadcaster.broadcast("§c${remainingTime} 후 게임이 종료됩니다.")
+                        delay(1000L)
+                    }
+                }
+
+                delay(1000L)
+                seconds--
+            }
+
+            cancelGame(null, "게임 최대 시간을 초과했습니다.")
+            BukkitBroadcaster.broadcast("게임 최대 시간을 초과하여 게임이 중단되었습니다.")
+        }
+    }
+
+    private fun stopMaxTimeStopTimer() {
+        maxTimeStopJob?.cancel()
+        maxTimeStopJob = null
     }
 
 }

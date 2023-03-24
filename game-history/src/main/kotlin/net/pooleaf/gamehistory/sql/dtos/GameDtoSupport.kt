@@ -19,6 +19,7 @@ fun Game.toDto(): GameDto {
 fun GamePlayer.toDto(): GameParticipantDto {
     var gameId = GameCore.game.gameId?.toString() ?: error("gameId cannot be null")
     var teamId = this.team?.id ?: error("teamId cannot be null")
+    val defeatYn = if (isDefeated) "Y" else "N"
 
-    return GameParticipantDto(gameId, teamId, this.uuid.toString())
+    return GameParticipantDto(gameId, teamId, this.uuid.toString(), defeatYn)
 }
