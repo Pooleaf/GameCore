@@ -18,7 +18,7 @@ class ReplayQuickBar(
 
     init {
         // 클릭 속도
-        clickDelayMillis = 1000L
+        clickDelayMillis = 500L
 
 
         // 텔레포터 슬롯
@@ -38,8 +38,7 @@ class ReplayQuickBar(
 
         // 재생 속도 느리게 슬롯
         // https://minecraft-heads.com/custom-heads/miscellaneous/32816-chapter-back-active
-        // TODO
-        val slowSlot = object : Slot() {
+/*        val slowSlot = object : Slot() {
             override fun updateItem(): ItemStack {
                 // https://minecraft-heads.com/custom-heads/alphabet/17841-backward
                 return ItemBuilder(HeadDatabaseAPI().getItemHead("17841"))
@@ -69,7 +68,7 @@ class ReplayQuickBar(
 
                 XSound.UI_BUTTON_CLICK.play(player, 0.3F, 0.7F)
             }
-        }
+        }*/
 
         // 뒤로가기 슬롯
         val goBackSlot = object : Slot() {
@@ -92,7 +91,7 @@ class ReplayQuickBar(
                 }
 
                 val replaySkipSeconds = GameReplayApi.replayConfig.replaySkipSeconds
-                var newTick = replayPlayer.currentTick - (replaySkipSeconds * 20 * 10)
+                var newTick = replayPlayer.currentTick - (replaySkipSeconds * 20)
                 if (newTick < 0) {
                     newTick = 0.0F
                 }
@@ -137,8 +136,7 @@ class ReplayQuickBar(
                     XSound.UI_BUTTON_CLICK.play(player, 0.3F, 0.7F)
                 }
 
-                updateAsynchronously()
-                player.updateInventory()
+                this@ReplayQuickBar.updateAsynchronously()
             }
         }
 
@@ -163,7 +161,7 @@ class ReplayQuickBar(
                 }
 
                 val replaySkipSeconds = GameReplayApi.replayConfig.replaySkipSeconds
-                var newTick = replayPlayer.currentTick + (replaySkipSeconds * 20 * 10)
+                var newTick = replayPlayer.currentTick + (replaySkipSeconds * 20)
                 if (newTick > replayPlayer.replay.endTick) {
                     newTick = replayPlayer.replay.endTick.toFloat()
                 }
@@ -180,7 +178,7 @@ class ReplayQuickBar(
 
         // 재생 속도 빠르게 슬롯
         // https://minecraft-heads.com/custom-heads/miscellaneous/32818-next-chapter-active
-        // TODO
+        // 추가 안함
 
         // 로비로 이동하기 슬롯
         val lobbySlot = object : Slot() {
@@ -208,7 +206,6 @@ class ReplayQuickBar(
         setSlot(6, skipSlot)
 
         setSlot(9, lobbySlot)
-
 
         updateAsynchronously()
     }

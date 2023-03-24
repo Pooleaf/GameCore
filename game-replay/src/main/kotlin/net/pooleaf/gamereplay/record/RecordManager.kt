@@ -1,6 +1,7 @@
 package net.pooleaf.gamereplay.record
 
 import net.pooleaf.core.modules.support.common.logger.Logger
+import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamereplay.GameReplayApi
 import net.pooleaf.gamereplay.GameReplayPlugin
 import net.pooleaf.gamereplay.data.datas.player.PlayerMoveData
@@ -111,6 +112,7 @@ class RecordManager {
      */
     fun isRecordingTargetPlayer(player: Player): Boolean {
         return record?.let { it.recordTargetPlayers.contains(player.uniqueId) } == true
+                && GameCore.unsafe.playerManager.get(player.uniqueId).isPlaying()
     }
 
 }

@@ -8,8 +8,10 @@ import net.citizensnpcs.trait.SkinTrait
 import net.pooleaf.core.modules.commonsender.CommonSenderModule
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.gui.GuiModule
-import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
+import net.pooleaf.core.modules.gui.bukkit.actionbar.showActionBarForever
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
+import net.pooleaf.core.modules.support.common.CommonChatColor
+import net.pooleaf.core.modules.support.common.util.StringUtil
 import net.pooleaf.gamereplay.GameReplayApi
 import net.pooleaf.gamereplay.GameReplayPlugin
 import net.pooleaf.gamereplay.data.datas.block.*
@@ -33,6 +35,8 @@ import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
 import java.util.*
@@ -252,8 +256,24 @@ class ReplayPlayer(
             }
         }
 
-        // 플레이어 텔레포트
+        // 뷰어 설정
+        viewer.inventory.helmet = null
+        viewer.inventory.chestplate = null
+        viewer.inventory.leggings = null
+        viewer.inventory.boots = null
+        viewer.inventory.clear()
+        viewer.level = 0
+        viewer.exp = 0.0F
+        viewer.gameMode = GameMode.ADVENTURE
+        viewer.addPotionEffect(PotionEffect(PotionEffectType.INVISIBILITY, 100000, 0, true))
+        viewer.allowFlight = true
+        viewer.isFlying = true
+
+        // 뷰어 텔레포트
         TeleportUtil.teleport(viewer, replay.startLocation)
+
+        // 퀵바
+        ReplayQuickBar(this).setTo(viewer)
 
         // 이벤트
         Bukkit.getPluginManager().callEvent(ReplayInitEvent(this))
@@ -267,8 +287,8 @@ class ReplayPlayer(
 
         replayTask = object : BukkitRunnable() {
             override fun run() {
-                if (currentTick.toInt() % 20 == 0) { // TODO remove
-                    BukkitBroadcaster.broadcast("§b리플레이: §f${(currentTick.toFloat() / 20).toLong()}§b초")
+                if (currentTick.toInt() % 20 == 0) {
+                    showProgress()
                 }
 
                 val toTick = currentTick.toLong()
@@ -290,9 +310,6 @@ class ReplayPlayer(
             }
         }.runTaskTimer(GameReplayPlugin.instance, 0L, 1L)
 
-        // 퀵바
-        ReplayQuickBar(this).setTo(viewer)
-
         // 이벤트
         Bukkit.getPluginManager().callEvent(ReplayPlayStartEvent(this))
     }
@@ -305,6 +322,9 @@ class ReplayPlayer(
 
         replayTask?.cancel()
         replayTask = null
+
+        // 진행현황
+        showProgress()
     }
 
 //    /**
@@ -362,6 +382,9 @@ class ReplayPlayer(
             // 경계선
             virtualWorldBorder.timeMachine(tick, viewer)
 
+            // 진행현황
+            showProgress()
+
             // 이벤트
             Bukkit.getPluginManager().callEvent(ReplayJumpToEvent(this@ReplayPlayer, beforeTick, tick))
         }
@@ -388,11 +411,30 @@ class ReplayPlayer(
         // 퀵바 제거
         GuiModule.getQuickBarManager().removeTo(viewer)
 
-        // 뷰어 텔레포트
-        GameReplayApi.spawnConfig.spawnLocation?.let { spawnLocation -> TeleportUtil.teleport(viewer, spawnLocation) }
+        // 뷰어 설정
+        viewer.activePotionEffects.forEach { viewer.removePotionEffect(it.type) }
+        viewer.allowFlight = false
+        viewer.isFlying = false
 
         // 이벤트
         Bukkit.getPluginManager().callEvent(ReplayExitEvent(this))
+    }
+
+    private fun showProgress() {
+        // 액션바
+        val state = if (isRunning()) "재생 중" else "일시 정지"
+
+        val currentSeconds = (currentTick.toFloat() / 20).toLong()
+        val currentTime = StringUtil.buildTimeStringFromSeconds(currentSeconds, CommonChatColor.WHITE, CommonChatColor.AQUA)
+
+        val endSeconds = (replay.endTick.toFloat() / 20).toLong()
+        val endTime = StringUtil.buildTimeStringFromSeconds(endSeconds, CommonChatColor.WHITE, CommonChatColor.AQUA)
+
+        viewer.showActionBarForever("§b[${state}]  §f${currentTime} §b/ §f${endTime}")
+
+        // 경험치바
+        val percent = currentTick.toFloat() / replay.endTick
+        viewer.exp = percent * 0.999F
     }
 
 }

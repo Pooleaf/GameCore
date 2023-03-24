@@ -1,0 +1,8 @@
+~~ 오류 ~~
+
+가끔씩 NPC 스폰 안보임
+모든 EntityMetaData 저장 시 EntityMetaDataReplayHandler 오류남
+
+~~ 수정 ~~
+
+관전 텔레포터 만들어야함

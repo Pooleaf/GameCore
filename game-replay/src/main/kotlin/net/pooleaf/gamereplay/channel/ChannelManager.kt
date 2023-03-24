@@ -31,7 +31,7 @@ class ChannelManager {
         val channel = getReplayChannelGroup()?.fastJoin(player.uniqueId)
 
         if (channel != null && gameId != null) {
-            channel.sendData(ReplayChannelTask.PLAY_REPLAY.name, gameId.toString(), tick)
+            channel.sendData(ReplayChannelTask.PLAY_REPLAY.name, player.uniqueId.toString(), gameId.toString(), tick)
         }
 
         return channel

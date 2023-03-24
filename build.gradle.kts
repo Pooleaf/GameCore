@@ -17,8 +17,8 @@ allprojects {
     }
 
     dependencies {
-        compileOnly("io.papermc:paper:1.8.8")
-        compileOnly("net.pooleaf:core:1.49.1")
+        compileOnly("io.papermc:paper-api:1.8.8")
+        compileOnly("net.pooleaf:core:1.50.0")
 
         compileOnly("com.grinderwolf:slimeworldmanager-api:2.2.1")
 

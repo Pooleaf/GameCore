@@ -67,16 +67,20 @@ class ReplayDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
     }
 
     /**
-     * 리플레이 목록을 반환합니다.
+     * 최근순으로 리플레이 목록을 반환합니다.
      * 파일을 다운로드하지 않습니다.
      */
-    fun selectReplayList(gameId: List<UUID>, count: Int, offset: Int = 0): List<ReplayDto> {
-        val placeholders = gameId.joinToString("?", "(", ")")
+    fun selectReplayList(gameId: List<UUID>?, count: Int, offset: Int = 0): List<ReplayDto> {
+        val context = replayTable.select()
 
-        val result = replayTable.select()
-            .where("game_id IN ${placeholders}")
-            .parameters(gameId)
-            .limit(offset, count)
+        if (gameId != null) {
+            val placeholders = gameId.joinToString("?", "(", ")")
+            context.where("game_id IN ${placeholders}")
+                .parameters(gameId)
+        }
+
+        val result = context.limit(offset, count)
+            .orderBy("created_at", false)
             .execute()
 
         return result.rows.map {
@@ -85,10 +89,16 @@ class ReplayDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
             ReplayDto(
                 UUID.fromString(gameId),
                 it.getLocalDateTime("created_at"),
-                it.getLong("end_tick"),
+                it.getInt("end_tick").toLong(),
             )
         }
     }
 
+    /**
+     * 리플레이 개수를 반환합니다.
+     */
+    fun selectReplayCount(): Long {
+        return replayTable.count()
+    }
 
 }

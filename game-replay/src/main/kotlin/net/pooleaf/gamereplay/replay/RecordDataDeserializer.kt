@@ -1,8 +1,8 @@
 package net.pooleaf.gamereplay.replay
 
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
+import net.pooleaf.core.lib.com.google.gson.JsonDeserializationContext
+import net.pooleaf.core.lib.com.google.gson.JsonDeserializer
+import net.pooleaf.core.lib.com.google.gson.JsonElement
 import net.pooleaf.core.modules.support.common.util.GsonUtil
 import net.pooleaf.gamereplay.GameReplayApi
 import net.pooleaf.gamereplay.data.RecordData

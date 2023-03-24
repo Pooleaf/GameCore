@@ -33,6 +33,7 @@ class GameReplayPlugin : BukkitCorePlugin() {
         GameReplayApi.unsafe.sqlManager.connect()
         loadConfig()
 
+        registerCommonEventListeners()
         registerEventListeners()
         registerCommands()
 
