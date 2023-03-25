@@ -13,8 +13,16 @@ class EntityMetaDataDataReplayHandler : RecordDataReplayHandler<EntityMetaDataDa
     override fun onPlay(recordData: EntityMetaDataData, viewer: Player) {
         val watchableObjects = recordData.dataWatchables.map {
             var value = it.value
-            if (value is Double) {
-                value = value.toFloat()
+
+            // 값 타입 변환
+            value = if (it.index == 1) {
+                (value as Number).toShort()
+            } else if (value is Double) {
+                value.toFloat()
+            } else if (value is Number) {
+                value.toByte()
+            } else {
+                value
             }
 
             WrappedWatchableObject(it.index, value)

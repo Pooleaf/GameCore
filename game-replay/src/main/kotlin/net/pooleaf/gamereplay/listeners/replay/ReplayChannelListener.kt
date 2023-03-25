@@ -1,5 +1,6 @@
-package net.pooleaf.gamereplay.listeners
+package net.pooleaf.gamereplay.listeners.replay
 
+import com.cryptomorin.xseries.XSound
 import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.channel.ChannelModule
 import net.pooleaf.core.modules.channel.common.events.ChannelMessageEvent
@@ -7,6 +8,7 @@ import net.pooleaf.core.modules.commonevent.common.CommonEventHandler
 import net.pooleaf.core.modules.commonevent.common.CommonEventListener
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.support.bukkit.messager.sendWarning
+import net.pooleaf.core.modules.support.bukkit.sound.playSound
 import net.pooleaf.core.modules.support.common.manager.AbstractEhcacheManager
 import net.pooleaf.gamereplay.GameReplayApi
 import net.pooleaf.gamereplay.GameReplayPlugin
@@ -18,7 +20,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import java.util.*
 
-class ChannelListener : CommonEventListener, Listener {
+class ReplayChannelListener : CommonEventListener, Listener {
 
     companion object {
         val replayReserveManager = ReplayReserveManager()
@@ -84,6 +86,7 @@ class ChannelListener : CommonEventListener, Listener {
             }
 
             player.sendWarning("오류가 발생하여 리플레이를 재생할 수 없습니다.")
+            player.playSound(XSound.BLOCK_NOTE_BLOCK_BASS)
 
             exception.printStackTrace()
         }

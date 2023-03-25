@@ -27,7 +27,12 @@ class EntityMetaDataDataRecordListener : PacketAdapter(GameReplayPlugin.instance
 
         val recordData = EntityMetaDataData().apply {
             this.entityId = entityId
-            this.dataWatchables = entityMetaData.map { DataWatchable(it.index, it.value) }
+            this.dataWatchables = entityMetaData.filter {
+                when (it.index) {
+                    in 11..16 -> false
+                    else -> true
+                }
+            }.map { DataWatchable(it.index, it.value) }
         }
         GameReplayApi.unsafe.recordManager.record!!.addRecordData(recordData)
     }

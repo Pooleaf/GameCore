@@ -1,9 +1,8 @@
-package net.pooleaf.gamereplay.listeners
+package net.pooleaf.gamereplay.listeners.replay
 
 import com.comphenix.protocol.PacketType
 import com.comphenix.protocol.events.PacketAdapter
 import com.comphenix.protocol.events.PacketEvent
-import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamereplay.GameReplayApi
 import net.pooleaf.gamereplay.GameReplayPlugin
 import org.bukkit.Bukkit
@@ -11,7 +10,7 @@ import org.bukkit.Bukkit
 /**
  * 플레이어 청크 로딩 시 가상 블럭을 보내줍니다.
  */
-class VirtualChunkLoadListener : PacketAdapter(GameReplayPlugin.instance, PacketType.Play.Server.MAP_CHUNK, PacketType.Play.Server.MAP_CHUNK_BULK) {
+class ReplayVirtualChunkLoadListener : PacketAdapter(GameReplayPlugin.instance, PacketType.Play.Server.MAP_CHUNK, PacketType.Play.Server.MAP_CHUNK_BULK) {
 
     override fun onPacketSending(event: PacketEvent) {
         val player = event.player

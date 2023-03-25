@@ -37,11 +37,12 @@ class RecordManager {
         worldName: String,
         x: Double,
         y: Double,
-        z: Double
+        z: Double,
+        worldBorderSize: Int
     ) {
         if (isRecording()) error("Recording already started")
 
-        record = Record(gameUuid, recordTargetPlayers, worldName, x, y, z)
+        record = Record(gameUuid, recordTargetPlayers, worldName, x, y, z, worldBorderSize)
         record?.let { record ->
             record.isRecording = true
             record.replay.createdAt = LocalDateTime.now()

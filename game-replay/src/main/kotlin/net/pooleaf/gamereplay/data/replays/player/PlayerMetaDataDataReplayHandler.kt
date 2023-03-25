@@ -15,15 +15,17 @@ class PlayerMetaDataDataReplayHandler : RecordDataReplayHandler<PlayerMetaDataDa
 
         val citizensNpc = replayPlayer.virtualPlayerManager.get(recordData.playerUuid)?.citizensNpc ?: return
 
+        var value = recordData.value.toByte()
+
         // 불 처리
-        when (recordData.value % 2) {
+        when (value % 2) {
             0 -> citizensNpc.entity.fireTicks = 0
             1 -> citizensNpc.entity.fireTicks = 9999999
         }
 
         val entityPlayer = BukkitReflectionUtil.getHandle(citizensNpc.entity) as EntityPlayer
         val dataWatcher = entityPlayer.dataWatcher
-        dataWatcher.watch(recordData.index, recordData.value)
+        dataWatcher.watch(recordData.index, value)
 
         val packet = PacketPlayOutEntityMetadata(citizensNpc.entity.entityId, dataWatcher, false)
         BukkitReflectionUtil.sendPacket(replayPlayer.viewer, packet)

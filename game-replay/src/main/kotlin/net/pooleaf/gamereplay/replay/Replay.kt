@@ -12,7 +12,8 @@ data class Replay(
     val worldName: String,
     val x: Double,
     val y: Double,
-    val z: Double
+    val z: Double,
+    val worldBorderSize: Int
 ) {
 
     var createdAt: LocalDateTime? = null

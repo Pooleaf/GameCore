@@ -10,10 +10,8 @@ class PlayerShowDataReplayHandler : RecordDataReplayHandler<PlayerShowData> {
     override fun onPlay(recordData: PlayerShowData, viewer: Player) {
         // NPC 보이기
         val replayPlayer = GameReplayApi.unsafe.replayPlayerManager.get(viewer.uniqueId)
-        val citizensNpc = replayPlayer.virtualPlayerManager.get(recordData.playerUuid).citizensNpc
-//        viewer.showPlayer(citizensNpc.entity as Player?)
-//        citizensNpc.despawn()
-        citizensNpc.spawn(citizensNpc.storedLocation)
+        val virtualPlayer = replayPlayer.virtualPlayerManager.get(recordData.playerUuid)
+        virtualPlayer.spawnNpc(viewer)
     }
 
 }

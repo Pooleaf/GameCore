@@ -33,7 +33,7 @@ class ReplayCommand {
     @Command(
         parent = ["리플레이"],
         name = ["재생", "play"],
-        arguments = "<게임ID> (초)",
+        arguments = "<게임ID> (Tick)",
         description = "해당 리플레이를 재생합니다."
     )
     fun replay_play(player: CommonPlayer<Player>, result: CommandResult) {
@@ -54,11 +54,11 @@ class ReplayCommand {
         }
 
         // 시점
-        val seconds = result.getArgumentAsLong(1) ?: 0
-        val tick = (seconds.toFloat() / 20).toLong()
+        val tick = result.getArgumentAsLong(1) ?: 0
 
         // 리플레이 재생 채널이 아닐경우 리플레이 서버로 전송
         if (!GameReplayApi.replayConfig.isReplayPlayServer) {
+            player.sendMessage("§e리플레이 채널로 이동합니다.")
             val sentChannel = GameReplayApi.unsafe.channelManager.sendToReplayChannel(player.platformSender, replay.gameId, tick)
             if (sentChannel == null) {
                 player.sendWarning("리플레이 채널로 이동할 수 없습니다.")
@@ -145,7 +145,7 @@ class ReplayCommand {
     @Command(
         parent = ["리플레이"],
         name = ["이동", "goTo", "jumpTo"],
-        arguments = "<초>",
+        arguments = "<Tick>",
         description = "해당 시점으로 이동합니다."
     )
     fun replay_goTo(player: CommonPlayer<Player>, result: CommandResult) {
@@ -155,24 +155,38 @@ class ReplayCommand {
             return
         }
 
-        val seconds = result.getArgumentAsLong(0) ?: 0
-        val tick = seconds * 20L
+        val tick = result.getArgumentAsLong(0) ?: 0
 
         if (tick < 0) {
-            player.sendWarning("0초보다 작을 수 없습니다.")
+            player.sendWarning("0 Tick 보다 작을 수 없습니다.")
             return
         }
 
         if (tick > replayPlayer.replay.endTick) {
-            val endSeconds = (replayPlayer.replay.endTick.toFloat() / 20).toInt()
-            player.sendWarning("${endSeconds}§e초 보다 클 수 없습니다.")
+            player.sendWarning("${replayPlayer.replay.endTick} Tick 보다 클 수 없습니다.")
             return
         }
 
         replayPlayer.jumpTo(tick)
 
-        val timeString = StringUtil.buildTimeStringFromSeconds(seconds, CommonChatColor.WHITE, CommonChatColor.YELLOW)
-        player.sendMessage("${timeString}§e로 이동합니다.")
+        player.sendMessage("${tick}§e Tick으로 이동합니다.")
+    }
+
+    @Command(
+        parent = ["리플레이"],
+        name = ["공유", "share"],
+        description = "현재 보고있는 리플레이와 시점을 공유합니다.",
+        color = CommonChatColor.AQUA,
+        permission = GameReplayPermission.ADMIN
+    )
+    fun replay_share(player: CommonPlayer<Player>, result: CommandResult) {
+        val replayPlayer = GameReplayApi.unsafe.replayPlayerManager.get(player.uuid)
+        if (replayPlayer == null) {
+            player.sendWarning("리플레이 재생 중이 아닙니다.")
+            return
+        }
+
+        GameReplayApi.shareReplay(player.platformSender, replayPlayer.replay, replayPlayer.currentTick.toLong())
     }
 
     @Command(

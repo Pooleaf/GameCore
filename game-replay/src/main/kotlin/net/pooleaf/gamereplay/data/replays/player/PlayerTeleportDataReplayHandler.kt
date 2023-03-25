@@ -6,16 +6,15 @@ import net.pooleaf.gamereplay.replay.RecordDataReplayHandler
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerTeleportEvent
 
 class PlayerTeleportDataReplayHandler : RecordDataReplayHandler<PlayerTeleportData> {
 
     override fun onPlay(recordData: PlayerTeleportData, viewer: Player) {
         val replayPlayer = GameReplayApi.unsafe.replayPlayerManager.get(viewer.uniqueId)
-        val citizensNpc = replayPlayer.virtualPlayerManager.get(recordData.playerUuid)?.citizensNpc ?: return
+        val virtualPlayer = replayPlayer.virtualPlayerManager.get(recordData.playerUuid)
 
         val location = Location(Bukkit.getWorld(recordData.worldName), recordData.x, recordData.y, recordData.z, recordData.yaw, recordData.pitch)
-        citizensNpc.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN)
+        virtualPlayer.teleport(viewer, location)
     }
 
 }

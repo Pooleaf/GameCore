@@ -1,14 +1,17 @@
 package net.pooleaf.gamereplay.replay
 
+import com.cryptomorin.xseries.XSound
 import kotlinx.coroutines.launch
 import net.citizensnpcs.api.trait.trait.Owner
-import net.citizensnpcs.trait.GameModeTrait
 import net.citizensnpcs.trait.Gravity
 import net.citizensnpcs.trait.SkinTrait
 import net.pooleaf.core.modules.commonsender.CommonSenderModule
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.gui.GuiModule
+import net.pooleaf.core.modules.gui.bukkit.actionbar.removeActionBar
 import net.pooleaf.core.modules.gui.bukkit.actionbar.showActionBarForever
+import net.pooleaf.core.modules.support.bukkit.messager.sendWarning
+import net.pooleaf.core.modules.support.bukkit.sound.playSound
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
 import net.pooleaf.core.modules.support.common.CommonChatColor
 import net.pooleaf.core.modules.support.common.util.StringUtil
@@ -81,6 +84,8 @@ class ReplayPlayer(
 
     // 가상 경계선
     val virtualWorldBorder: VirtualWorldBorder = VirtualWorldBorder()
+
+    internal val quickBar: ReplayQuickBar = ReplayQuickBar(this)
 
 
     fun isRunning(): Boolean {
@@ -198,16 +203,12 @@ class ReplayPlayer(
             citizensNpc.isProtected = true
             citizensNpc.getOrAddTrait(Owner::class.java).setOwner(viewer)
             citizensNpc.getOrAddTrait(Gravity::class.java).toggle()
-            citizensNpc.getOrAddTrait(GameModeTrait::class.java).gameMode = GameMode.CREATIVE
             citizensNpc.getOrAddTrait(SkinTrait::class.java).setSkinName(commonPlayer?.name, true)
-            citizensNpc.spawn(viewer.location)
-
-            // NPC 가리기
-            Bukkit.getOnlinePlayers().filter { it.uniqueId != viewer.uniqueId }
-                .forEach { it.hidePlayer(citizensNpc.entity as Player?) }
 
             val virtualPlayer = VirtualPlayer(uuid, citizensNpc)
             virtualPlayerManager.set(uuid, virtualPlayer)
+
+            virtualPlayer.spawnNpc(viewer, viewer.location)
         }
 
         // 가상 플레이어 캐싱
@@ -269,11 +270,18 @@ class ReplayPlayer(
         viewer.allowFlight = true
         viewer.isFlying = true
 
+        // 가리기
+        Bukkit.getOnlinePlayers().forEach {
+            it.hidePlayer(viewer)
+            viewer.hidePlayer(it)
+        }
+
         // 뷰어 텔레포트
         TeleportUtil.teleport(viewer, replay.startLocation)
 
         // 퀵바
-        ReplayQuickBar(this).setTo(viewer)
+        quickBar.setTo(viewer)
+        quickBar.replayTeleporterGui.updateAsynchronously()
 
         // 이벤트
         Bukkit.getPluginManager().callEvent(ReplayInitEvent(this))
@@ -293,13 +301,20 @@ class ReplayPlayer(
 
                 val toTick = currentTick.toLong()
                 for (tick in (lastPlayedTick + 1)..toTick) {
-                    val tickRecordDatas = replay.recordDatas.get(tick)
-                    tickRecordDatas?.forEach { recordData ->
-                        val recordDataReplayHandler = GameReplayApi.unsafe.recordDataManager.get(recordData.javaClass)
-                        recordDataReplayHandler?.onPlay(recordData, viewer)
-                    }
+                    try {
+                        val tickRecordDatas = replay.recordDatas.get(tick)
+                        tickRecordDatas?.forEach { recordData ->
+                            val recordDataReplayHandler = GameReplayApi.unsafe.recordDataManager.get(recordData.javaClass)
+                            recordDataReplayHandler?.onPlay(recordData, viewer)
+                        }
 
-                    lastPlayedTick = tick
+                        lastPlayedTick = tick
+                    } catch (exception: Exception) {
+                        viewer.sendWarning("오류가 발생하여 리플레이를 재생할 수 없습니다.")
+                        viewer.playSound(XSound.BLOCK_NOTE_BLOCK_BASS)
+
+                        pause()
+                    }
                 }
 
                 currentTick += playSpeed
@@ -309,6 +324,9 @@ class ReplayPlayer(
                 }
             }
         }.runTaskTimer(GameReplayPlugin.instance, 0L, 1L)
+
+        // 퀵바
+        quickBar.updateAsynchronously()
 
         // 이벤트
         Bukkit.getPluginManager().callEvent(ReplayPlayStartEvent(this))
@@ -322,6 +340,9 @@ class ReplayPlayer(
 
         replayTask?.cancel()
         replayTask = null
+
+        // 퀵바
+        quickBar.updateAsynchronously()
 
         // 진행현황
         showProgress()
@@ -382,6 +403,9 @@ class ReplayPlayer(
             // 경계선
             virtualWorldBorder.timeMachine(tick, viewer)
 
+            // 텔레포터 GUI
+            quickBar.replayTeleporterGui.updateAsynchronously()
+
             // 진행현황
             showProgress()
 
@@ -411,6 +435,9 @@ class ReplayPlayer(
         // 퀵바 제거
         GuiModule.getQuickBarManager().removeTo(viewer)
 
+        // 액션바 제거
+        viewer.removeActionBar()
+
         // 뷰어 설정
         viewer.activePotionEffects.forEach { viewer.removePotionEffect(it.type) }
         viewer.allowFlight = false
@@ -422,6 +449,7 @@ class ReplayPlayer(
 
     private fun showProgress() {
         // 액션바
+        val color = if (isRunning()) "§a" else "§7"
         val state = if (isRunning()) "재생 중" else "일시 정지"
 
         val currentSeconds = (currentTick.toFloat() / 20).toLong()
@@ -430,7 +458,7 @@ class ReplayPlayer(
         val endSeconds = (replay.endTick.toFloat() / 20).toLong()
         val endTime = StringUtil.buildTimeStringFromSeconds(endSeconds, CommonChatColor.WHITE, CommonChatColor.AQUA)
 
-        viewer.showActionBarForever("§b[${state}]  §f${currentTime} §b/ §f${endTime}")
+        viewer.showActionBarForever("${color}[${state}]  §f${currentTime} ${color}/ §f${endTime}")
 
         // 경험치바
         val percent = currentTick.toFloat() / replay.endTick

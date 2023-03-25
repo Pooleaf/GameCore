@@ -1,14 +1,15 @@
 package net.pooleaf.gamereplay
 
+import com.cryptomorin.xseries.XSound
+import net.md_5.bungee.api.chat.ClickEvent
+import net.pooleaf.core.modules.support.common.component.SimpleComponentBuilder
 import net.pooleaf.gamereplay.channel.ChannelManager
 import net.pooleaf.gamereplay.configs.ReplayConfig
 import net.pooleaf.gamereplay.configs.SpawnConfig
 import net.pooleaf.gamereplay.record.RecordManager
-import net.pooleaf.gamereplay.replay.RecordDataManager
-import net.pooleaf.gamereplay.replay.ReplayManager
-import net.pooleaf.gamereplay.replay.ReplayPlayerManager
-import net.pooleaf.gamereplay.replay.ReplayService
+import net.pooleaf.gamereplay.replay.*
 import net.pooleaf.gamereplay.sql.GameReplaySqlManager
+import org.bukkit.entity.Player
 import java.io.File
 
 object GameReplayApi {
@@ -82,6 +83,24 @@ object GameReplayApi {
 
     fun loadConfig() {
         unsafe.loadConfig()
+    }
+
+    /**
+     * 리플레이 공유 메시지를 보냅니다.
+     */
+    fun shareReplay(player: Player, replay: Replay, tick: Long = 0) {
+        player.sendMessage("")
+        player.sendMessage(SimpleComponentBuilder("§e리플레이를 공유하려면 §6§l[여기]§e를 클릭하고 명령어를 복사하세요.")
+            .clickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/리플레이 재생 ${replay.gameId}")
+            .hoverShowText("클릭 시 명령어를 복사하여 다른사람에게 공유하세요!")
+            .build())
+        if (tick > 0) {
+            player.sendMessage(SimpleComponentBuilder("§e현재 재생시간의 리플레이를 공유하려면 §6§l[여기]§e를 클릭하고 명령어를 복사하세요.")
+                .clickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/리플레이 재생 ${replay.gameId} ${tick}")
+                .hoverShowText("클릭 시 명령어를 복사하여 다른사람에게 공유하세요!")
+                .build())
+        }
+        XSound.UI_BUTTON_CLICK.play(player, 0.3F, 0.7F)
     }
 
 }

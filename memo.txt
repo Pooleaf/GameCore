@@ -1,8 +1,11 @@
 ~~ 오류 ~~
 
-가끔씩 NPC 스폰 안보임
-모든 EntityMetaData 저장 시 EntityMetaDataReplayHandler 오류남
+가끔씩 NPC 스폰 안보임 o
+모든 EntityMetaData 저장 시 EntityMetaDataReplayHandler 오류남 o
 
 ~~ 수정 ~~
 
-관전 텔레포터 만들어야함
+리플레이 텔레포터 만들어야함 o
+리플레이 액션바 색깔 변경 o
+리플레이 공유하기 o
+리플레이 맵 탈출 방지 o

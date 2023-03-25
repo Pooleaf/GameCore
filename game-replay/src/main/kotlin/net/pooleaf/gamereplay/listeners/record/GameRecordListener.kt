@@ -1,4 +1,4 @@
-package net.pooleaf.gamereplay.listeners
+package net.pooleaf.gamereplay.listeners.record
 
 import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
@@ -24,7 +24,7 @@ class GameRecordListener : Listener {
 
             val map = GameCore.currentMap ?: return@runTaskLater
 
-            GameReplayApi.unsafe.recordManager.startRecord(gameId, targetPlayers, map.centerWorldName!!, map.centerX, map.centerY, map.centerZ)
+            GameReplayApi.unsafe.recordManager.startRecord(gameId, targetPlayers, map.centerWorldName!!, map.centerX, map.centerY, map.centerZ, map.worldBorderSize)
         }, 1L)
     }
 

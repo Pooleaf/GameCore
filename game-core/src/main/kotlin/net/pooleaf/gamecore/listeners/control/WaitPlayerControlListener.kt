@@ -4,8 +4,10 @@ import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageBy
 import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageEvent
 import net.pooleaf.gamecore.GameCore
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockDamageEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.player.PlayerBucketEmptyEvent
 import org.bukkit.event.player.PlayerBucketFillEvent
@@ -26,6 +28,13 @@ class WaitPlayerControlListener: Listener {
 
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {
+        if (isWaiting()) {
+            event.isCancelled = true
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    fun onBlockDamage(event: BlockDamageEvent) {
         if (isWaiting()) {
             event.isCancelled = true
         }

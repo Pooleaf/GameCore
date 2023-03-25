@@ -58,6 +58,7 @@ class ReplayService {
 
         // DB에서 리플레이 불러오기
         if (!GameReplayApi.unsafe.replayManager.exists(gameId)) {
+            viewer.sendMessage("${gameId} §e리플레이를 불러오는 중입니다..")
             GameReplayApi.unsafe.replayService.loadReplayFromDatabase(gameId)
         }
 
@@ -65,6 +66,8 @@ class ReplayService {
 
         // 재생
         val replayPlayer = ReplayPlayer(viewer, replay)
+        GameReplayApi.unsafe.replayPlayerManager.set(viewer.uniqueId, replayPlayer)
+
         replayPlayer.init()
         replayPlayer.play()
 
@@ -72,8 +75,6 @@ class ReplayService {
         if (tick > 0) {
             replayPlayer.jumpTo(tick)
         }
-
-        GameReplayApi.unsafe.replayPlayerManager.set(viewer.uniqueId, replayPlayer)
 
         viewer.sendMessage("${replayPlayer.replay.gameId} §e리플레이를 재생합니다.")
 
@@ -143,8 +144,6 @@ class ReplayService {
         val replayDto = selectReplayDtoNoCache(gameId, true)
         val replay = loadReplayFromFile(gameId)
         GameReplayApi.unsafe.replayManager.set(gameId, replay)
-
-        GameReplayApi.unsafe.replayManager.setTimeToIdle(gameId, 5 * 60)
 
         return replay
     }

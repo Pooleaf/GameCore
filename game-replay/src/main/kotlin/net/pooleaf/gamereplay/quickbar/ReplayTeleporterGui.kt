@@ -7,19 +7,21 @@ import net.pooleaf.core.modules.gui.bukkit.inventory.pageable.LargePageableGui
 import net.pooleaf.core.modules.support.bukkit.util.ItemBuilder
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
 import net.pooleaf.gamereplay.GameReplayApi
+import net.pooleaf.gamereplay.replay.ReplayPlayer
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 class ReplayTeleporterGui(
-    val viewer: Player
+    val replayPlayer: ReplayPlayer
 ): LargePageableGui("관전할 플레이어를 선택하세요.") {
 
     override fun onUpdate() {
         clear()
 
-        val replayPlayer = GameReplayApi.unsafe.replayPlayerManager.get(viewer.uniqueId) ?: return
-        replayPlayer.virtualPlayerManager.values().forEach { virtualPlayer ->
+        replayPlayer.virtualPlayerManager.values()
+            .filter { !it.isDefeated && it.citizensNpc.entity != null }
+            .forEach { virtualPlayer ->
             val commonPlayer = CommonSenderModule.getPlayer(virtualPlayer.uuid)
 
             addItem(object : InventoryIcon() {

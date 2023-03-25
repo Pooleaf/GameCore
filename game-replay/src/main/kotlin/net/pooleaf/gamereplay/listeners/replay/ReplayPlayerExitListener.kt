@@ -1,4 +1,4 @@
-package net.pooleaf.gamereplay.listeners
+package net.pooleaf.gamereplay.listeners.replay
 
 import net.pooleaf.gamereplay.GameReplayApi
 import org.bukkit.event.EventHandler

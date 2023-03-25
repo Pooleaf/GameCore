@@ -10,14 +10,15 @@ class Record(
     worldName: String,
     x: Double,
     y: Double,
-    z: Double
+    z: Double,
+    worldBorderSize: Int
 ) {
 
     var isRecording: Boolean = false
 
     var currentTick: Float = 0.0F
 
-    val replay: Replay = Replay(uuid, recordTargetPlayers, worldName, x, y, z)
+    val replay: Replay = Replay(uuid, recordTargetPlayers, worldName, x, y, z, worldBorderSize)
 
 
     /**

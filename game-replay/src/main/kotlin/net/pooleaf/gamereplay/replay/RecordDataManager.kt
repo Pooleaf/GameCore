@@ -24,7 +24,7 @@ import net.pooleaf.gamereplay.data.replays.game.GameWorldBorderChangeDataReplayH
 import net.pooleaf.gamereplay.data.replays.game.TeamDefeatDataReplayHandler
 import net.pooleaf.gamereplay.data.replays.player.*
 import net.pooleaf.gamereplay.listeners.TestPacketListener
-import net.pooleaf.gamereplay.listeners.VirtualChunkLoadListener
+import net.pooleaf.gamereplay.listeners.replay.ReplayVirtualChunkLoadListener
 
 class RecordDataManager : AbstractManager<Class<out RecordData>, RecordDataReplayHandler<out RecordData>>() {
 
@@ -103,7 +103,7 @@ class RecordDataManager : AbstractManager<Class<out RecordData>, RecordDataRepla
         registerRecordData(TpsData::class.java, TpsDataReplayHandler())
 
         // Chunk
-        ProtocolLibrary.getProtocolManager().addPacketListener(VirtualChunkLoadListener())
+        ProtocolLibrary.getProtocolManager().addPacketListener(ReplayVirtualChunkLoadListener())
     }
 
     fun registerRecordData(recordDataClass: Class<out RecordData>, recordDataReplayHandler: RecordDataReplayHandler<out RecordData>) {

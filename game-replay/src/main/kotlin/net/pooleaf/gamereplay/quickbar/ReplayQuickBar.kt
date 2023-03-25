@@ -16,9 +16,12 @@ class ReplayQuickBar(
     val replayPlayer: ReplayPlayer
 ): QuickBar() {
 
+    val replayTeleporterGui = ReplayTeleporterGui(replayPlayer)
+
+
     init {
         // 클릭 속도
-        clickDelayMillis = 500L
+        clickDelayMillis = 200L
 
 
         // 텔레포터 슬롯
@@ -31,8 +34,7 @@ class ReplayQuickBar(
             }
 
             override fun onClick(event: SlotClickEvent) {
-                val player = event.player
-                ReplayTeleporterGui(player).open(player)
+                replayTeleporterGui.open(event.player)
             }
         }
 
@@ -135,8 +137,6 @@ class ReplayQuickBar(
                     replayPlayer.pause()
                     XSound.UI_BUTTON_CLICK.play(player, 0.3F, 0.7F)
                 }
-
-                this@ReplayQuickBar.updateAsynchronously()
             }
         }
 
@@ -180,6 +180,26 @@ class ReplayQuickBar(
         // https://minecraft-heads.com/custom-heads/miscellaneous/32818-next-chapter-active
         // 추가 안함
 
+        // 공유 슬롯
+        // https://minecraft-heads.com/custom-heads/miscellaneous/56518-social-share-icon
+        val shareSlot = object : Slot() {
+            override fun updateItem(): ItemStack {
+                val replaySkipSeconds = GameReplayApi.replayConfig.replaySkipSeconds
+
+                // https://minecraft-heads.com/custom-heads/alphabet/2301-forward
+                return ItemBuilder(HeadDatabaseAPI().getItemHead("56518"))
+                    .displayName("§e§l리플레이 공유하기 §f§l(우클릭)")
+                    .lore("§f우클릭 시 리플레이를 공유합니다.")
+                    .build()
+            }
+
+            override fun onClick(event: SlotClickEvent) {
+                val player = event.player
+
+                GameReplayApi.shareReplay(player, replayPlayer.replay, replayPlayer.currentTick.toLong())
+            }
+        }
+
         // 로비로 이동하기 슬롯
         val lobbySlot = object : Slot() {
             override fun updateItem(): ItemStack {
@@ -205,6 +225,7 @@ class ReplayQuickBar(
         setSlot(5, pausePlaySlot)
         setSlot(6, skipSlot)
 
+        setSlot(8, shareSlot)
         setSlot(9, lobbySlot)
 
         updateAsynchronously()
