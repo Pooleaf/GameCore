@@ -33,7 +33,7 @@ class RecordDataManager : AbstractManager<Class<out RecordData>, RecordDataRepla
 
 
     fun registerRecordListeners() {
-        ProtocolLibrary.getProtocolManager().addPacketListener(TestPacketListener())
+//        ProtocolLibrary.getProtocolManager().addPacketListener(TestPacketListener())
 
         // Block
         ProtocolLibrary.getProtocolManager().addPacketListener(BlockChangeDataRecordListener())

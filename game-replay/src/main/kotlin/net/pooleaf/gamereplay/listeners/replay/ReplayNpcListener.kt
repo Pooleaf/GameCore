@@ -24,7 +24,7 @@ class ReplayNpcListener : Listener {
         // NPC가 안보이는 문제가 있어 리스폰
         val replayPlayer = GameReplayApi.unsafe.replayPlayerManager.get(player.uniqueId) ?: return
         replayPlayer.virtualPlayerManager.values()
-            .filter { it.isSpawned() }
+            .filter { it.isSpawned }
             .forEach {
             it.despawnNpc()
             it.spawnNpc(player)

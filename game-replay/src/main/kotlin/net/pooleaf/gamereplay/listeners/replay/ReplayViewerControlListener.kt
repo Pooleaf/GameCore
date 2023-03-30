@@ -22,6 +22,8 @@ class ReplayViewerControlListener: Listener {
 
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
+        if (!isReplayPlayServer()) return
+
         Bukkit.getOnlinePlayers().forEach {
             it.hidePlayer(event.player)
             event.player.hidePlayer(it)

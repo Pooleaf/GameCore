@@ -4,7 +4,6 @@ import net.pooleaf.core.modules.sqllib.common.AbstractSqlManager
 import net.pooleaf.core.modules.sqllib.common.SqlDao
 import net.pooleaf.core.modules.sqllib.common.SqlTable
 import net.pooleaf.gamehistory.sql.dtos.*
-import java.time.LocalDateTime
 import java.util.*
 
 class GameDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
@@ -28,6 +27,7 @@ class GameDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
         "team_id INT",
         "player_uuid VARCHAR(36)",
         "defeat_yn VARCHAR(1)",
+        "team_defeat_yn VARCHAR(1)",
         "PRIMARY KEY(game_id, player_uuid)"
     )
 
@@ -82,15 +82,49 @@ class GameDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
             .execute(GameDto::class.java)
     }
 
-    fun selectRecentGameIdByPlayerUuid(playerUuid: String, count: Int = 1): List<String> {
+    fun selectGameCountByPlayerUuid(playerUuid: String): Long {
+        return sqlManager.getResult("""
+            SELECT count(*)
+            FROM ${gameTable.name} game, ${gameParticipantTable.name} part
+            WHERE game.game_id = part.game_id
+            AND part.player_uuid = ?
+            ORDER BY game.started_at DESC
+        """.trimIndent(), playerUuid).rows.firstOrNull()?.getLong("count(*)") ?: 0
+    }
+
+    fun selectRecentGameIdByPlayerUuid(playerUuid: String, count: Int = 1, offset: Int = 0): List<String> {
         return sqlManager.getResult("""
             SELECT game.game_id
             FROM ${gameTable.name} game, ${gameParticipantTable.name} part
             WHERE game.game_id = part.game_id
             AND part.player_uuid = ?
             ORDER BY game.started_at DESC
-            LIMIT ${count}
+            LIMIT ${offset}, ${count}
         """.trimIndent(), playerUuid).rows.map { it.getString("game_id") }
+    }
+
+    fun selectRecentPlayerGameInfoByPlayerUuid(playerUuid: String, count: Int = 1, offset: Int = 0): List<GamePlayerGameInfoDto> {
+        return sqlManager.getResult("""
+            SELECT game.game_id
+            , game.game_type_id
+            , game.started_at
+            , game.ended_at
+            , game.cancel_yn
+            , game.channel_name
+            , part.team_id
+            , part.player_uuid
+            , part.defeat_yn
+            , part.team_defeat_yn
+            , (SELECT count(*) FROM game_kills kills WHERE kills.game_id = game.game_id AND kills.killer_player_uuid = part.player_uuid) AS kill_count
+            , (SELECT count(*) FROM game_kills kills WHERE kills.game_id = game.game_id AND kills.dead_player_uuid = part.player_uuid) AS death_count
+            , (SELECT count(*) FROM game_winners winners WHERE winners.game_id = game.game_id AND winners.winner_player_uuid = part.player_uuid) AS win_count
+            , (SELECT game_id FROM game_replays replays WHERE replays.game_id = game.game_id) AS replay_id
+            FROM ${gameTable.name} game, ${gameParticipantTable.name} part
+            WHERE game.game_id = part.game_id
+            AND part.player_uuid = ?
+            ORDER BY game.started_at DESC
+            LIMIT ${offset}, ${count}
+        """.trimIndent(), playerUuid).rows.map { it.toObject(GamePlayerGameInfoDto::class.java) }
     }
 
     /**
@@ -149,9 +183,9 @@ class GameDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
 
     fun updateGameParticipantDefeat(gameParticipantDto: GameParticipantDto) {
         gameParticipantTable.update()
-            .set("defeat_yn = ?")
+            .set("defeat_yn = ? AND team_defeat_yn = ?")
             .where("player_uuid = ?")
-            .parameters(gameParticipantDto.defeatYn, gameParticipantDto.playerUuid)
+            .parameters(gameParticipantDto.defeatYn, gameParticipantDto.teamDefeatYn, gameParticipantDto.playerUuid)
             .execute()
     }
 
@@ -248,7 +282,7 @@ class GameDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
     }
 
     fun addGamePlayerStatsKillCount(playerUuid: UUID, gameTypeId: Int, addCount: Int) {
-        if (selectGamePlayerStatsByPlayerUuidAndGameTypeId(playerUuid.toString(), gameTypeId, 1).isEmpty()) {
+        if (selectGamePlayerStatsByPlayerUuidAndGameTypeId(playerUuid.toString(), gameTypeId) == null) {
             insertGamePlayerStats(
                 GamePlayerStatsDto(
                     playerUuid.toString(),
@@ -269,7 +303,7 @@ class GameDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
     }
 
     fun addGamePlayerStatsDeathCount(playerUuid: UUID, gameTypeId: Int, addCount: Int) {
-        if (selectGamePlayerStatsByPlayerUuidAndGameTypeId(playerUuid.toString(), gameTypeId, 1).isEmpty()) {
+        if (selectGamePlayerStatsByPlayerUuidAndGameTypeId(playerUuid.toString(), gameTypeId) == null) {
             insertGamePlayerStats(
                 GamePlayerStatsDto(
                     playerUuid.toString(),
@@ -290,7 +324,7 @@ class GameDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
     }
 
     fun addGamePlayerStatsAssistCount(playerUuid: UUID, gameTypeId: Int, addCount: Int) {
-        if (selectGamePlayerStatsByPlayerUuidAndGameTypeId(playerUuid.toString(), gameTypeId, 1).isEmpty()) {
+        if (selectGamePlayerStatsByPlayerUuidAndGameTypeId(playerUuid.toString(), gameTypeId) == null) {
             insertGamePlayerStats(
                 GamePlayerStatsDto(
                     playerUuid.toString(),
@@ -311,7 +345,7 @@ class GameDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
     }
 
     fun addGamePlayerStatsWinCount(playerUuid: UUID, gameTypeId: Int, addCount: Int) {
-        if (selectGamePlayerStatsByPlayerUuidAndGameTypeId(playerUuid.toString(), gameTypeId, 1).isEmpty()) {
+        if (selectGamePlayerStatsByPlayerUuidAndGameTypeId(playerUuid.toString(), gameTypeId) == null) {
             insertGamePlayerStats(
                 GamePlayerStatsDto(
                     playerUuid.toString(),
@@ -337,12 +371,11 @@ class GameDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
             .executeList(GamePlayerStatsDto::class.java)
     }
 
-    fun selectGamePlayerStatsByPlayerUuid(playerUuid: String, count: Int, offset: Int = 0): List<GamePlayerStatsDto> {
+    fun selectGamePlayerStatsByPlayerUuid(playerUuid: String): GamePlayerStatsDto {
         return gamePlayerStats.select()
             .where("player_uuid = ?")
             .parameters(playerUuid)
-            .limit(offset, count)
-            .executeList(GamePlayerStatsDto::class.java)
+            .execute(GamePlayerStatsDto::class.java)
     }
 
     fun selectGamePlayerStatsByGameTypeId(gameTypeId: Int, count: Int, offset: Int = 0): List<GamePlayerStatsDto> {
@@ -353,12 +386,11 @@ class GameDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
             .executeList(GamePlayerStatsDto::class.java)
     }
 
-    fun selectGamePlayerStatsByPlayerUuidAndGameTypeId(playerUuid: String, gameTypeId: Int, count: Int, offset: Int = 0): List<GamePlayerStatsDto> {
+    fun selectGamePlayerStatsByPlayerUuidAndGameTypeId(playerUuid: String, gameTypeId: Int): GamePlayerStatsDto {
         return gamePlayerStats.select()
             .where("player_uuid = ? AND game_type_id = ?")
             .parameters(playerUuid, gameTypeId)
-            .limit(offset, count)
-            .executeList(GamePlayerStatsDto::class.java)
+            .execute(GamePlayerStatsDto::class.java)
     }
 
 }

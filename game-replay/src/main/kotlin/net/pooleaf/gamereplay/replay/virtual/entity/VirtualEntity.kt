@@ -10,6 +10,41 @@ data class VirtualEntity(
     val entityId: Int
 ) : VirtualHistory() {
 
+    companion object {
+        val BOAT = 1
+        val ITEM_STACK = 2
+        val MINECART = 10
+        val MINECART_STORAGE = 11
+        val MINECART_POWERED = 12
+        val ACTIVATED_TNT = 50
+        val ENDER_CRYSTAL = 51
+        val ARROW_PROJECTILE = 60
+        val SNOWBALL_PROJECTILE = 61
+        val EGG_PROJECTILE = 62
+        val FIRE_BALL_GHAST = 63
+        val FIRE_BALL_BLAZE = 64
+        val THROWN_ENDERPEARL = 65
+        val WITHER_SKULL = 66
+        val FALLING_BLOCK = 70
+        val ITEM_FRAME = 71
+        val EYE_OF_ENDER = 72
+        val THROWN_POTION = 73
+        val FALLING_DRAGON_EGG = 74
+        val THROWN_EXP_BOTTLE = 75
+        val FIREWORK = 76
+        val FISHING_FLOAT = 90
+    }
+
+
+    fun getEntityType(): Int? {
+        val spawnEntityData = histories.values.flatten()
+            .filterIsInstance<SpawnEntityData>()
+            .firstOrNull()
+
+        return spawnEntityData?.objectType
+    }
+
+
     fun isSpawned(tick: Long): Boolean {
         val spawnEntityDataTick = histories.filter { it.value.filterIsInstance<SpawnEntityData>().isNotEmpty() }.firstNotNullOfOrNull { it.key }
         val entityDestroyDataTick = histories.filter { it.value.filterIsInstance<EntityDestroyData>().isNotEmpty() }.firstNotNullOfOrNull { it.key }

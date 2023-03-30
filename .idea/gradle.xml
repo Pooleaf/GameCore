@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/game-core" />
             <option value="$PROJECT_DIR$/game-history" />
+            <option value="$PROJECT_DIR$/game-profile" />
             <option value="$PROJECT_DIR$/game-reconnector" />
             <option value="$PROJECT_DIR$/game-replay" />
           </set>

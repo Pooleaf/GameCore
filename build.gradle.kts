@@ -17,13 +17,16 @@ allprojects {
     }
 
     dependencies {
+        // Platform
         compileOnly("io.papermc:paper-api:1.8.8")
-        compileOnly("net.pooleaf:core:1.50.0")
 
+        // Pooleaf
+        compileOnly("net.pooleaf:core:1.54.0")
+        compileOnly("net.pooleaf:permission:1.0.0")
+
+        // Bukkit Library
         compileOnly("com.grinderwolf:slimeworldmanager-api:2.2.1")
-
         compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
-
         compileOnly("com.arcaniax:HeadDatabase-API:1.3.1")
 
         compileOnly("net.citizensnpcs:citizens-main:2.0.30-SNAPSHOT") {

@@ -14,6 +14,7 @@ class PlayerMetaDataDataReplayHandler : RecordDataReplayHandler<PlayerMetaDataDa
         val replayPlayer = GameReplayApi.unsafe.replayPlayerManager.get(viewer.uniqueId)
 
         val citizensNpc = replayPlayer.virtualPlayerManager.get(recordData.playerUuid)?.citizensNpc ?: return
+        if (citizensNpc.entity == null) return
 
         var value = recordData.value.toByte()
 

@@ -203,7 +203,9 @@ class ReplayPlayer(
             citizensNpc.isProtected = true
             citizensNpc.getOrAddTrait(Owner::class.java).setOwner(viewer)
             citizensNpc.getOrAddTrait(Gravity::class.java).toggle()
-            citizensNpc.getOrAddTrait(SkinTrait::class.java).setSkinName(commonPlayer?.name, true)
+            if (commonPlayer != null) {
+                citizensNpc.getOrAddTrait(SkinTrait::class.java).setSkinName(commonPlayer?.name, true)
+            }
 
             val virtualPlayer = VirtualPlayer(uuid, citizensNpc)
             virtualPlayerManager.set(uuid, virtualPlayer)
@@ -292,6 +294,7 @@ class ReplayPlayer(
      */
     fun play() {
         if (isRunning()) error("Replay already running")
+        if (currentTick >= replay.endTick) return
 
         replayTask = object : BukkitRunnable() {
             override fun run() {
@@ -301,20 +304,24 @@ class ReplayPlayer(
 
                 val toTick = currentTick.toLong()
                 for (tick in (lastPlayedTick + 1)..toTick) {
-                    try {
-                        val tickRecordDatas = replay.recordDatas.get(tick)
-                        tickRecordDatas?.forEach { recordData ->
+                    val tickRecordDatas = replay.recordDatas.get(tick)
+                    tickRecordDatas?.forEach { recordData ->
+                        try {
                             val recordDataReplayHandler = GameReplayApi.unsafe.recordDataManager.get(recordData.javaClass)
                             recordDataReplayHandler?.onPlay(recordData, viewer)
+                        } catch (exception: Exception) {
+                            exception.printStackTrace()
+
+                            println("recordData: ${recordData}")
+
+                            viewer.sendWarning("오류가 발생하여 리플레이를 재생할 수 없습니다.")
+                            viewer.playSound(XSound.BLOCK_NOTE_BLOCK_BASS)
+
+                            pause()
                         }
-
-                        lastPlayedTick = tick
-                    } catch (exception: Exception) {
-                        viewer.sendWarning("오류가 발생하여 리플레이를 재생할 수 없습니다.")
-                        viewer.playSound(XSound.BLOCK_NOTE_BLOCK_BASS)
-
-                        pause()
                     }
+
+                    lastPlayedTick = tick
                 }
 
                 currentTick += playSpeed

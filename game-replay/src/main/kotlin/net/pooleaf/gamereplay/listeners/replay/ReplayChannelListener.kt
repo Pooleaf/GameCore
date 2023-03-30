@@ -62,7 +62,7 @@ class ReplayChannelListener : CommonEventListener, Listener {
             val replayReserve = replayReserveManager.get(player.uniqueId)
             if (replayReserve == null) {
                 // 리플레이 서버일 때 리플레이 재생하지 않을 경우 로비로 이동
-                if (GameReplayApi.replayConfig.isReplayPlayServer || !GameReplayApi.unsafe.replayPlayerManager.exists(player.uniqueId)) {
+                if (GameReplayApi.replayConfig.isReplayPlayServer && !GameReplayApi.unsafe.replayPlayerManager.exists(player.uniqueId)) {
                     ChannelModule.getLobbyChannelGroup().fastJoin(player.uniqueId)
                 }
 
@@ -73,6 +73,7 @@ class ReplayChannelListener : CommonEventListener, Listener {
             val tick = replayReserve.tick
 
             playReplay(player, gameId, tick)
+            replayReserveManager.remove(player.uniqueId)
         }, 1L)
     }
 

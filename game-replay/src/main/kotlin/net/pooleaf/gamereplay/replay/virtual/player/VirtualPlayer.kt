@@ -28,13 +28,11 @@ class VirtualPlayer(
     val location: Location
         get() = citizensNpc.entity.location
 
+    var isSpawned: Boolean = true
+
     // 커스텀 데이터
     val etcDatas = HashMap<String, Any>()
 
-
-    fun isSpawned(): Boolean {
-        return !isDefeated && isOnline
-    }
 
     fun spawnNpc(viewer: Player, location: Location = citizensNpc.storedLocation) {
         citizensNpc.spawn(location)
@@ -43,19 +41,20 @@ class VirtualPlayer(
 
         // 다른 플레이어들에게서 NPC 가리기
         Bukkit.getOnlinePlayers().filter { it != viewer }.forEach { it.hidePlayer(citizensNpc.entity as Player) }
+
+        isSpawned = true
     }
     
     fun despawnNpc() {
         citizensNpc.despawn()
+
+        isSpawned = false
     }
 
     fun teleport(viewer: Player, location: Location) {
-        println("teleport1: ${location} / ${citizensNpc.entity.location}")
         despawnNpc()
         spawnNpc(viewer, location)
         citizensNpc.teleport(location, PlayerTeleportEvent.TeleportCause.PLUGIN)
-        println("teleport2: ${location} / ${citizensNpc.entity.location}")
-
     }
 
     fun timeMachine(tick: Long, viewer: Player) {
@@ -112,7 +111,7 @@ class VirtualPlayer(
         }
 
         // NPC가 안보이는 문제가 있어 리스폰
-        if (isSpawned()) {
+        if (isSpawned) {
             despawnNpc()
             spawnNpc(viewer)
         }
@@ -140,24 +139,27 @@ class VirtualPlayer(
         }
 
         // 나머지 최근 데이터 처리
-        getCurrentData(PlayerAnimationData::class.java, tick)?.let { datas.addAll(it) }
         getCurrentData(PlayerChatData::class.java, tick)?.let { datas.addAll(it) }
-        getCurrentData(PlayerDamageData::class.java, tick)?.let { datas.addAll(it) }
         getLastData(PlayerHealthChangeData::class.java, tick)?.let { datas.add(it) }
-        getLastData(PlayerMetaDataData::class.java, tick)?.let { datas.add(it) }
 
-        // 장비 처리
-        val equipmentChangeDatas = histories.filterKeys { it <= tick }
-            .toSortedMap()
-            .values
-            .flatten()
-            .filterIsInstance<PlayerEquipmentChangeData>()
+        if (isSpawned) {
+            getCurrentData(PlayerAnimationData::class.java, tick)?.let { datas.addAll(it) }
+            getCurrentData(PlayerDamageData::class.java, tick)?.let { datas.addAll(it) }
+            getLastData(PlayerMetaDataData::class.java, tick)?.let { datas.add(it) }
 
-        equipmentChangeDatas.filter { it.equipmentType == 0 }.lastOrNull()?.let { datas.add(it) }
-        equipmentChangeDatas.filter { it.equipmentType == 4 }.lastOrNull()?.let { datas.add(it) }
-        equipmentChangeDatas.filter { it.equipmentType == 3 }.lastOrNull()?.let { datas.add(it) }
-        equipmentChangeDatas.filter { it.equipmentType == 2 }.lastOrNull()?.let { datas.add(it) }
-        equipmentChangeDatas.filter { it.equipmentType == 1 }.lastOrNull()?.let { datas.add(it) }
+            // 장비 처리
+            val equipmentChangeDatas = histories.filterKeys { it <= tick }
+                .toSortedMap()
+                .values
+                .flatten()
+                .filterIsInstance<PlayerEquipmentChangeData>()
+
+            equipmentChangeDatas.filter { it.equipmentType == 0 }.lastOrNull()?.let { datas.add(it) }
+            equipmentChangeDatas.filter { it.equipmentType == 4 }.lastOrNull()?.let { datas.add(it) }
+            equipmentChangeDatas.filter { it.equipmentType == 3 }.lastOrNull()?.let { datas.add(it) }
+            equipmentChangeDatas.filter { it.equipmentType == 2 }.lastOrNull()?.let { datas.add(it) }
+            equipmentChangeDatas.filter { it.equipmentType == 1 }.lastOrNull()?.let { datas.add(it) }
+        }
 
         // 재생
         datas.forEach { data ->
