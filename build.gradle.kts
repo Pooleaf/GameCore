@@ -17,6 +17,9 @@ allprojects {
     }
 
     dependencies {
+        // Kotlin
+        compileOnly(kotlin("stdlib"))
+
         // Platform
         compileOnly("io.papermc:paper-api:1.8.8")
 
