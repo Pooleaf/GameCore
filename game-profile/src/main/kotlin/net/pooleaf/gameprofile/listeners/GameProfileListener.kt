@@ -26,7 +26,7 @@ class GameProfileListener : Listener {
         // 쉬프트 우클릭만
         if (!player.isSneaking) return
 
-        val targetCommonPlayer = CommonSenderModule.getPlayer(rightClicked.uniqueId) ?: return
+        val targetCommonPlayer = CommonSenderModule.getOfflinePlayer(rightClicked.uniqueId) ?: return
         BukkitAsyncScope.launch {
             GameProfileGui(targetCommonPlayer).open(player)
         }

@@ -9,7 +9,7 @@ import org.bukkit.entity.Player
 class PlayerJoinDataReplayHandler : RecordDataReplayHandler<PlayerJoinData> {
 
     override fun onPlay(recordData: PlayerJoinData, viewer: Player) {
-        val joinCommonPlayer = CommonSenderModule.getPlayer(recordData.playerUuid)
+        val joinCommonPlayer = CommonSenderModule.getOfflinePlayer(recordData.playerUuid)
         val joinPlayerName = joinCommonPlayer?.displayName ?: recordData.playerUuid
         viewer.sendMessage("§7[리플레이] §f${joinPlayerName} §e님께서 접속했습니다.")
 

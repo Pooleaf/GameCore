@@ -196,7 +196,7 @@ class ReplayPlayer(
 
         // 가상 플레이어 NPC 생성
         replay.recordedPlayers.forEach { uuid ->
-            val commonPlayer = CommonSenderModule.getPlayer(uuid)
+            val commonPlayer = CommonSenderModule.getOfflinePlayer(uuid)
 
             val npcName = commonPlayer?.name ?: "Unknown"
             val citizensNpc = virtualPlayerManager.npcRegistry.createNPC(EntityType.PLAYER, npcName)

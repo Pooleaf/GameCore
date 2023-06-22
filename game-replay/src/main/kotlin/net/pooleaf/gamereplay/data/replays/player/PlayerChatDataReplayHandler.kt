@@ -10,7 +10,7 @@ class PlayerChatDataReplayHandler : RecordDataReplayHandler<PlayerChatData> {
     override fun onPlay(recordData: PlayerChatData, viewer: Player) {
         if (!viewer.isOp) return
 
-        val chatCommonPlayer = CommonSenderModule.getPlayer(recordData.playerUuid)
+        val chatCommonPlayer = CommonSenderModule.getOfflinePlayer(recordData.playerUuid)
         val chatPlayerName = chatCommonPlayer?.displayName ?: recordData.playerUuid
         viewer.sendMessage("§7[리플레이] §f${chatPlayerName}§f: ${recordData.message}")
     }

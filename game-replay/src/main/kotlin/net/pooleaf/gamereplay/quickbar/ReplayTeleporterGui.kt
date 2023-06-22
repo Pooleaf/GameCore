@@ -22,7 +22,7 @@ class ReplayTeleporterGui(
         replayPlayer.virtualPlayerManager.values()
             .filter { !it.isDefeated && it.citizensNpc.entity != null }
             .forEach { virtualPlayer ->
-            val commonPlayer = CommonSenderModule.getPlayer(virtualPlayer.uuid)
+            val commonPlayer = CommonSenderModule.getOfflinePlayer(virtualPlayer.uuid)
 
             addItem(object : InventoryIcon() {
                 val uuid = virtualPlayer.uuid

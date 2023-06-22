@@ -18,7 +18,7 @@ class ProfileCommand {
         val targetPlayer = if (result.argumentsLength == 0) {
             player
         } else {
-            CommonSenderModule.getPlayerByName(result.getArgument(0))
+            CommonSenderModule.getOfflinePlayerByName(result.getArgument(0))
         }
 
         if (targetPlayer == null) {

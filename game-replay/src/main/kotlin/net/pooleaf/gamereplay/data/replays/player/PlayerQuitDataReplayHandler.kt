@@ -9,7 +9,7 @@ import org.bukkit.entity.Player
 class PlayerQuitDataReplayHandler : RecordDataReplayHandler<PlayerQuitData> {
 
     override fun onPlay(recordData: PlayerQuitData, viewer: Player) {
-        val quitCommonPlayer = CommonSenderModule.getPlayer(recordData.playerUuid)
+        val quitCommonPlayer = CommonSenderModule.getOfflinePlayer(recordData.playerUuid)
         val quitPlayerName = quitCommonPlayer?.displayName ?: recordData.playerUuid
         viewer.sendMessage("§7[리플레이] §f${quitPlayerName} §e님이 퇴장했습니다.")
 

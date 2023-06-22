@@ -9,12 +9,12 @@ import org.bukkit.entity.Player
 class GamePlayerDefeatDataReplayHandler : RecordDataReplayHandler<GamePlayerDefeatData> {
 
     override fun onPlay(recordData: GamePlayerDefeatData, viewer: Player) {
-        val playerName = CommonSenderModule.getPlayer(recordData.defeatPlayerUuid)?.displayName ?: recordData.defeatPlayerUuid
+        val playerName = CommonSenderModule.getOfflinePlayer(recordData.defeatPlayerUuid)?.displayName ?: recordData.defeatPlayerUuid
 
         if (recordData.killerPlayerUuid == null) {
             viewer.sendMessage("§c${playerName} §c님이 탈락했습니다.")
         } else {
-            val killerPlayerName = CommonSenderModule.getPlayer(recordData.killerPlayerUuid)?.displayName ?: recordData.killerPlayerUuid
+            val killerPlayerName = CommonSenderModule.getOfflinePlayer(recordData.killerPlayerUuid)?.displayName ?: recordData.killerPlayerUuid
             viewer.sendMessage("§c${killerPlayerName} §c님이 §c${playerName} §c님을 탈락시켰습니다.")
         }
 

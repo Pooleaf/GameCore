@@ -11,7 +11,7 @@ class TeamDefeatDataReplayHandler : RecordDataReplayHandler<TeamDefeatData> {
         if (recordData.teamPlayerUuids.size <= 1) return
 
         val teamName = if (recordData.teamName == null) {
-            recordData.teamPlayerUuids.map { CommonSenderModule.getPlayer(it)?.displayName ?: it.toString() }
+            recordData.teamPlayerUuids.map { CommonSenderModule.getOfflinePlayer(it)?.displayName ?: it.toString() }
         } else {
             recordData.teamName
         }

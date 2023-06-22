@@ -10,7 +10,7 @@ import org.bukkit.entity.Player
 class GameEndDataReplayHandler : RecordDataReplayHandler<GameEndData> {
 
     override fun onPlay(recordData: GameEndData, viewer: Player) {
-        val winnerPlayerNames = recordData.winnerPlayerUuidss.map { CommonSenderModule.getPlayer(it)?.displayName ?: it.toString() }.joinToString()
+        val winnerPlayerNames = recordData.winnerPlayerUuidss.map { CommonSenderModule.getOfflinePlayer(it)?.displayName ?: it.toString() }.joinToString()
 
         // 우승 타이틀
         viewer.sendTitle("§e우승", "§f${winnerPlayerNames}")
