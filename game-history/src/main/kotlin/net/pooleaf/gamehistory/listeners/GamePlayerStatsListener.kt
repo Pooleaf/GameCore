@@ -25,6 +25,7 @@ class GamePlayerStatsListener : Listener {
 
         val deadPlayer = event.deadGamePlayer
         val killerPlayer = event.killerGamePlayer
+        val assistPlayers = event.assistGamePlayers
 
         val gameTypeId = GameCore.game.gameTypeId
 
@@ -40,12 +41,11 @@ class GamePlayerStatsListener : Listener {
             GameHistoryApi.unsafe.sqlManager.gameDao.insertGameKill(gameKillDto)
 
             // 전적 저장
+            GameHistoryApi.unsafe.sqlManager.gameDao.addGamePlayerStatsDeathCount(deadPlayer.uuid, gameTypeId, 1)
             if (killerPlayer != null) {
                 GameHistoryApi.unsafe.sqlManager.gameDao.addGamePlayerStatsKillCount(killerPlayer.uuid, gameTypeId, 1)
             }
-            GameHistoryApi.unsafe.sqlManager.gameDao.addGamePlayerStatsDeathCount(deadPlayer.uuid, gameTypeId, 1)
-
-            // TODO 어시스트 저장
+            assistPlayers?.forEach { GameHistoryApi.unsafe.sqlManager.gameDao.addGamePlayerStatsAssistCount(it.uuid, gameTypeId, 1) }
         }
     }
 
