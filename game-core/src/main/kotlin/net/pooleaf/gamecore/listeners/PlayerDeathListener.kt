@@ -4,6 +4,7 @@ import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageEv
 import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.player.GamePlayerDeathEvent
+import net.pooleaf.gamecore.events.player.GamePlayerKillEvent
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -51,6 +52,9 @@ class PlayerDeathListener : Listener {
 
         // 이벤트
         Bukkit.getPluginManager().callEvent(GamePlayerDeathEvent(deadGamePlayer, killerGamePlayer))
+        if (killerGamePlayer != null) {
+            Bukkit.getPluginManager().callEvent(GamePlayerKillEvent(killerGamePlayer, deadGamePlayer))
+        }
     }
 
 }
