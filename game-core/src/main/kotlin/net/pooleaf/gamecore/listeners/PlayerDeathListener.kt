@@ -4,6 +4,7 @@ import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageEv
 import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.player.GamePlayerDeathEvent
+import net.pooleaf.gamecore.killstreak.KillStreak
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -42,11 +43,33 @@ class PlayerDeathListener : Listener {
         val killerGamePlayer = deadGamePlayer.getKillerGamePlayer()
         var assistGamePlayers = deadGamePlayer.getKillerAssistGamePlayer()
 
+        // 킬 처리
+        if (killerGamePlayer != null) {
+            // 연속킬
+            if (GameCore.gameConfig.useKillStreak) {
+                if (killerGamePlayer.lastKillTime?.let { System.currentTimeMillis() - it < GameCore.gameConfig.killStreakValidSeconds * 1000 } == true) {
+                    killerGamePlayer.killStreak = killerGamePlayer.killStreak?.getNextKillStreak()
+                } else {
+                    killerGamePlayer.killStreak = null
+                }
+            }
+
+            killerGamePlayer.lastKillTime = System.currentTimeMillis()
+        }
+
+
         // 메시지
         if (killerGamePlayer == null) {
             BukkitBroadcaster.broadcast("§c${deadGamePlayer.displayName} §c님이 죽었습니다.")
         } else {
-            BukkitBroadcaster.broadcast("§c${killerGamePlayer.displayName} §c님이 §c${deadGamePlayer.displayName} §c님을 죽였습니다.")
+            // 연속킬 메시지 계산
+            val killStreakMessage = if (killerGamePlayer.killStreak != null) {
+                "(${killerGamePlayer.killStreak!!.color}${killerGamePlayer.killStreak!!.text})"
+            } else {
+                ""
+            }
+
+            BukkitBroadcaster.broadcast("§c${killerGamePlayer.displayName} §c님이 §c${deadGamePlayer.displayName} §c님을 죽였습니다. ${killStreakMessage}")
         }
 
         // 이벤트

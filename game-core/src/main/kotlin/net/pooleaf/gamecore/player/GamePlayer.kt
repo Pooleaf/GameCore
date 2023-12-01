@@ -3,6 +3,7 @@ package net.pooleaf.gamecore.player
 import kotlinx.coroutines.Job
 import net.pooleaf.core.modules.support.bukkit.player.AbstractBukkitPlayer
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.killstreak.KillStreak
 import net.pooleaf.gamecore.team.Team
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -39,6 +40,12 @@ open class GamePlayer(uuid: UUID) : AbstractBukkitPlayer(uuid) {
     // 마지막에 이 플레이어를 때린 플레이어와 시간
     val lastDamager: Pair<GamePlayer, Long>? // GamePlayer, Millis
         get() = lastDamagers.toList().maxByOrNull { (key, value) -> value }
+
+    // 연속 킬
+    var killStreak: KillStreak? = null
+
+    // 마지막 킬 시간
+    var lastKillTime: Long? = null
 
 
     /**
@@ -107,7 +114,7 @@ open class GamePlayer(uuid: UUID) : AbstractBukkitPlayer(uuid) {
      */
     fun getKillerAssistGamePlayer(): List<GamePlayer>? {
         var assistGamePlayers = getKillerGamePlayer()?.team?.players?.filter { teamPlayer ->
-            teamPlayer != getKillerGamePlayer() && lastDamagers.get(teamPlayer)?.let { lastHitTime -> System.currentTimeMillis() - lastHitTime <= GameCore.gameConfig.assistValidSeconds } == true
+            teamPlayer != getKillerGamePlayer() && lastDamagers.get(teamPlayer)?.let { lastHitTime -> System.currentTimeMillis() - lastHitTime <= GameCore.gameConfig.assistValidSeconds * 1000 } == true
         }
         if (assistGamePlayers?.isEmpty() == true) {
             assistGamePlayers = null

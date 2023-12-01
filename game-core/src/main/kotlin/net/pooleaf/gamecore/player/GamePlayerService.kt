@@ -27,6 +27,9 @@ class GamePlayerService {
 
         gamePlayer.lastDamagers.clear()
 
+        gamePlayer.killStreak = null
+        gamePlayer.lastKillTime = null
+
         gamePlayer.team?.removePlayer(gamePlayer)
 
         gamePlayer.reconnectJob?.cancel()
