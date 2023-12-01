@@ -4,7 +4,6 @@ import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageEv
 import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.player.GamePlayerDeathEvent
-import net.pooleaf.gamecore.events.player.GamePlayerKillEvent
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -40,8 +39,13 @@ class PlayerDeathListener : Listener {
      */
     fun handlePlayerDeath(player: Player) {
         val deadGamePlayer = GameCore.unsafe.playerManager.get(player.uniqueId)
-
         val killerGamePlayer = deadGamePlayer.getKillerGamePlayer()
+        var assistGamePlayers = killerGamePlayer?.team?.players?.filter { teamPlayer ->
+            deadGamePlayer.lastDamagers.get(teamPlayer)?.let { lastHitTime -> System.currentTimeMillis() - lastHitTime <= GameCore.gameConfig.assistValidSeconds } == true
+        }
+        if (assistGamePlayers?.isEmpty() == true) {
+            assistGamePlayers = null
+        }
 
         // 메시지
         if (killerGamePlayer == null) {
@@ -51,10 +55,7 @@ class PlayerDeathListener : Listener {
         }
 
         // 이벤트
-        Bukkit.getPluginManager().callEvent(GamePlayerDeathEvent(deadGamePlayer, killerGamePlayer))
-        if (killerGamePlayer != null) {
-            Bukkit.getPluginManager().callEvent(GamePlayerKillEvent(killerGamePlayer, deadGamePlayer))
-        }
+        Bukkit.getPluginManager().callEvent(GamePlayerDeathEvent(deadGamePlayer, killerGamePlayer, assistGamePlayers))
     }
 
 }

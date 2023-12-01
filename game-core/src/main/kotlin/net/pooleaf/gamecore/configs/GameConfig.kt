@@ -18,6 +18,9 @@ class GameConfig(file: File?) : SimpleAnnoConfig(file) {
     @ConfigName("킬 유효 시간(초)")
     var killValidSeconds: Int = 10
 
+    @ConfigName("어시스트 유효 시간(초)")
+    var assistValidSeconds: Int = 10
+
     @ConfigName("게임 최대 시간(초)")
     var gameMaxSeconds: Int = 60 * 60
 

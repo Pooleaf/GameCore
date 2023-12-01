@@ -8,6 +8,7 @@ import net.pooleaf.gamecore.player.GamePlayer
  */
 class GamePlayerDeathEvent(
     val deadGamePlayer: GamePlayer,
-    val killerGamePlayer: GamePlayer?
+    val killerGamePlayer: GamePlayer?,
+    val assistGamePlayers: List<GamePlayer>?
 ): HandlerEvent() {
 }

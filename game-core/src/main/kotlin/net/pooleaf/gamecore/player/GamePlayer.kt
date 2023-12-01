@@ -33,11 +33,11 @@ open class GamePlayer(uuid: UUID) : AbstractBukkitPlayer(uuid) {
     var reconnectJob: Job? = null
         internal set
 
-    // 마지막에 이 플레이어를 때린 플레이어 시간 기록 (GamePlayer / Millis)
-    val lastDamagers = ConcurrentHashMap<GamePlayer, Long>()
+    // 다른 플레이어가 이 플레이어를 마지막으로 때린 시간
+    val lastDamagers = ConcurrentHashMap<GamePlayer, Long>() // GamePlayer, Millis
 
-    // 마지막에 이 플레이어를 때린 플레이어 정보
-    val lastDamagerInfo: Pair<GamePlayer, Long>?
+    // 마지막에 이 플레이어를 때린 플레이어와 시간
+    val lastDamager: Pair<GamePlayer, Long>? // GamePlayer, Millis
         get() = lastDamagers.toList().maxByOrNull { (key, value) -> value }
 
 
@@ -97,7 +97,7 @@ open class GamePlayer(uuid: UUID) : AbstractBukkitPlayer(uuid) {
      * 없으면 null을 반환합니다.
      */
     fun getKillerGamePlayer(): GamePlayer? {
-        if (lastDamagerInfo?.let { System.currentTimeMillis() - it.second < GameCore.gameConfig.killValidSeconds * 1000L } == true) return lastDamagerInfo!!.first
+        if (lastDamager?.let { System.currentTimeMillis() - it.second <= GameCore.gameConfig.killValidSeconds * 1000L } == true) return lastDamager!!.first
         return null
     }
 
