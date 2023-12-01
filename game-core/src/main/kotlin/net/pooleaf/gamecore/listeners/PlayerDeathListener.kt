@@ -40,12 +40,7 @@ class PlayerDeathListener : Listener {
     fun handlePlayerDeath(player: Player) {
         val deadGamePlayer = GameCore.unsafe.playerManager.get(player.uniqueId)
         val killerGamePlayer = deadGamePlayer.getKillerGamePlayer()
-        var assistGamePlayers = killerGamePlayer?.team?.players?.filter { teamPlayer ->
-            deadGamePlayer.lastDamagers.get(teamPlayer)?.let { lastHitTime -> System.currentTimeMillis() - lastHitTime <= GameCore.gameConfig.assistValidSeconds } == true
-        }
-        if (assistGamePlayers?.isEmpty() == true) {
-            assistGamePlayers = null
-        }
+        var assistGamePlayers = deadGamePlayer.getKillerAssistGamePlayer()
 
         // 메시지
         if (killerGamePlayer == null) {

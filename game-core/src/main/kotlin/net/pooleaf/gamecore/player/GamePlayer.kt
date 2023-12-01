@@ -101,4 +101,19 @@ open class GamePlayer(uuid: UUID) : AbstractBukkitPlayer(uuid) {
         return null
     }
 
+    /**
+     * 플레이어를 죽이는데 도움을 준 플레이어를 반환합니다.
+     * 없으면 null을 반환합니다.
+     */
+    fun getKillerAssistGamePlayer(): List<GamePlayer>? {
+        var assistGamePlayers = getKillerGamePlayer()?.team?.players?.filter { teamPlayer ->
+            teamPlayer != getKillerGamePlayer() && lastDamagers.get(teamPlayer)?.let { lastHitTime -> System.currentTimeMillis() - lastHitTime <= GameCore.gameConfig.assistValidSeconds } == true
+        }
+        if (assistGamePlayers?.isEmpty() == true) {
+            assistGamePlayers = null
+        }
+
+        return assistGamePlayers
+    }
+
 }

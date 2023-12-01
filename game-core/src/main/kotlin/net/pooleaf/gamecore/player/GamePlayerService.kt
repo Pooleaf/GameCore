@@ -287,7 +287,7 @@ class GamePlayerService {
         GameCore.unsafe.quickBarManager.spectatorQuickBar.spectatorTeleporterGui.updateAsynchronously()
 
         // 이벤트
-        Bukkit.getPluginManager().callEvent(GamePlayerDefeatEvent(gamePlayer, gamePlayer.getKillerGamePlayer()))
+        Bukkit.getPluginManager().callEvent(GamePlayerDefeatEvent(gamePlayer, gamePlayer.getKillerGamePlayer(), gamePlayer.getKillerAssistGamePlayer()))
 
         // 팀 탈락 이벤트
         if (gamePlayer.team?.let { it.isDefeated() } == true) {
