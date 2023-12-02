@@ -221,7 +221,9 @@ class GamePlayerService {
 
             // 리셋하면 참여 정보가 사라지므로 다시 설정
             gamePlayer.isJoined = isJoined
-            GameCore.unsafe.teamNameTagManager.setTeamNameTag(gamePlayer)
+            if (GameCore.unsafe.teamNameTagManager.exists(gamePlayer.uuid)) {
+                GameCore.unsafe.teamNameTagManager.setTeamNameTag(gamePlayer)
+            }
 
             // 관전 셋팅
             val player = gamePlayer.player
