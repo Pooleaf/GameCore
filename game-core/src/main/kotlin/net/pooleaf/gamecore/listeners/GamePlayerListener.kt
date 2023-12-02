@@ -21,7 +21,7 @@ class GamePlayerListener: Listener {
     /**
      * GamePlayer 등록 및 리셋
      * -> 게임 중이 아니라면? -> 게임 참여 대기 셋팅 -> 자동 시작
-     * -> 게임 중이라면? -> 참여했다면? -> 게임 참여 게임 중 셋팅
+     * -> 게임 중이라면? -> 플레이 중이라면? -> 게임 중 셋팅
      *                    안했다면?  -> 관전 등록
      */
     @EventHandler(priority = EventPriority.HIGH)
@@ -47,7 +47,12 @@ class GamePlayerListener: Listener {
             }
             // 게임 중이라면
             else {
-                // 게임에 참여했다면
+                // 게임에 참여했고 팀이 있으면 팀 이름표 접두사 보여줌
+                if (gamePlayer.isJoined && gamePlayer.team?.players?.size?.let { it > 1 } == true) {
+                    GameCore.unsafe.teamNameTagManager.setTeamNameTag(gamePlayer)
+                }
+
+                // 게임 플레이 중이라면
                 if (!isNewPlayer && gamePlayer.isPlaying()) {
                     // 게임 중 셋팅
                     GameCore.unsafe.playerService.settingToPlaying(gamePlayer)
@@ -59,7 +64,7 @@ class GamePlayerListener: Listener {
                     // 관전 텔레포터 GUI 업데이트
                     GameCore.unsafe.quickBarManager.spectatorQuickBar.spectatorTeleporterGui.updateAsynchronously()
                 }
-                // 참여하지 않았다면
+                // 플레이 중이 아니라면
                 else {
                     GameCore.unsafe.playerService.enableSpectatorMode(gamePlayer)
                 }

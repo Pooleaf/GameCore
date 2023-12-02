@@ -1,6 +1,7 @@
 package net.pooleaf.gamecore.listeners
 
 import com.cryptomorin.xseries.XSound
+import net.pooleaf.core.modules.support.bukkit.util.InventoryUtil
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.supply.SupplyGetEvent
 import org.bukkit.event.EventHandler
@@ -35,10 +36,19 @@ class SupplyListener: Listener {
                 if (supplyGetEvent.isCancelled) return
 
                 // 아이템 지급
-                supplyBlock.supply.items.forEach { player.inventory.addItem(it) }
+                var dropped = false
+                supplyBlock.supply.items.forEach {
+                    if (InventoryUtil.hasInventorySpace(player.inventory, it)) {
+                        player.inventory.addItem(it)
+                    } else {
+                        dropped = true
+                        supplyBlock.location.world.dropItem(supplyBlock.location, it)
+                    }
+                }
                 supplyBlock.usedBy = gamePlayer
 
                 gamePlayer.sendMessageSafely("§e보급품을 획득했습니다.")
+                if (dropped) gamePlayer.sendWarningSafely("인벤토리 공간이 부족하여 아이템이 바닥에 떨어졌습니다.")
                 gamePlayer.playSoundSafely(XSound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4F, 1.0F)
             } else {
                 gamePlayer.sendWarningSafely("이미 누군가가 발견한 보급품입니다.")

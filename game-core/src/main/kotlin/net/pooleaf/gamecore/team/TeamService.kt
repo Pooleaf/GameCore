@@ -3,6 +3,7 @@ package net.pooleaf.gamecore.team
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.player.GamePlayer
 
+
 class TeamService {
 
     /**
@@ -11,7 +12,14 @@ class TeamService {
      */
     fun addPlayer(team: Team, gamePlayer: GamePlayer): Boolean {
         if (team.players.contains(gamePlayer)) return false
-        team.players.add(gamePlayer); return true
+        team.players.add(gamePlayer);
+
+        // 이름표 접두사 팀 표시 보여주기
+        if (gamePlayer.team!!.players.size > 1) {
+            team.players.forEach { GameCore.unsafe.teamNameTagManager.setTeamNameTag(it) }
+        }
+
+        return true
     }
 
     /**
@@ -25,6 +33,12 @@ class TeamService {
             GameCore.unsafe.teamManager.remove(team)
         }
 
+        // 이름표 접두사 팀 표시 제거
+        if (gamePlayer.team!!.players.isNotEmpty()) {
+            team.players.forEach { GameCore.unsafe.teamNameTagManager.setTeamNameTag(it) }
+            GameCore.unsafe.teamNameTagManager.removeTeamNameTag(gamePlayer)
+        }
+
         return removed
     }
 
@@ -36,7 +50,7 @@ class TeamService {
      */
     fun matchingTeams(playerCountPerTeam: Int, maxTeamCount: Int) {
         var tempTeam: Team? = null
-        GameCore.unsafe.playerManager.getPlayingPlayers().forEach { gamePlayer ->
+        GameCore.unsafe.playerManager.getPlayingPlayers().shuffled().forEach { gamePlayer ->
             // 새 팀 생성
             if (tempTeam == null) {
                 // 최대 팀 수에 도달했을 경우 중단

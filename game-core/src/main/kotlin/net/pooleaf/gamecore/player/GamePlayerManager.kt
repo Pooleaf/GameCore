@@ -53,7 +53,7 @@ open class GamePlayerManager<T: GamePlayer>(
     }
 
     /**
-     * 오프라인 [T]를 포함한 게임을 플레이 중인 [T]의 목록을 반환합니다.
+     * 오프라인 [T]를 포함한 게임에서 탈락하지 않고 플레이 중인 [T]의 목록을 반환합니다.
      */
     fun getPlayingPlayers(): List<T> {
         return values().filter { it.isPlaying() }
@@ -61,7 +61,7 @@ open class GamePlayerManager<T: GamePlayer>(
     }
 
     /**
-     * 게임을 플레이 중인 온라인 [T]의 목록을 반환합니다.
+     * 게임에서 탈락하지 않고 플레이 중인 온라인 [T]의 목록을 반환합니다.
      */
     fun getOnlinePlayingPlayers(): List<T> {
         return values().filter { it.isPlaying() && it.isOnline }

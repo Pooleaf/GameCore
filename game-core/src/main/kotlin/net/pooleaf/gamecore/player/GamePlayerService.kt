@@ -79,6 +79,11 @@ class GamePlayerService {
             // 투명 해제
             Bukkit.getOnlinePlayers().forEach { it.showPlayer(player) }
 
+            // 팀 이름표 접두사 제거
+            if (GameCore.unsafe.teamNameTagManager.exists(gamePlayer.uuid)) {
+                GameCore.unsafe.teamNameTagManager.removeTeamNameTag(gamePlayer)
+            }
+
             // 퀵바 제거
             GuiModule.getQuickBarManager().removeTo(player)
 
@@ -200,6 +205,8 @@ class GamePlayerService {
         if (gamePlayer.isSpectator) error("gamePlayer already spectator")
 
         BukkitSyncScope.launch {
+            val isJoined = gamePlayer.isJoined
+
             // 정보 업데이트
             gamePlayer.isSpectator = true
 
@@ -211,6 +218,10 @@ class GamePlayerService {
 
             // 리셋
             resetPlayer(gamePlayer)
+
+            // 리셋하면 참여 정보가 사라지므로 다시 설정
+            gamePlayer.isJoined = isJoined
+            GameCore.unsafe.teamNameTagManager.setTeamNameTag(gamePlayer)
 
             // 관전 셋팅
             val player = gamePlayer.player

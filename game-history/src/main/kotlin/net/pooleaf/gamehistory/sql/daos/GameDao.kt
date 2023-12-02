@@ -183,7 +183,7 @@ class GameDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
 
     fun updateGameParticipantDefeat(gameParticipantDto: GameParticipantDto) {
         gameParticipantTable.update()
-            .set("defeat_yn = ? AND team_defeat_yn = ?")
+            .set("defeat_yn = ?, team_defeat_yn = ?")
             .where("player_uuid = ?")
             .parameters(gameParticipantDto.defeatYn, gameParticipantDto.teamDefeatYn, gameParticipantDto.playerUuid)
             .execute()
@@ -371,7 +371,7 @@ class GameDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
             .executeList(GamePlayerStatsDto::class.java)
     }
 
-    fun selectGamePlayerStatsByPlayerUuid(playerUuid: String): GamePlayerStatsDto {
+    fun selectGamePlayerStatsByPlayerUuid(playerUuid: String): GamePlayerStatsDto? {
         return gamePlayerStats.select()
             .where("player_uuid = ?")
             .parameters(playerUuid)
@@ -386,7 +386,7 @@ class GameDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
             .executeList(GamePlayerStatsDto::class.java)
     }
 
-    fun selectGamePlayerStatsByPlayerUuidAndGameTypeId(playerUuid: String, gameTypeId: Int): GamePlayerStatsDto {
+    fun selectGamePlayerStatsByPlayerUuidAndGameTypeId(playerUuid: String, gameTypeId: Int): GamePlayerStatsDto? {
         return gamePlayerStats.select()
             .where("player_uuid = ? AND game_type_id = ?")
             .parameters(playerUuid, gameTypeId)

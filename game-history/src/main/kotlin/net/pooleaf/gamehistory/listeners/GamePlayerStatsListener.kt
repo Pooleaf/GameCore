@@ -29,15 +29,16 @@ class GamePlayerStatsListener : Listener {
 
         val gameTypeId = GameCore.game.gameTypeId
 
+        // 킬 정보 DTO 생성
+        val gameKillDto = GameKillDto(
+            GameCore.game.gameId.toString(),
+            killerPlayer?.uuid?.toString() ?: null,
+            deadPlayer.uuid.toString(),
+            LocalDateTime.now()
+        )
+
         BukkitAsyncScope.launch {
             // 킬 정보 저장
-            val gameKillDto = GameKillDto(
-                GameCore.game.gameId.toString(),
-                killerPlayer?.uuid.toString(),
-                deadPlayer.uuid.toString(),
-                LocalDateTime.now()
-            )
-
             GameHistoryApi.unsafe.sqlManager.gameDao.insertGameKill(gameKillDto)
 
             // 전적 저장
@@ -51,8 +52,10 @@ class GamePlayerStatsListener : Listener {
 
     @EventHandler
     fun onPlayerDefeat(event: GamePlayerDefeatEvent) {
+        val dto = event.gamePlayer.toDto()
+
         BukkitAsyncScope.launch {
-            GameHistoryApi.unsafe.sqlManager.gameDao.updateGameParticipantDefeat(event.gamePlayer.toDto())
+            GameHistoryApi.unsafe.sqlManager.gameDao.updateGameParticipantDefeat(dto)
         }
     }
 

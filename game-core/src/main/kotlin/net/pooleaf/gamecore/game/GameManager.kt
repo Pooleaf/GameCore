@@ -24,7 +24,6 @@ import org.bukkit.command.CommandSender
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
-import kotlin.math.max
 
 class GameManager {
 
@@ -393,11 +392,13 @@ class GameManager {
 
                 // 팀끼리 맵으로 텔레포트
                 GameCore.unsafe.teamManager.teams.forEach { team ->
-                    val location = map.getRandomLocation()
-                    location?.let {
-                        team.spawnLocation = location
-                        team.teleport(location)
-                    } ?: error("random location cannot be null")
+                    // 팀 스폰이 설정되어있지 않을 경우 스폰을 랜덤 위치로 설정
+                    if (team.spawnLocation == null) {
+                        val randomLocation = map.getRandomLocation() ?: error("Random location cannot be null")
+
+                        team.spawnLocation = randomLocation
+                        team.teleport(randomLocation)
+                    }
                 }
             }.join()
 

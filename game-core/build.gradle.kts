@@ -31,7 +31,7 @@ tasks {
 
     register<Copy>("copyToServerWindows") {
         from(shadowJar)
-        into("D:\\서버\\1.8.9 LeafServer S6\\city.ability.pf.1\\update")
+        into("D:\\서버\\1.8.9 LeafServer S6\\.plugin_build")
     }
 }
 

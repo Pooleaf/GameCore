@@ -12,4 +12,7 @@ class TeamConfig(file: File?) : SimpleAnnoConfig(file) {
     @ConfigName("팀당 플레이어 수")
     val playerCountPerTeam: Int = 1
 
+    @ConfigName("팀끼리 PVP 허용")
+    val allowPvp: Boolean = false
+
 }

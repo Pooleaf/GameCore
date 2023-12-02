@@ -22,8 +22,9 @@ class GameReconnectCommand {
         }
 
         val channelName = recentGame.channelName
-        player.sendMessage("${channelName}§e채널에 재접속 합니다.")
-        ChannelModule.getChannel(channelName).join(player.uniqueId)
+        val channel = ChannelModule.getChannel(channelName)
+        player.sendMessage("${channel.displayName} §e채널에 재접속 합니다.")
+        channel.join(player.uniqueId)
     }
 
 }

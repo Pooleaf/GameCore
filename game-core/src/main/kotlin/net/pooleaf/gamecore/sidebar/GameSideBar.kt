@@ -36,14 +36,16 @@ open class GameSideBar(val title: String) {
                 .toList()
 
             BukkitSyncScope.launch {
-                viewers.forEach { (gamePlayer, _) ->
+                viewers.filter { it.key.isOnline }
+                    .forEach { (gamePlayer, _) ->
                     gamePlayer.player.scoreboard = commonSideBar?.updateScoreboard(null)
                 }
             }
         }
         // 개인용
         else {
-            viewers.forEach { (gamePlayer, _) ->
+            viewers.filter { it.key.isOnline }
+                .forEach { (gamePlayer, _) ->
                 update(gamePlayer)
             }
         }
@@ -94,6 +96,7 @@ open class GameSideBar(val title: String) {
 
         // 적용
         BukkitSyncScope.launch {
+            if (!gamePlayer.player.isOnline) return@launch
             gamePlayer.player.scoreboard = sideBar.updateScoreboard(null)
         }
     }

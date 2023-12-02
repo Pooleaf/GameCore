@@ -2,6 +2,7 @@ package net.pooleaf.gamecore.listeners
 
 import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageEvent
 import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
+import net.pooleaf.core.modules.support.common.logger.Logger
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.player.GamePlayerDeathEvent
 import net.pooleaf.gamecore.killstreak.KillStreak
@@ -33,6 +34,9 @@ class PlayerDeathListener : Listener {
     fun onDeath(event: PlayerDeathEvent) {
         // 사망 처리
         handlePlayerDeath(event.entity)
+
+        // 사망메시지 비활성화 (즉사 시키는 능력 사용 시 사망메시지가 나오지 않도록 하기 위해)
+        event.deathMessage = null
     }
 
     /**
@@ -48,7 +52,7 @@ class PlayerDeathListener : Listener {
             // 연속킬
             if (GameCore.gameConfig.useKillStreak) {
                 if (killerGamePlayer.lastKillTime?.let { System.currentTimeMillis() - it < GameCore.gameConfig.killStreakValidSeconds * 1000 } == true) {
-                    killerGamePlayer.killStreak = killerGamePlayer.killStreak?.getNextKillStreak()
+                    killerGamePlayer.killStreak = killerGamePlayer.killStreak?.getNextKillStreak() ?: KillStreak.DOUBLE
                 } else {
                     killerGamePlayer.killStreak = null
                 }
@@ -56,7 +60,6 @@ class PlayerDeathListener : Listener {
 
             killerGamePlayer.lastKillTime = System.currentTimeMillis()
         }
-
 
         // 메시지
         if (killerGamePlayer == null) {

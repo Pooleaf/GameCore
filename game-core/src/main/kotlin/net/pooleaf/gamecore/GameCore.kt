@@ -25,6 +25,7 @@ import net.pooleaf.gamecore.startitem.StartItemService
 import net.pooleaf.gamecore.supply.SupplyManager
 import net.pooleaf.gamecore.supply.SupplyService
 import net.pooleaf.gamecore.team.TeamManager
+import net.pooleaf.gamecore.team.TeamNameTagManager
 import net.pooleaf.gamecore.team.TeamService
 import net.pooleaf.gamecore.vote.map.MapVoteManager
 import net.pooleaf.gamecore.vote.start.StartVoteManager
@@ -45,6 +46,7 @@ object GameCore {
         lateinit var playerService: GamePlayerService
 
         lateinit var teamManager: TeamManager
+        lateinit var teamNameTagManager: TeamNameTagManager
         lateinit var teamService: TeamService
 
         lateinit var startVoteManager: StartVoteManager
@@ -90,6 +92,7 @@ object GameCore {
             playerService = GamePlayerService()
 
             teamManager = TeamManager()
+            teamNameTagManager = TeamNameTagManager()
             teamService = TeamService()
 
             startVoteManager = StartVoteManager()
