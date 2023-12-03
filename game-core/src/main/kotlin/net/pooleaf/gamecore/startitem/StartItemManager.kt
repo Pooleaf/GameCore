@@ -1,7 +1,6 @@
 package net.pooleaf.gamecore.startitem
 
-class StartItemManager {
+import net.pooleaf.core.modules.support.common.manager.AbstractManager
 
-    var startItem = StartItem()
-
+class StartItemManager : AbstractManager<String, StartItem>() { // RankName, StartItem
 }

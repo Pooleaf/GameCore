@@ -39,8 +39,6 @@ class EntityMetaDataDataReplayHandler : RecordDataReplayHandler<EntityMetaDataDa
                 value
             }
 
-            println("index: ${it.index} / value: ${value}")
-
             WrappedWatchableObject(it.index, value)
         }
 

@@ -132,7 +132,7 @@ object GameCore {
             mapService.loadMapConfigs()
 
             kitService.loadKitConfigs()
-            startItemService.loadStartItemConfig()
+            startItemService.loadAllStartItemConfig()
             supplyService.loadSupplyConfigs()
         }
     }

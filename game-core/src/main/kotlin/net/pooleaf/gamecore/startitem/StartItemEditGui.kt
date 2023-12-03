@@ -15,7 +15,11 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
-class StartItemEditGui : InventoryGui("시작 아이템 수정", 6) {
+class StartItemEditGui(
+    val rankName: String
+) : InventoryGui("시작 아이템 수정 (${rankName})", 6) {
+
+    private val startItem = GameCore.unsafe.startItemManager.get(rankName) ?: StartItem()
 
     val armorPanel: InventoryPanel
     val itemPanel: InventoryPanel
@@ -42,8 +46,6 @@ class StartItemEditGui : InventoryGui("시작 아이템 수정", 6) {
         }
 
         // 갑옷 아이템 넣기
-        val startItem = GameCore.unsafe.startItemManager.startItem
-
         armorPanel.set(1, 1, startItem.helmetItem)
         armorPanel.set(2, 1, startItem.chestplatItem)
         armorPanel.set(3, 1, startItem.leggingsItem)
@@ -72,11 +74,11 @@ class StartItemEditGui : InventoryGui("시작 아이템 수정", 6) {
                             return
                         }
 
-                        GameCore.unsafe.startItemManager.startItem.level = level
+                        startItem.level = level
                         player.sendMessage("§b시작 레벨을 §f${level}§b(으)로 설정했습니다.")
 
                         // GUI 열기
-                        StartItemEditGui().open(player)
+                        StartItemEditGui(rankName).open(player)
                     }
                 }.open(event.player)
             }
@@ -107,8 +109,6 @@ class StartItemEditGui : InventoryGui("시작 아이템 수정", 6) {
     }
 
     override fun onClose(event: InventoryGuiCloseEvent) {
-        val startItem = GameCore.unsafe.startItemManager.startItem
-
         // 갑옷
         startItem.helmetItem = armorPanel.getItemInInventory(1, 1)
         startItem.chestplatItem = armorPanel.getItemInInventory(2, 1)
@@ -119,7 +119,8 @@ class StartItemEditGui : InventoryGui("시작 아이템 수정", 6) {
         startItem.items.clear()
         itemPanel.itemListInInventory.forEach { startItem.items.add(it as ItemStack) }
 
-        startItem.saveStartItemConfig()
+        GameCore.unsafe.startItemManager.set(rankName, startItem)
+        GameCore.unsafe.startItemService.saveStartItemConfig(rankName)
         event.player.sendMessage("§b시작 아이템을 저장했습니다.")
     }
 
