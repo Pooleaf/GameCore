@@ -10,7 +10,7 @@ import org.bukkit.Location
  * 팀간 PVP가 금지됩니다.
  */
 class Team(
-    val id: Int,
+    val id: Int = GameCore.unsafe.teamManager.teams.size,
     var teamName: String? = null
 ) {
 

@@ -26,7 +26,7 @@ class TeamNameTagManager : AbstractManager<UUID, String>() { // PlayerUUID, Team
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SCOREBOARD_TEAM)
         packet.strings.write(0, teamName)
         packet.integers.write(1, 0)
-        packet.strings.write(2, "§7[팀] ")
+        packet.strings.write(2, "§7[팀] §f")
         packet.getSpecificModifier(Collection::class.java).write(0, gamePlayer.team!!.players.map { it.name })
 
         ProtocolLibrary.getProtocolManager().sendServerPacket(gamePlayer.player, packet)

@@ -90,13 +90,12 @@ open class GameSideBar(val title: String) {
             beforeElement = element
         }
 
-
         val sideBar = viewers.get(gamePlayer)!!
         sideBar.texts = texts
 
         // 적용
         BukkitSyncScope.launch {
-            if (!gamePlayer.player.isOnline) return@launch
+            if (!gamePlayer.isOnline) return@launch
             gamePlayer.player.scoreboard = sideBar.updateScoreboard(null)
         }
     }

@@ -123,6 +123,7 @@ class GameManager {
         // 투표 초기화
         GameCore.unsafe.startVoteManager.initVote()
         GameCore.unsafe.mapVoteManager.initVote()
+        GameCore.unsafe.godModeSkipVoteManager.initVote()
 
         // 사이드바
         if (GameCore.unsafe.sideBarManager.isSideBarTimerRunning()) {
@@ -217,6 +218,15 @@ class GameManager {
     fun onGameStarted() {
         // 팀 매칭
         GameCore.unsafe.teamService.matchingTeams(GameCore.teamConfig.playerCountPerTeam, GameCore.teamConfig.maxTeamCount)
+        // 매칭 후 팀이 없을 경우 설정한 팀보다 인원이 많은 것이므로 관전 처리
+        GameCore.unsafe.playerManager.getJoinedPlayers()
+            .filter { it.team == null }
+            .forEach {
+                BukkitAsyncScope.launch {
+                    GameCore.unsafe.playerService.enableSpectatorMode(it)
+                    it.sendWarningSafely("게임에 참여할 수 있는 인원을 초과하여 관전 모드로 전환되었습니다.")
+                }
+            }
 
         // 게임 정보 업데이트
         game.isGameStarted = true

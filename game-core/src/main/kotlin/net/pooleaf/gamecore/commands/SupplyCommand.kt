@@ -22,8 +22,7 @@ class SupplyCommand {
         parent = ["", "게임"],
         name = ["보급품", "supply"],
         description = "보급품 명령어를 확인합니다.",
-        helpCommand = true,
-        color = CommonChatColor.AQUA,
+        helpCommand = true
     )
     fun supply(sender: CommonCommandSender<CommandSender>, result: HelpCommandResult) {
     }
@@ -32,8 +31,7 @@ class SupplyCommand {
         parent = ["보급품", "게임 보급품"],
         name = ["기록", "history"],
         arguments = "(페이지)",
-        description = "보급품 기록을 확인합니다.",
-        color = CommonChatColor.AQUA,
+        description = "보급품 기록을 확인합니다."
     )
     fun supply_history(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
         if (!GameCore.game.isGameStarted) {
@@ -156,7 +154,7 @@ class SupplyCommand {
             }
 
             override fun handleValue(supply: Supply, i: Int): Any {
-                return SimpleComponentBuilder("$headerColor[ $i ] §f${supply.name} §b/ 확률 비율: §f${supply.probabilityRatio}")
+                return SimpleComponentBuilder("$headerColor[ ${i + 1} ] §f${supply.name} §b/ 확률 비율: §f${supply.probabilityRatio}")
                     .hoverShowText("§b클릭 시 §f${supply.name} §b보급품을 수정합니다.")
                     .clickRunCommand("/게임 보급품 수정 ${supply.name}")
                     .build()

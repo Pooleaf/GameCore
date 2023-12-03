@@ -191,7 +191,7 @@ class MapCommand {
             }
 
             override fun handleValue(map: GameMap, i: Int): Any {
-                return SimpleComponentBuilder("$headerColor[ $i ] §f${map.name}")
+                return SimpleComponentBuilder("$headerColor[ ${i + 1} ] §f${map.name}")
                     .hoverShowText(
                         """
                             ${map.name}

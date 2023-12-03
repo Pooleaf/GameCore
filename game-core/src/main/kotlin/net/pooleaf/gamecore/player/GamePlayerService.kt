@@ -90,6 +90,7 @@ class GamePlayerService {
             // 투표 삭제
             GameCore.unsafe.startVoteManager.unvote(gamePlayer)
             GameCore.unsafe.mapVoteManager.unvote(gamePlayer)
+            GameCore.unsafe.godModeSkipVoteManager.unvote(gamePlayer)
 
             // 이벤트
             Bukkit.getPluginManager().callEvent(GamePlayerResetEvent(gamePlayer))
@@ -205,7 +206,7 @@ class GamePlayerService {
         if (gamePlayer.isSpectator) error("gamePlayer already spectator")
 
         BukkitSyncScope.launch {
-            val isJoined = gamePlayer.isJoined
+            val isJoined = GameCore.game.isGameStarted && gamePlayer.isJoined
 
             // 정보 업데이트
             gamePlayer.isSpectator = true
@@ -219,9 +220,9 @@ class GamePlayerService {
             // 리셋
             resetPlayer(gamePlayer)
 
-            // 리셋하면 참여 정보가 사라지므로 다시 설정
+            // 게임 중 참여 해제하고 리셋하면 정보가 사라지므로 다시 설정
             gamePlayer.isJoined = isJoined
-            if (GameCore.unsafe.teamNameTagManager.exists(gamePlayer.uuid)) {
+            if (isJoined && GameCore.unsafe.teamNameTagManager.exists(gamePlayer.uuid)) {
                 GameCore.unsafe.teamNameTagManager.setTeamNameTag(gamePlayer)
             }
 

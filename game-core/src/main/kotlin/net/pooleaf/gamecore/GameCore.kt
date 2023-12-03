@@ -27,6 +27,7 @@ import net.pooleaf.gamecore.supply.SupplyService
 import net.pooleaf.gamecore.team.TeamManager
 import net.pooleaf.gamecore.team.TeamNameTagManager
 import net.pooleaf.gamecore.team.TeamService
+import net.pooleaf.gamecore.vote.godmodeskip.GodModeSkipVoteManager
 import net.pooleaf.gamecore.vote.map.MapVoteManager
 import net.pooleaf.gamecore.vote.start.StartVoteManager
 import org.bukkit.plugin.java.JavaPlugin
@@ -51,6 +52,7 @@ object GameCore {
 
         lateinit var startVoteManager: StartVoteManager
         lateinit var mapVoteManager: MapVoteManager
+        lateinit var godModeSkipVoteManager: GodModeSkipVoteManager
 
         lateinit var quickBarManager: QuickBarManager
         lateinit var sideBarManager: GameSideBarManager
@@ -97,6 +99,7 @@ object GameCore {
 
             startVoteManager = StartVoteManager()
             mapVoteManager = MapVoteManager()
+            godModeSkipVoteManager = GodModeSkipVoteManager()
 
             quickBarManager = QuickBarManager()
             sideBarManager = GameSideBarManager()

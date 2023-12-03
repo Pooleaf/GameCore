@@ -75,7 +75,9 @@ open class Phase() {
         }
         job?.join()
 
-        end()
+        if (!isEnded) {
+            end()
+        }
     }
 
     /**
@@ -85,9 +87,9 @@ open class Phase() {
         if (!isStarted) error("Phase not started.")
         if (isEnded) error("Phase already ended.")
 
-        job?.cancel() ?: error("job cannot be null")
-
         isEnded = true
+        job?.cancel()
+
         onEnd()
     }
 
@@ -98,9 +100,9 @@ open class Phase() {
         if (!isStarted) error("Phase not started")
         if (isEnded) error("Phase already ended.")
 
-        job?.cancel() ?: error("job cannot be null")
-
         isEnded = true
+        job?.cancel()
+
         onCancel()
     }
 

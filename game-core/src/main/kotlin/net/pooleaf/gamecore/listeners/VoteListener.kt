@@ -13,6 +13,7 @@ class VoteListener: Listener {
 
         GameCore.unsafe.startVoteManager.unvote(gamePlayer)
         GameCore.unsafe.mapVoteManager.unvote(gamePlayer)
+        GameCore.unsafe.godModeSkipVoteManager.unvote(gamePlayer)
     }
 
 }

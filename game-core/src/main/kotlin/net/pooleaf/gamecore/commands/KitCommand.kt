@@ -122,7 +122,7 @@ class KitCommand {
             }
 
             override fun handleValue(kit: Kit, i: Int): Any {
-                return SimpleComponentBuilder("$headerColor[ $i ] §f${kit.name}")
+                return SimpleComponentBuilder("$headerColor[ ${i + 1} ] §f${kit.name}")
                     .hoverShowText("§b클릭 시 §f${kit.name} §b킷을 수정합니다.")
                     .clickRunCommand("/게임 킷 수정 ${kit.name}")
                     .build()

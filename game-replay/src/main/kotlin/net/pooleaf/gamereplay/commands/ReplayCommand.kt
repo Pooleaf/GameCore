@@ -223,7 +223,7 @@ class ReplayCommand {
                 val seconds = (replayDto.endTick.toFloat() / 20).toLong()
                 val runningTime = StringUtil.buildTimeStringFromSeconds(seconds, CommonChatColor.WHITE, CommonChatColor.RED)
 
-                return SimpleComponentBuilder("§c[ $i ] §f${replayDto.gameId} §c| §f${createdTime} §c| §f${runningTime}")
+                return SimpleComponentBuilder("§c[ ${i + 1} ] §f${replayDto.gameId} §c| §f${createdTime} §c| §f${runningTime}")
                     .hoverShowText("§e클릭 시 §f${replayDto.gameId} §e리플레이를 재생합니다.")
                     .clickRunCommand("/리플레이 재생 ${replayDto.gameId}")
                     .build()

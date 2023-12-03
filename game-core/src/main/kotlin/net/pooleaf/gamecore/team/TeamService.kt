@@ -12,7 +12,7 @@ class TeamService {
      */
     fun addPlayer(team: Team, gamePlayer: GamePlayer): Boolean {
         if (team.players.contains(gamePlayer)) return false
-        team.players.add(gamePlayer);
+        team.players.add(gamePlayer)
 
         // 이름표 접두사 팀 표시 보여주기
         if (gamePlayer.team!!.players.size > 1) {
@@ -35,8 +35,12 @@ class TeamService {
 
         // 이름표 접두사 팀 표시 제거
         if (gamePlayer.team!!.players.isNotEmpty()) {
-            team.players.forEach { GameCore.unsafe.teamNameTagManager.setTeamNameTag(it) }
-            GameCore.unsafe.teamNameTagManager.removeTeamNameTag(gamePlayer)
+            team.players.filter { it.isOnline }
+                .forEach { GameCore.unsafe.teamNameTagManager.setTeamNameTag(it) }
+
+            if (gamePlayer.isOnline) {
+                GameCore.unsafe.teamNameTagManager.removeTeamNameTag(gamePlayer)
+            }
         }
 
         return removed

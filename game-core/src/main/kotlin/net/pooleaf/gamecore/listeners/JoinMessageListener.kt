@@ -1,6 +1,8 @@
 package net.pooleaf.gamecore.listeners
 
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.events.player.GamePlayerJoinEvent
+import net.pooleaf.gamecore.events.player.GamePlayerQuitEvent
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
@@ -13,7 +15,7 @@ class JoinMessageListener: Listener {
      *                 관전 중 -> 관전 메시지
      */
     @EventHandler
-    fun onPlayerJoin(event: net.pooleaf.gamecore.events.player.GamePlayerJoinEvent) {
+    fun onPlayerJoin(event: GamePlayerJoinEvent) {
         val gamePlayer = event.gamePlayer
         val playerJoinEvent = event.playerJoinEvent
 
@@ -39,7 +41,7 @@ class JoinMessageListener: Listener {
      *                 관전 중 -> 관전 퇴장 메시지
      */
     @EventHandler
-    fun onPlayerQuit(event: net.pooleaf.gamecore.events.player.GamePlayerQuitEvent) {
+    fun onPlayerQuit(event: GamePlayerQuitEvent) {
         val gamePlayer = event.gamePlayer
         val playerQuitEvent = event.playerQuitEvent
 

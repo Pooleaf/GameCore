@@ -107,8 +107,6 @@ class GameCommand {
         description = "게임에 참여 중인 플레이어 목록을 확인합니다."
     )
     fun game_playerList(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
-        sender.sendMessage("")
-
         // 참여자
         val playerNames = if (!GameCore.game.isGameStarted) {
             GameCore.unsafe.playerManager.getOnlinePlayingPlayers().joinToString { it.displayName }

@@ -70,11 +70,15 @@ class GamePlayerListener: Listener {
                 }
             }
 
-
             // 이벤트
-            Bukkit.getPluginManager().callEvent(GamePlayerJoinEvent(gamePlayer, event))
+            val gamePlayerJoinEvent = GamePlayerJoinEvent(gamePlayer, event)
+            Bukkit.getPluginManager().callEvent(gamePlayerJoinEvent)
 
+            // 접속 메시지
+            gamePlayerJoinEvent.playerJoinEvent.joinMessage?.let { BukkitBroadcaster.broadcast(it) }
         }
+
+        event.joinMessage = null
     }
 
     /**
@@ -118,7 +122,11 @@ class GamePlayerListener: Listener {
             }
 
             // 이벤트
-            Bukkit.getPluginManager().callEvent(GamePlayerQuitEvent(gamePlayer, event))
+            val gamePlayerQuitEvent = GamePlayerQuitEvent(gamePlayer, event)
+            Bukkit.getPluginManager().callEvent(gamePlayerQuitEvent)
+
+            // 접속 메시지
+            gamePlayerQuitEvent.playerQuitEvent.quitMessage?.let { BukkitBroadcaster.broadcast(it) }
 
             // 관전 해제
             if (gamePlayer.isSpectator) {
@@ -139,6 +147,8 @@ class GamePlayerListener: Listener {
                 }
             }, 1L)
         }
+
+        event.quitMessage = null
     }
 
 }
