@@ -8,36 +8,36 @@ import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.phase.Phase
 import net.pooleaf.gamecore.utils.StringUtil
 
-abstract class GodModPhase() : Phase() {
+abstract class GodModePhase() : Phase() {
 
-    var remainingGodModSeconds: Int? = null
+    var remainingGodModeSeconds: Int? = null
 
 
     /**
      * 무적 지속 시간을 반환합니다.
      */
-    abstract fun getGodModSeconds(): Int
+    abstract fun getGodModeSeconds(): Int
 
     override fun onInit() {
-        remainingGodModSeconds = null
+        remainingGodModeSeconds = null
     }
 
     override suspend fun onStart() {
         GameCore.game.isGodMode = true
 
         // 무적 알림
-        val godModTime = StringUtil.buildTimeStringWithColor(getGodModSeconds() * 1000L, CommonChatColor.WHITE, CommonChatColor.YELLOW)
+        val godModeTime = StringUtil.buildTimeStringWithColor(getGodModeSeconds() * 1000L, CommonChatColor.WHITE, CommonChatColor.YELLOW)
 
         BukkitBroadcaster.broadcast("")
         BukkitBroadcaster.broadcast("§e무적 시간이 시작되었습니다.")
-        BukkitBroadcaster.broadcast("${godModTime} §e간 무적 상태가 지속됩니다.")
+        BukkitBroadcaster.broadcast("${godModeTime} §e간 무적 상태가 지속됩니다.")
         BukkitBroadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
     }
 
     override suspend fun onRun() {
         // 카운트
-        for (count in getGodModSeconds() downTo 1) {
-            remainingGodModSeconds = count
+        for (count in getGodModeSeconds() downTo 1) {
+            remainingGodModeSeconds = count
 
             if (count <= 5) {
                 val remainingTime = StringUtil.buildTimeStringWithColor(count * 1000L, CommonChatColor.WHITE, CommonChatColor.YELLOW)

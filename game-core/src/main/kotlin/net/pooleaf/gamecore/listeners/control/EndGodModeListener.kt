@@ -5,7 +5,7 @@ import net.pooleaf.gamecore.GameCore
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
-class EndGodModListener: Listener {
+class EndGodModeListener: Listener {
 
     @EventHandler
     fun onPlayerDamage(event: PlayerDamageEvent) {
