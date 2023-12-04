@@ -5,6 +5,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.channel.ChannelModule
+import net.pooleaf.core.modules.channel.common.channel.KnownChannelStatus
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitNewAsyncScope
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
@@ -52,6 +53,10 @@ class GameManager {
         game.endedAt = null
 
         game.currentGameMode = game.waitingGameMode
+
+        // 채널 상태 변경
+        ChannelModule.getCurrentChannel().channelStatus = KnownChannelStatus.GAME_WAITING
+        ChannelModule.getCurrentChannel().save()
 
         // 이벤트
         Bukkit.getPluginManager().callEvent(GameInitEvent())
@@ -190,6 +195,10 @@ class GameManager {
             // 게임 정보 업데이트
             game.gameId = UUID.randomUUID()
 
+            // 채널 상태 변경
+            ChannelModule.getCurrentChannel().channelStatus = KnownChannelStatus.GAME_STARTING
+            ChannelModule.getCurrentChannel().save()
+
             // 액션바 제거
             BukkitBroadcaster.removeActionBar()
 
@@ -231,6 +240,10 @@ class GameManager {
         // 게임 정보 업데이트
         game.isGameStarted = true
         game.startedAt = LocalDateTime.now()
+
+        // 채널 상태 변경
+        ChannelModule.getCurrentChannel().channelStatus = KnownChannelStatus.GAME_PLAYING
+        ChannelModule.getCurrentChannel().save()
 
         // 액션바 제거
         BukkitBroadcaster.removeActionBar()
@@ -348,6 +361,10 @@ class GameManager {
         // 게임 정보 업데이트
         game.isEnded = true
         game.endedAt = LocalDateTime.now()
+
+        // 채널 상태 변경
+        ChannelModule.getCurrentChannel().channelStatus = KnownChannelStatus.GAME_ENDING
+        ChannelModule.getCurrentChannel().save()
 
         // 재접속 중인 플레이어 탈락처리
         GameCore.unsafe.playerManager.getJoinedPlayers().filter { it.reconnectJob?.isActive == true }
