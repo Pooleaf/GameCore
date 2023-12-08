@@ -3,8 +3,10 @@ package net.pooleaf.gamecore.startitem
 import net.pooleaf.core.modules.annoconfig.AnnoConfigModule
 import net.pooleaf.core.modules.support.common.logger.Logger
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.events.player.GamePlayerStartItemReceiveEvent
 import net.pooleaf.gamecore.player.GamePlayer
 import net.pooleaf.permission.common.PermissionApi
+import org.bukkit.Bukkit
 import java.io.File
 
 class StartItemService {
@@ -77,15 +79,15 @@ class StartItemService {
         if (!gamePlayer.isOnline) error("gamePlayer is not online")
         if (gamePlayer.isReceiveStartItems) error("gamePlayer already receive start items.")
 
+        var startItem = StartItem()
         val defaultStartItem = GameCore.unsafe.startItemManager.get(defaultStartItemName)
         if (defaultStartItem != null) {
-            val player = gamePlayer.player
-            player.inventory.helmet = defaultStartItem.helmetItem
-            player.inventory.chestplate = defaultStartItem.chestplatItem
-            player.inventory.leggings = defaultStartItem.leggingsItem
-            player.inventory.boots = defaultStartItem.bootsItem
-            defaultStartItem.items.forEach { player.inventory.addItem(it) }
-            player.level = defaultStartItem.level
+            startItem.helmetItem = defaultStartItem.helmetItem
+            startItem.chestplatItem = defaultStartItem.chestplatItem
+            startItem.leggingsItem = defaultStartItem.leggingsItem
+            startItem.bootsItem = defaultStartItem.bootsItem
+            startItem.items.addAll(defaultStartItem.items)
+            startItem.level = defaultStartItem.level
         }
 
         val permissionPlayer = PermissionApi.getPlayer(gamePlayer.uuid)
@@ -93,14 +95,30 @@ class StartItemService {
 
         val rankStartItem = GameCore.unsafe.startItemManager.get(permissionGroupName)
         if (rankStartItem != null) {
-            val player = gamePlayer.player
-            if (rankStartItem.helmetItem != null) player.inventory.helmet = rankStartItem.helmetItem
-            if (rankStartItem.chestplatItem != null) player.inventory.chestplate = rankStartItem.chestplatItem
-            if (rankStartItem.leggingsItem != null) player.inventory.leggings = rankStartItem.leggingsItem
-            if (rankStartItem.bootsItem != null) player.inventory.boots = rankStartItem.bootsItem
-            rankStartItem.items.forEach { player.inventory.addItem(it) }
-            if (rankStartItem.level != 0) player.level = rankStartItem.level
+            if (rankStartItem.helmetItem != null) startItem.helmetItem = rankStartItem.helmetItem
+            if (rankStartItem.chestplatItem != null) startItem.chestplatItem = rankStartItem.chestplatItem
+            if (rankStartItem.leggingsItem != null) startItem.leggingsItem = rankStartItem.leggingsItem
+            if (rankStartItem.bootsItem != null) startItem.bootsItem = rankStartItem.bootsItem
+            startItem.items.addAll(rankStartItem.items)
+            if (rankStartItem.level != 0) startItem.level = rankStartItem.level
         }
+
+        // 이벤트
+        val event = GamePlayerStartItemReceiveEvent(gamePlayer, startItem)
+        Bukkit.getPluginManager().callEvent(event)
+        if (event.isCancelled) return
+
+        // 이벤트에서 수정한 시작아이템 사용
+        startItem = event.startItem
+
+        // 시작아이템 지급
+        val player = gamePlayer.player
+        player.inventory.helmet = startItem.helmetItem
+        player.inventory.chestplate = startItem.chestplatItem
+        player.inventory.leggings = startItem.leggingsItem
+        player.inventory.boots = startItem.bootsItem
+        startItem.items.forEach { player.inventory.addItem(it) }
+        player.level = startItem.level
 
         gamePlayer.isReceiveStartItems = true
     }

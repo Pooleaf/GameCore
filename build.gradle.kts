@@ -24,7 +24,7 @@ allprojects {
         compileOnly("io.papermc:paper-api:1.8.8")
 
         // Pooleaf
-        compileOnly("net.pooleaf:core:1.63.3")
+        compileOnly("net.pooleaf:core:1.65.1")
         compileOnly("net.pooleaf:permission:1.0.0")
 
         // Bukkit Library
