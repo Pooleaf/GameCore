@@ -2,6 +2,7 @@ package net.pooleaf.gamehistory.listeners
 
 import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitNewAsyncScope
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.game.GameEndEvent
 import net.pooleaf.gamecore.events.player.GamePlayerDeathEvent
@@ -37,7 +38,7 @@ class GamePlayerStatsListener : Listener {
             LocalDateTime.now()
         )
 
-        BukkitAsyncScope.launch {
+        BukkitNewAsyncScope.launch {
             // 킬 정보 저장
             GameHistoryApi.unsafe.sqlManager.gameDao.insertGameKill(gameKillDto)
 
@@ -54,7 +55,7 @@ class GamePlayerStatsListener : Listener {
     fun onPlayerDefeat(event: GamePlayerDefeatEvent) {
         val dto = event.gamePlayer.toDto()
 
-        BukkitAsyncScope.launch {
+        BukkitNewAsyncScope.launch {
             GameHistoryApi.unsafe.sqlManager.gameDao.updateGameParticipantDefeat(dto)
         }
     }
@@ -70,7 +71,7 @@ class GamePlayerStatsListener : Listener {
 
         val gameTypeId = GameCore.game.gameTypeId
 
-        BukkitAsyncScope.launch {
+        BukkitNewAsyncScope.launch {
             winnerTeam.players.forEach { gamePlayer ->
                 GameHistoryApi.unsafe.sqlManager.gameDao.addGamePlayerStatsWinCount(gamePlayer.uuid, gameTypeId, 1)
             }
