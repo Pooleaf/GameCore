@@ -23,7 +23,7 @@ open class GamePlayerManager<T: GamePlayer>(
      * [name]으로 [T]를 찾아 반환합니다.
      */
     fun getByName(name: String): T? {
-        return values().firstOrNull { it.name == name }
+        return values().firstOrNull { it.name.equals(name, true) }
     }
 
     /**
