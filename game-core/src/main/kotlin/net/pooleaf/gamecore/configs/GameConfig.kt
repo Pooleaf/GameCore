@@ -30,4 +30,7 @@ class GameConfig(file: File?) : SimpleAnnoConfig(file) {
     @ConfigName("게임 최대 시간(초)")
     var gameMaxSeconds: Int = 60 * 60
 
+    @ConfigName("퇴장 시 탈락 사망 체력 (이하)")
+    var quitDeathHealth: Int = 6
+
 }
