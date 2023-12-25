@@ -92,12 +92,12 @@ object GameReplayApi {
         player.sendMessage("")
         player.sendMessage(SimpleComponentBuilder("§e리플레이를 공유하려면 §6§l[여기]§e를 클릭하고 명령어를 복사하세요.")
             .clickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/리플레이 재생 ${replay.gameId}")
-            .hoverShowText("클릭 시 명령어를 복사하여 다른사람에게 공유하세요!")
+            .hoverShowText("클릭 후 명령어를 복사하여 다른사람에게 공유하세요!")
             .build())
         if (tick > 0) {
             player.sendMessage(SimpleComponentBuilder("§e현재 재생시간의 리플레이를 공유하려면 §6§l[여기]§e를 클릭하고 명령어를 복사하세요.")
                 .clickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/리플레이 재생 ${replay.gameId} ${tick}")
-                .hoverShowText("클릭 시 명령어를 복사하여 다른사람에게 공유하세요!")
+                .hoverShowText("클릭 후 명령어를 복사하여 다른사람에게 공유하세요!")
                 .build())
         }
         XSound.UI_BUTTON_CLICK.play(player, 0.3F, 0.7F)
