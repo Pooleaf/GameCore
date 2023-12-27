@@ -24,8 +24,9 @@ allprojects {
         compileOnly("io.papermc:paper-api:1.8.8")
 
         // Pooleaf
-        compileOnly("net.pooleaf:core:1.65.1")
-        compileOnly("net.pooleaf:permission:1.0.0")
+        compileOnly("net.pooleaf:core:latest.integration")
+        compileOnly("net.pooleaf:permission:latest.integration")
+        compileOnly("net.pooleaf:bungee-party:latest.integration")
 
         // Bukkit Library
         compileOnly("com.grinderwolf:slimeworldmanager-api:2.2.1")

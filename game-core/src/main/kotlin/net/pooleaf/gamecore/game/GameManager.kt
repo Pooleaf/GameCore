@@ -56,6 +56,7 @@ class GameManager {
 
         // 채널 상태 변경
         ChannelModule.getCurrentChannel().channelStatus = KnownChannelStatus.GAME_WAITING
+        ChannelModule.getCurrentChannel().isAllowFastJoin = true
         ChannelModule.getCurrentChannel().save()
 
         // 이벤트
@@ -243,6 +244,7 @@ class GameManager {
 
         // 채널 상태 변경
         ChannelModule.getCurrentChannel().channelStatus = KnownChannelStatus.GAME_PLAYING
+        ChannelModule.getCurrentChannel().isAllowFastJoin = false
         ChannelModule.getCurrentChannel().save()
 
         // 액션바 제거
