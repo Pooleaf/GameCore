@@ -36,7 +36,9 @@ class GameProfileGui(val commonPlayer: CommonPlayer<*>) : InventoryGui("${common
                     .displayName("§f§l${commonPlayer.displayName}")
 
                 if (isOnline) {
-                    builder.lore("§f${ChannelModule.getChannelHasPlayer(commonPlayer.uuid)?.displayName ?: "알 수 없음"} §e채널에 접속 중입니다.")
+                    builder.lore("§f${ChannelModule.getChannelHasPlayer(commonPlayer.uuid)?.displayName ?: "알 수 없음"} §e채널 접속 중")
+                        .lore("§f")
+                        .lore("§f클릭 시 접속 중인 채널로 이동합니다.")
                 } else {
                     builder.lore("§e마지막 접속: §f${commonPlayer.lastOnline.format(DateTimeFormatter.ofPattern("yyyy-MM-dd a hh:mm:ss"))}")
                 }
@@ -99,8 +101,8 @@ class GameProfileGui(val commonPlayer: CommonPlayer<*>) : InventoryGui("${common
 
         // 아이콘 배치
         mainPanel.set(2, 2, profileIcon)
-        mainPanel.set(3, 2, levelIcon)
-        mainPanel.set(4, 2, rankIcon)
+//        mainPanel.set(3, 2, levelIcon)
+        mainPanel.set(3, 2, rankIcon)
         mainPanel.set(7, 2, historyIcon)
 
         updateAsynchronously()
