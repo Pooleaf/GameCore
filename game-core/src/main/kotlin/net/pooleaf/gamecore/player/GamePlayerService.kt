@@ -290,6 +290,14 @@ class GamePlayerService {
     suspend fun defeatPlayer(gamePlayer: GamePlayer) {
         gamePlayer.isDefeated = true
 
+        // 이벤트
+        Bukkit.getPluginManager().callEvent(GamePlayerDefeatEvent(gamePlayer, gamePlayer.getKillerGamePlayer(), gamePlayer.getKillerAssistGamePlayer()))
+
+        // 팀 탈락 이벤트
+        if (gamePlayer.team?.let { it.isDefeated() } == true) {
+            Bukkit.getPluginManager().callEvent(TeamDefeatEvent(gamePlayer.team!!, gamePlayer.getKillerGamePlayer()))
+        }
+
         // 재접속 타이머 취소
         if (gamePlayer.reconnectJob?.isActive == true) {
             gamePlayer.reconnectJob?.cancel()
@@ -303,14 +311,6 @@ class GamePlayerService {
 
         // 관전 텔레포터 GUI 업데이트
         GameCore.unsafe.quickBarManager.spectatorQuickBar.spectatorTeleporterGui.updateAsynchronously()
-
-        // 이벤트
-        Bukkit.getPluginManager().callEvent(GamePlayerDefeatEvent(gamePlayer, gamePlayer.getKillerGamePlayer(), gamePlayer.getKillerAssistGamePlayer()))
-
-        // 팀 탈락 이벤트
-        if (gamePlayer.team?.let { it.isDefeated() } == true) {
-            Bukkit.getPluginManager().callEvent(TeamDefeatEvent(gamePlayer.team!!, gamePlayer.getKillerGamePlayer()))
-        }
     }
 
 }
