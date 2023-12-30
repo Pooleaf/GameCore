@@ -126,7 +126,7 @@ class GameProfileGui(val commonPlayer: CommonPlayer<*>) : InventoryGui("${common
                 .displayName("§b§l다이아몬드")
                 .build()
             "master" -> return ItemBuilder("322") // 황금사과
-                .displayName("§a§l마스터")
+                .displayName("§9§l마스터")
                 .build()
             "challenger" -> return ItemBuilder("322:1") // 인챈트 황금사과
                 .displayName("§e§l챌린저")
