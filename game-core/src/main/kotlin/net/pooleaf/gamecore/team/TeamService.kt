@@ -101,7 +101,7 @@ class TeamService {
                 // 새 팀 생성
                 if (tempTeam == null) {
                     // 최대 팀 수에 도달했을 경우 중단
-                    if (GameCore.unsafe.teamManager.teams.size >= maxTeamCount) {
+                    if (tempTeamIndex >= maxTeamCount) {
                         return@forEach
                     }
 
