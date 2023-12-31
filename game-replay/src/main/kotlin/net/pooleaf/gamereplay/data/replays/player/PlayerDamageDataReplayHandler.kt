@@ -15,6 +15,7 @@ class PlayerDamageDataReplayHandler : RecordDataReplayHandler<PlayerDamageData> 
         val replayPlayer = GameReplayApi.unsafe.replayPlayerManager.get(viewer.uniqueId)
 
         val citizensNpc = replayPlayer.virtualPlayerManager.get(recordData.playerUuid)?.citizensNpc ?: return
+        if (citizensNpc.entity == null) return
 
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ANIMATION)
         packet.integers.write(0, citizensNpc.entity.entityId)

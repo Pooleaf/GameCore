@@ -37,10 +37,10 @@ class VirtualPlayer(
     fun spawnNpc(viewer: Player, location: Location = citizensNpc.storedLocation) {
         citizensNpc.spawn(location)
         citizensNpc.getOrAddTrait(GameModeTrait::class.java).gameMode = GameMode.CREATIVE
-        (citizensNpc.entity as Player).gameMode = GameMode.CREATIVE
+        (citizensNpc.entity as Player?)?.gameMode = GameMode.CREATIVE
 
         // 다른 플레이어들에게서 NPC 가리기
-        Bukkit.getOnlinePlayers().filter { it != viewer }.forEach { it.hidePlayer(citizensNpc.entity as Player) }
+        Bukkit.getOnlinePlayers().filter { it != viewer }.forEach { it.hidePlayer(citizensNpc.entity as Player?) }
 
         isSpawned = true
     }

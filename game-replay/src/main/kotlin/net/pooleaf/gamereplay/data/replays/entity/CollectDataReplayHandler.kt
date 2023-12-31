@@ -16,6 +16,7 @@ class CollectDataReplayHandler : RecordDataReplayHandler<CollectData> {
     override fun onPlay(recordData: CollectData, viewer: Player) {
         val replayPlayer = GameReplayApi.unsafe.replayPlayerManager.get(viewer.uniqueId)
         val citizensNpc = replayPlayer.virtualPlayerManager.get(recordData.collectorPlayerUuid)?.citizensNpc ?: return
+        if (citizensNpc.entity == null) return
 
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.COLLECT)
         packet.integers.write(0, recordData.collectedEntityId + ReplayPlayer.ENTITY_ID_OFFSET)

@@ -13,10 +13,11 @@ class PlayerAnimationDataReplayHandler : RecordDataReplayHandler<PlayerAnimation
         val replayPlayer = GameReplayApi.unsafe.replayPlayerManager.get(viewer.uniqueId)
 
         val citizensNpc = replayPlayer.virtualPlayerManager.get(recordData.playerUuid)?.citizensNpc ?: return
+        if (citizensNpc.entity == null) return
 
         val animationType = PlayerAnimationType.valueOf(recordData.animationType!!)
         if (animationType == PlayerAnimationType.ARM_SWING) {
-            PlayerAnimation.ARM_SWING.play(citizensNpc.entity as Player)
+            PlayerAnimation.ARM_SWING.play(citizensNpc.entity as Player?)
         }
     }
 
