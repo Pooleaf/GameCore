@@ -49,8 +49,10 @@ class StartVoteManager {
 
         // 과반수 동의 시 게임 시작
         // 최소 2명 투표해야 시작 가능
+        // 팀 인원보다 많이 투표해야 시작 가능
         if (!GameCore.game.isCountingStarted
             && startVote.agreePlayers.size >= 2
+            && startVote.agreePlayers.size > GameCore.teamConfig.playerCountPerTeam
             && startVote.agreePlayers.size >= GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size.toFloat() / 2) {
             BukkitSyncScope.launch { GameCore.unsafe.gameManager.startGame(null) }
         }
