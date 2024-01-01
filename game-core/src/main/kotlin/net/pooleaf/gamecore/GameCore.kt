@@ -66,6 +66,9 @@ object GameCore {
         lateinit var supplyManager: SupplyManager
         lateinit var supplyService: SupplyService
 
+        // 재부팅 예약
+        var rebootScheduled = false
+
 
         val gameConfig: GameConfig by lazy {
             GameConfig(File(GameCore.gamePlugin.dataFolder, "game-config.yml"))

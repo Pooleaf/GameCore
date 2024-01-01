@@ -70,6 +70,20 @@ class GameManager {
         // 이벤트
         Bukkit.getPluginManager().callEvent(GameBeforeResetEvent())
 
+        // 재부팅이 예약되어 있을 경우 재부팅
+        if (GameCore.unsafe.rebootScheduled) {
+            ChannelModule.getCurrentChannel().isAllowFastJoin = false
+            ChannelModule.getCurrentChannel().save()
+
+            BukkitBroadcaster.broadcast("서버 재부팅을 위해 로비로 이동됩니다.")
+            Bukkit.getOnlinePlayers().forEach { ChannelModule.getLobbyChannelGroup().fastJoin(it.uniqueId) }
+
+            BukkitAsyncScope.launch {
+                delay(5000L)
+                Bukkit.shutdown()
+            }
+        }
+
         game.isInitialized = false
 
         // 초기화

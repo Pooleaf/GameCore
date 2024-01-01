@@ -1,9 +1,11 @@
 package net.pooleaf.gamecore.commands
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.annocommand.common.Command
 import net.pooleaf.core.modules.annocommand.common.CommandResult
 import net.pooleaf.core.modules.annocommand.common.HelpCommandResult
+import net.pooleaf.core.modules.channel.ChannelModule
 import net.pooleaf.core.modules.commonsender.common.CommonCommandSender
 import net.pooleaf.core.modules.commonsender.common.CommonPlayer
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
@@ -12,6 +14,7 @@ import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import net.pooleaf.core.modules.support.common.CommonChatColor
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.GameCorePermission
+import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
@@ -150,6 +153,44 @@ class GameCommand {
             sender.sendMessage("§b관전자($spectatorPlayerCount): §f${spectatorPlayerNames}")
         }
 
+    }
+
+    @Command(
+        parent = ["", "게임"],
+        name = ["재부팅예약", "scheduleReboot"],
+        description = "서버 재부팅을 예약합니다.",
+        color = CommonChatColor.AQUA,
+        permission = GameCorePermission.ADMIN
+    )
+    fun game_scheduleReboot(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
+        GameCore.unsafe.rebootScheduled = true
+        sender.sendMessage("§a서버 재부팅을 예약했습니다.")
+
+        // 게임 중이 아니면 즉시 재부팅
+        if (!GameCore.game.isCountingStarted) {
+            ChannelModule.getCurrentChannel().isAllowFastJoin = false
+            ChannelModule.getCurrentChannel().save()
+
+            BukkitBroadcaster.broadcast("서버 재부팅을 위해 로비로 이동됩니다.")
+            Bukkit.getOnlinePlayers().forEach { ChannelModule.getLobbyChannelGroup().fastJoin(it.uniqueId) }
+
+            BukkitAsyncScope.launch {
+                delay(5000L)
+                Bukkit.shutdown()
+            }
+        }
+    }
+
+    @Command(
+        parent = ["", "게임"],
+        name = ["재부팅예약취소", "cancelScheduleReboot"],
+        description = "서버 재부팅 예약을 취소합니다.",
+        color = CommonChatColor.AQUA,
+        permission = GameCorePermission.ADMIN
+    )
+    fun game_cancelScheduleReboot(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
+        GameCore.unsafe.rebootScheduled = false
+        sender.sendMessage("§c서버 재부팅 예약을 취소했습니다.")
     }
 
 }
