@@ -13,7 +13,7 @@ class QuitDeathListener : Listener {
         if (!GameCore.game.isGameStarted || GameCore.game.isEnded) return
 
         val player = event.player
-        val gamePlayer = GameCore.unsafe.playerManager.get(player.uniqueId)
+        val gamePlayer = GameCore.unsafe.playerManager.get(player.uniqueId) ?: return
         if (!gamePlayer.isPlaying()) return
 
         // 체력이 낮은 상태로 퇴장 시 사망

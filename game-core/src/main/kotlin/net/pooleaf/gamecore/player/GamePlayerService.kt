@@ -80,18 +80,23 @@ class GamePlayerService {
             // 투명 해제
             Bukkit.getOnlinePlayers().forEach { it.showPlayer(player) }
 
-            // 팀 이름표 접두사 제거
-            if (GameCore.unsafe.teamNameTagManager.exists(gamePlayer.uuid)) {
-                GameCore.unsafe.teamNameTagManager.removeTeamNameTag(gamePlayer)
+            try {
+                // 팀 이름표 접두사 제거
+                if (GameCore.unsafe.teamNameTagManager.exists(gamePlayer.uuid)) {
+                    GameCore.unsafe.teamNameTagManager.removeTeamNameTag(gamePlayer)
+                }
+
+                // 퀵바 제거
+                GuiModule.getQuickBarManager().removeTo(player)
+
+                // 투표 삭제
+                GameCore.unsafe.startVoteManager.unvote(gamePlayer)
+                GameCore.unsafe.mapVoteManager.unvote(gamePlayer)
+                GameCore.unsafe.godModeSkipVoteManager.unvote(gamePlayer)
+            } catch (exception: Exception) {
+                exception.printStackTrace()
             }
 
-            // 퀵바 제거
-            GuiModule.getQuickBarManager().removeTo(player)
-
-            // 투표 삭제
-            GameCore.unsafe.startVoteManager.unvote(gamePlayer)
-            GameCore.unsafe.mapVoteManager.unvote(gamePlayer)
-            GameCore.unsafe.godModeSkipVoteManager.unvote(gamePlayer)
 
             // 이벤트
             Bukkit.getPluginManager().callEvent(GamePlayerResetEvent(gamePlayer))
