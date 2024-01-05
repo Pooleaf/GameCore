@@ -18,6 +18,8 @@ class PlayerDeathListener : Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     fun onDeathDamage(event: PlayerDamageEvent) {
+        if (event.isCancelled) return
+
         val player = event.player
 
         // 죽을 만큼 데미지를 받을 경우
@@ -37,6 +39,9 @@ class PlayerDeathListener : Listener {
 
         // 사망메시지 비활성화 (즉사 시키는 능력 사용 시 사망메시지가 나오지 않도록 하기 위해)
         event.deathMessage = null
+
+        // 드랍템 삭제
+        event.drops.clear()
     }
 
     /**
