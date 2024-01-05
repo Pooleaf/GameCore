@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockExplodeEvent
 import org.bukkit.event.player.PlayerInteractEvent
 
 class SupplyListener: Listener {
@@ -65,6 +66,14 @@ class SupplyListener: Listener {
         if (GameCore.unsafe.supplyManager.getCreatedSupply(location) != null) {
             event.isCancelled = true
         }
+    }
+
+    @EventHandler
+    fun onSupplyExplode(event: BlockExplodeEvent) {
+        if (!GameCore.game.isGameStarted) return
+
+        // 보급품은 부실 수 없음
+        event.blockList().removeIf { GameCore.unsafe.supplyManager.getCreatedSupply(it.location) != null }
     }
 
 }
