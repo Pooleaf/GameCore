@@ -110,11 +110,11 @@ open class GameMap {
     /**
      * 해당 위치가 경계선 안인지 확인합니다.
      */
-    fun isInWorldBorder(location: Location): Boolean {
+    fun isInWorldBorder(location: Location, worldBorderSize: Int = currentWorldBorderSize): Boolean {
         return centerLocation?.let { centerLocation ->
             location.world.equals(centerLocation.world)
-                    && Math.abs(centerLocation.x - location.x) <= currentWorldBorderSize / 2
-                    && Math.abs(centerLocation.z - location.z) <= currentWorldBorderSize / 2
+                    && Math.abs(centerLocation.x - location.x) <= worldBorderSize / 2
+                    && Math.abs(centerLocation.z - location.z) <= worldBorderSize / 2
         } == true
     }
 

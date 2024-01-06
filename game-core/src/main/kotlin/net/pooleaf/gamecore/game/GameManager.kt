@@ -60,7 +60,11 @@ class GameManager {
         ChannelModule.getCurrentChannel().save()
 
         // 이벤트
-        Bukkit.getPluginManager().callEvent(GameInitEvent())
+        try {
+            Bukkit.getPluginManager().callEvent(GameInitEvent())
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+        }
     }
 
     /**
@@ -68,7 +72,11 @@ class GameManager {
      */
     suspend fun resetGame() {
         // 이벤트
-        Bukkit.getPluginManager().callEvent(GameBeforeResetEvent())
+        try {
+            Bukkit.getPluginManager().callEvent(GameBeforeResetEvent())
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+        }
 
         // 재부팅이 예약되어 있을 경우 재부팅
         if (GameCore.unsafe.rebootScheduled) {
@@ -166,7 +174,11 @@ class GameManager {
         stopMaxTimeStopTimer()
 
         // 이벤트
-        Bukkit.getPluginManager().callEvent(GameResetEvent())
+        try {
+            Bukkit.getPluginManager().callEvent(GameResetEvent())
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+        }
 
         game.isInitialized = true
     }
@@ -232,7 +244,11 @@ class GameManager {
             startMaxTimeStopTimer()
 
             // 이벤트
-            Bukkit.getPluginManager().callEvent(GameStartEvent(starterSender))
+            try {
+                Bukkit.getPluginManager().callEvent(GameStartEvent(starterSender))
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+            }
         }.join()
     }
 
@@ -283,7 +299,11 @@ class GameManager {
         GameCore.unsafe.playerManager.getOnlinePlayingPlayers().forEach { it.giveStartItem() }
 
         // 이벤트
-        Bukkit.getPluginManager().callEvent(GameStartedEvent())
+        try {
+            Bukkit.getPluginManager().callEvent(GameStartedEvent())
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+        }
     }
 
     /**
@@ -390,7 +410,11 @@ class GameManager {
         val winnerTeam = GameCore.unsafe.teamManager.getNotDefeatedOnlineTeams().firstOrNull()
 
         // 게임 종료 이벤트
-        Bukkit.getPluginManager().callEvent(GameEndEvent(winnerTeam))
+        try {
+            Bukkit.getPluginManager().callEvent(GameEndEvent(winnerTeam))
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+        }
 
         return winnerTeam
     }
@@ -407,7 +431,11 @@ class GameManager {
         game.endedAt = LocalDateTime.now()
 
         // 이벤트
-        Bukkit.getPluginManager().callEvent(GameCancelEvent(cancelSender, cancelCause))
+        try {
+            Bukkit.getPluginManager().callEvent(GameCancelEvent(cancelSender, cancelCause))
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+        }
 
         // 리셋
         resetGame()
@@ -417,7 +445,11 @@ class GameManager {
         BukkitBroadcaster.broadcastSound(XSound.ENTITY_ITEM_BREAK, 1.0F, 1.0F)
 
         // 이벤트
-        Bukkit.getPluginManager().callEvent(GameCancelledEvent(cancelSender, cancelCause))
+        try {
+            Bukkit.getPluginManager().callEvent(GameCancelledEvent(cancelSender, cancelCause))
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+        }
     }
 
     /**
@@ -452,7 +484,11 @@ class GameManager {
             game.isTeleportedToMap = true
 
             // 이벤트
-            Bukkit.getPluginManager().callEvent(GameMapTeleportedEvent())
+            try {
+                Bukkit.getPluginManager().callEvent(GameMapTeleportedEvent())
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+            }
         } ?: error("currentMap cannot be null")
     }
 

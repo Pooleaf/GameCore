@@ -133,7 +133,11 @@ class GameMapService {
             map.currentWorldBorderSize = newSize
 
             // 이벤트
-            Bukkit.getPluginManager().callEvent(GameWorldBorderChangeEvent(centerLocation, beforeSize, newSize, 0))
+            try {
+                Bukkit.getPluginManager().callEvent(GameWorldBorderChangeEvent(centerLocation, beforeSize, newSize, 0))
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+            }
         } ?: error("centerLocation cannot be null")
     }
 
@@ -160,7 +164,11 @@ class GameMapService {
             map.currentWorldBorderSize = newSize
 
             // 이벤트
-            Bukkit.getPluginManager().callEvent(GameWorldBorderChangeEvent(centerLocation, beforeSize, newSize, updateDurationSeconds))
+            try {
+                Bukkit.getPluginManager().callEvent(GameWorldBorderChangeEvent(centerLocation, beforeSize, newSize, updateDurationSeconds))
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+            }
 
             return updateDurationSeconds
         } ?: error("centerLocation cannot be null")

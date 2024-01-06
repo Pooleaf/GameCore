@@ -72,7 +72,11 @@ class GamePlayerListener: Listener {
 
             // 이벤트
             val gamePlayerJoinEvent = GamePlayerJoinEvent(gamePlayer, event)
-            Bukkit.getPluginManager().callEvent(gamePlayerJoinEvent)
+            try {
+                Bukkit.getPluginManager().callEvent(gamePlayerJoinEvent)
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+            }
 
             // 접속 메시지
             gamePlayerJoinEvent.playerJoinEvent.joinMessage?.let { BukkitBroadcaster.broadcast(it) }
@@ -123,7 +127,11 @@ class GamePlayerListener: Listener {
 
             // 이벤트
             val gamePlayerQuitEvent = GamePlayerQuitEvent(gamePlayer, event)
-            Bukkit.getPluginManager().callEvent(gamePlayerQuitEvent)
+            try {
+                Bukkit.getPluginManager().callEvent(gamePlayerQuitEvent)
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+            }
 
             // 접속 메시지
             gamePlayerQuitEvent.playerQuitEvent.quitMessage?.let { BukkitBroadcaster.broadcast(it) }

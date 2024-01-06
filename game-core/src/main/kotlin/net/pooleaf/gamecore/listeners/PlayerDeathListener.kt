@@ -1,8 +1,6 @@
 package net.pooleaf.gamecore.listeners
 
-import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageEvent
 import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
-import net.pooleaf.core.modules.support.common.logger.Logger
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.player.GamePlayerDeathEvent
 import net.pooleaf.gamecore.killstreak.KillStreak
@@ -11,19 +9,20 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 
 class PlayerDeathListener : Listener {
 
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    fun onDeathDamage(event: PlayerDamageEvent) {
-        if (event.isCancelled) return
+    fun onDeathDamage(event: EntityDamageEvent) {
+        if (event.isCancelled || event.entity !is Player) return
 
-        val player = event.player
+        val player = event.entity as Player
 
         // 죽을 만큼 데미지를 받을 경우
-        if (player.health - event.entityDamageEvent.finalDamage < 1) {
+        if (player.health - event.finalDamage < 1) {
             // 이벤트 캔슬
             event.isCancelled = true
 
@@ -81,7 +80,11 @@ class PlayerDeathListener : Listener {
         }
 
         // 이벤트
-        Bukkit.getPluginManager().callEvent(GamePlayerDeathEvent(deadGamePlayer, killerGamePlayer, assistGamePlayers))
+        try {
+            Bukkit.getPluginManager().callEvent(GamePlayerDeathEvent(deadGamePlayer, killerGamePlayer, assistGamePlayers))
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+        }
     }
 
 }

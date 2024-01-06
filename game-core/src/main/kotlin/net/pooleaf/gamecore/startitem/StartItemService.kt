@@ -105,7 +105,11 @@ class StartItemService {
 
         // 이벤트
         val event = GamePlayerStartItemReceiveEvent(gamePlayer, startItem)
-        Bukkit.getPluginManager().callEvent(event)
+        try {
+            Bukkit.getPluginManager().callEvent(event)
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+        }
         if (event.isCancelled) return
 
         // 이벤트에서 수정한 시작아이템 사용

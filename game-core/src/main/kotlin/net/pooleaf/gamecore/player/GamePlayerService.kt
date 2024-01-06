@@ -37,7 +37,11 @@ class GamePlayerService {
         gamePlayer.reconnectJob = null
 
         // 이벤트
-        Bukkit.getPluginManager().callEvent(GamePlayerInitEvent(gamePlayer))
+        try {
+            Bukkit.getPluginManager().callEvent(GamePlayerInitEvent(gamePlayer))
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+        }
     }
 
     /**
@@ -99,7 +103,11 @@ class GamePlayerService {
 
 
             // 이벤트
-            Bukkit.getPluginManager().callEvent(GamePlayerResetEvent(gamePlayer))
+            try {
+                Bukkit.getPluginManager().callEvent(GamePlayerResetEvent(gamePlayer))
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+            }
         }.await()
     }
 
@@ -130,7 +138,11 @@ class GamePlayerService {
         }
 
         // 이벤트
-        Bukkit.getPluginManager().callEvent(GamePlayerJoinToGameEvent(gamePlayer))
+        try {
+            Bukkit.getPluginManager().callEvent(GamePlayerJoinToGameEvent(gamePlayer))
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+        }
     }
 
     /**
@@ -167,7 +179,11 @@ class GamePlayerService {
         }
 
         // 이벤트
-        Bukkit.getPluginManager().callEvent(GamePlayerQuitFromGameEvent(gamePlayer))
+        try {
+            Bukkit.getPluginManager().callEvent(GamePlayerQuitFromGameEvent(gamePlayer))
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+        }
     }
 
     /**
@@ -260,7 +276,11 @@ class GamePlayerService {
             }
 
             // 이벤트
-            Bukkit.getPluginManager().callEvent(GamePlayerEnableSpectatorModeEvent(gamePlayer))
+            try {
+                Bukkit.getPluginManager().callEvent(GamePlayerEnableSpectatorModeEvent(gamePlayer))
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+            }
         }.join()
     }
 
@@ -283,9 +303,11 @@ class GamePlayerService {
             joinToGame(gamePlayer)
 
             // 이벤트
-            Bukkit.getPluginManager().callEvent(
-                GamePlayerDisableSpectatorModeEvent(gamePlayer)
-            )
+            try {
+                Bukkit.getPluginManager().callEvent(GamePlayerDisableSpectatorModeEvent(gamePlayer))
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+            }
         }.await()
     }
 
@@ -296,11 +318,19 @@ class GamePlayerService {
         gamePlayer.isDefeated = true
 
         // 이벤트
-        Bukkit.getPluginManager().callEvent(GamePlayerDefeatEvent(gamePlayer, gamePlayer.getKillerGamePlayer(), gamePlayer.getKillerAssistGamePlayer()))
+        try {
+            Bukkit.getPluginManager().callEvent(GamePlayerDefeatEvent(gamePlayer, gamePlayer.getKillerGamePlayer(), gamePlayer.getKillerAssistGamePlayer()))
+        } catch (exception: Exception) {
+            exception.printStackTrace()
+        }
 
         // 팀 탈락 이벤트
         if (gamePlayer.team?.let { it.isDefeated() } == true) {
-            Bukkit.getPluginManager().callEvent(TeamDefeatEvent(gamePlayer.team!!, gamePlayer.getKillerGamePlayer()))
+            try {
+                Bukkit.getPluginManager().callEvent(TeamDefeatEvent(gamePlayer.team!!, gamePlayer.getKillerGamePlayer()))
+            } catch (exception: Exception) {
+                exception.printStackTrace()
+            }
         }
 
         // 재접속 타이머 취소
