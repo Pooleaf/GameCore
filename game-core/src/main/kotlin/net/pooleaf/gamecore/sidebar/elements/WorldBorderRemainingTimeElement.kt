@@ -15,7 +15,7 @@ class WorldBorderRemainingTimeElement: GameSideBarPersonalNamedTextElement("§6�
 
     override fun getValueText(gamePlayer: GamePlayer): String {
         val worldBorderUpdatePhase = GameCore.game.phasePipeline.currentPhase as WorldBorderUpdatePhase
-        return "${StringUtil.buildTimeStringFromSeconds(worldBorderUpdatePhase.updateRemainingSeconds?.toLong() ?: 0)} §6 / ${if (GameCore.currentMap?.isInWorldBorder(gamePlayer.player.location, worldBorderUpdatePhase.getNewWorldBorderSize()) == true) "§f안전" else "§c위험"}"
+        return "${StringUtil.buildTimeStringFromSeconds(worldBorderUpdatePhase.updateRemainingSeconds?.toLong() ?: 0)} §6/ ${if (GameCore.currentMap?.isInWorldBorder(gamePlayer.player.location, worldBorderUpdatePhase.getNewWorldBorderSize()) == true) "§f안전" else "§c위험"}"
     }
 
     override fun isShow(gamePlayer: GamePlayer): Boolean {

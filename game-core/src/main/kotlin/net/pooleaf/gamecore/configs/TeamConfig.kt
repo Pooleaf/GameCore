@@ -12,7 +12,16 @@ class TeamConfig(file: File?) : SimpleAnnoConfig(file) {
     @ConfigName("팀당 플레이어 수")
     val playerCountPerTeam: Int = 1
 
-    @ConfigName("팀끼리 PVP 허용")
-    val allowPvp: Boolean = false
+    @ConfigName("PVP.허용")
+    val allowPvp: Boolean = true
+
+    @ConfigName("낮은 데미지 PVP.허용")
+    val allowLowDamagePvp: Boolean = false
+
+    @ConfigName("낮은 데미지 PVP.데미지 기준(이하)")
+    val allowedLowDamage: Int = 1
+
+    @ConfigName("데미지 0으로 변환.사용")
+    val useDamageConvertToZero: Boolean = true
 
 }

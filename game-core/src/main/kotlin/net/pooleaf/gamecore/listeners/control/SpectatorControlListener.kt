@@ -5,6 +5,7 @@ import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageBy
 import net.pooleaf.core.modules.eventsupport.bukkit.events.damage.PlayerDamageEvent
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.player.GamePlayerJoinEvent
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -132,10 +133,12 @@ class SpectatorControlListener: Listener {
 
     @EventHandler(priority = EventPriority.HIGH)
     fun onWorldChange(event: PlayerChangedWorldEvent) {
-        if (isSpectator(event.player) && !isWaiting()) {
-            event.player.allowFlight = true
-            event.player.isFlying = true
-        }
+        Bukkit.getScheduler().runTaskLater(GameCore.gamePlugin, {
+            if (isSpectator(event.player) && !isWaiting()) {
+                event.player.allowFlight = true
+                event.player.isFlying = true
+            }
+        }, 1L)
     }
 
 }

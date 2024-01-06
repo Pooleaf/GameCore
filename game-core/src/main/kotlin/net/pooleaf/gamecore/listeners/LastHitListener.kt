@@ -15,9 +15,10 @@ class LastHitListener: Listener {
         val damagedGamePlayer = event.player.toGamePlayer()
         val damagerGamePlayer = event.damager?.toGamePlayer()
 
-        damagerGamePlayer?.let { damagerGamePlayer ->
-            damagedGamePlayer?.lastDamagers?.put(damagerGamePlayer, System.currentTimeMillis())
-        }
+        if (damagedGamePlayer == null || damagerGamePlayer == null) return
+        if (damagedGamePlayer.team == damagerGamePlayer.team) return
+
+        damagedGamePlayer.lastDamagers.put(damagerGamePlayer, System.currentTimeMillis())
     }
 
 }

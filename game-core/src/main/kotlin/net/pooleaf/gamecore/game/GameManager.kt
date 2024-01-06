@@ -355,7 +355,7 @@ class GameManager {
             }
             // 아무도 없을 경우
             else if (GameCore.unsafe.teamManager.getNotDefeatedOnlineTeams().isEmpty()) {
-                cancelGame(null)
+                cancelGame(null, "우승 가능한 팀이 없습니다.")
             }
             // 우승
             else {

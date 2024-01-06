@@ -13,8 +13,8 @@ class TeamNameTagManager : AbstractManager<UUID, String>() { // PlayerUUID, Team
      * 팀 이름표 접두사를 보여줍니다.
      */
     fun setTeamNameTag(gamePlayer: GamePlayer) {
-        if (!gamePlayer.isOnline) error("gamePlayer is not online")
-        if (gamePlayer.team == null) error("gamePlayer's team is not exists")
+        if (!gamePlayer.isOnline) return
+        if (gamePlayer.team == null) return
 
         // 이미 팀을 생성했을 경우 삭제 후 다시생성
         if (exists(gamePlayer.uuid)) {
@@ -38,9 +38,9 @@ class TeamNameTagManager : AbstractManager<UUID, String>() { // PlayerUUID, Team
      * 팀 이름표 접두사를 삭제합니다.
      */
     fun removeTeamNameTag(gamePlayer: GamePlayer) {
-        if (!gamePlayer.isOnline) error("gamePlayer is not online")
+        if (!gamePlayer.isOnline) return
 
-        val teamName = get(gamePlayer.uuid) ?: error("teamName not exists")
+        val teamName = get(gamePlayer.uuid) ?: return
 
         val packet = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SCOREBOARD_TEAM)
         packet.strings.write(0, teamName)
