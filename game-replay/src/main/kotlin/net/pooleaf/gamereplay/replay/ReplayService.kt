@@ -76,6 +76,10 @@ class ReplayService {
             replayPlayer.jumpTo(tick)
         }
 
+        // 날기 허용
+        viewer.allowFlight = true
+        viewer.isFlying = true
+
         viewer.sendMessage("${replayPlayer.replay.gameId} §e리플레이를 재생합니다.")
 
         return replayPlayer
@@ -93,6 +97,10 @@ class ReplayService {
         replayPlayer.exit()
 
         GameReplayApi.unsafe.replayPlayerManager.remove(viewer.uniqueId)
+
+        // 날기 비허용
+        viewer.allowFlight = false
+        viewer.isFlying = false
 
         // 뷰어 텔레포트
         GameReplayApi.spawnConfig.spawnLocation?.let { spawnLocation -> TeleportUtil.teleport(viewer, spawnLocation) }
