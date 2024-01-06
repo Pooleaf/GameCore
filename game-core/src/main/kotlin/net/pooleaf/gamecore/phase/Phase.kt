@@ -84,8 +84,8 @@ open class Phase() {
      * Phase를 종료합니다.
      */
     fun end() {
-        if (!isStarted) error("Phase not started.")
-        if (isEnded) error("Phase already ended.")
+        if (!isStarted) return
+        if (isEnded) return
 
         isEnded = true
         job?.cancel()
@@ -97,8 +97,8 @@ open class Phase() {
      * Phase를 취소합니다.
      */
     fun cancel() {
-        if (!isStarted) error("Phase not started")
-        if (isEnded) error("Phase already ended.")
+        if (!isStarted) return
+        if (isEnded) return
 
         isEnded = true
         job?.cancel()
