@@ -172,6 +172,7 @@ class GameCommand {
             ChannelModule.getCurrentChannel().save()
 
             BukkitAsyncScope.launch {
+                BukkitBroadcaster.broadcast("§c서버 재부팅을 위해 로비로 이동됩니다.")
                 BukkitBroadcaster.broadcastTitle("§c서버 재부팅을 위해 로비로 이동됩니다.")
 
                 delay(1000L)
