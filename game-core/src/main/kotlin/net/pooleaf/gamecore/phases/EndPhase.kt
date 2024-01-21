@@ -19,7 +19,7 @@ open class EndPhase(): Phase() {
         // 게임 우승 조건이 안될 경우 중단
         if (!GameCore.unsafe.gameManager.canEnd()
             // 우승 가능 시간이 안될 경우
-            || System.currentTimeMillis() - GameCore.game.startedAt!!.toMillis() < GameCore.gameConfig.winAllowSeconds) {
+            || !GameCore.unsafe.gameManager.isWinAllowTime()) {
             GameCore.unsafe.gameManager.stopGame()
         }
 

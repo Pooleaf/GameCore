@@ -348,7 +348,7 @@ class GameManager {
         // 플레이 중인 팀이 한팀 남았으면 게임 종료
         else if (GameCore.game.isGameStarted && GameCore.unsafe.teamManager.getNotDefeatedOnlineTeams().size < 2) {
             // 우승 시간 안됐을 때 중단
-            if (System.currentTimeMillis() - GameCore.game.startedAt!!.toMillis() < GameCore.gameConfig.winAllowSeconds) {
+            if (!isWinAllowTime()) {
                 cancelGame(null, "게임 진행 시간이 적어 우승할 수 없습니다.")
                 BukkitBroadcaster.broadcast("§c게임 진행 시간이 적어 승자가 결정되지 않았습니다.")
                 BukkitBroadcaster.broadcast("§c더 많은 시간을 플레이해야 게임이 정상적으로 종료됩니다.")
@@ -368,7 +368,8 @@ class GameManager {
      * 우승 가능 여부를 반환합니다.
      */
     fun isWinAllowTime(): Boolean {
-        return game.startedAt?.let { System.currentTimeMillis() - it.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() > GameCore.gameConfig.winAllowSeconds * 1000 } == true
+        val startedAt = game.startedAt
+        return startedAt != null && System.currentTimeMillis() - startedAt.toMillis() > GameCore.gameConfig.winAllowSeconds * 1000
     }
 
     /**
