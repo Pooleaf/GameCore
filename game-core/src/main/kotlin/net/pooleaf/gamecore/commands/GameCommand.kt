@@ -171,10 +171,12 @@ class GameCommand {
             ChannelModule.getCurrentChannel().isAllowFastJoin = false
             ChannelModule.getCurrentChannel().save()
 
-            BukkitBroadcaster.broadcast("서버 재부팅을 위해 로비로 이동됩니다.")
-            Bukkit.getOnlinePlayers().forEach { ChannelModule.getLobbyChannelGroup().fastJoin(it.uniqueId) }
-
             BukkitAsyncScope.launch {
+                BukkitBroadcaster.broadcastTitle("§c서버 재부팅을 위해 로비로 이동됩니다.")
+
+                delay(1000L)
+                Bukkit.getOnlinePlayers().forEach { ChannelModule.getLobbyChannelGroup().fastJoin(it.uniqueId) }
+
                 delay(5000L)
                 Bukkit.shutdown()
             }
