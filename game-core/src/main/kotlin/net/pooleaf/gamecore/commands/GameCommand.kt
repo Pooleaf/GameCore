@@ -1,5 +1,6 @@
 package net.pooleaf.gamecore.commands
 
+import com.cryptomorin.xseries.XSound
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.annocommand.common.Command
@@ -173,12 +174,13 @@ class GameCommand {
 
             BukkitAsyncScope.launch {
                 BukkitBroadcaster.broadcast("§c서버 재부팅을 위해 로비로 이동됩니다.")
-                BukkitBroadcaster.broadcastTitle("§c서버 재부팅을 위해 로비로 이동됩니다.")
+                BukkitBroadcaster.broadcastTitle("§c알림", "§c서버 재부팅을 위해 로비로 이동됩니다.")
+                BukkitBroadcaster.broadcastSound(XSound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4F, 1.0F)
 
-                delay(1000L)
+                delay(2000L)
                 Bukkit.getOnlinePlayers().forEach { ChannelModule.getLobbyChannelGroup().fastJoin(it.uniqueId) }
 
-                delay(5000L)
+                delay(7000L)
                 Bukkit.shutdown()
             }
         }
