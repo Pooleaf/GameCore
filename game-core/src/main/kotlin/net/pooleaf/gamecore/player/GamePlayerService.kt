@@ -79,7 +79,7 @@ class GamePlayerService {
             player.spigot().collidesWithEntities = true
 
             // 포션 효과 제거
-            PotionEffectType.values().forEach { player.removePotionEffect(it) }
+            player.activePotionEffects.forEach { player.removePotionEffect(it.type) }
 
             // 투명 해제
             Bukkit.getOnlinePlayers().forEach { it.showPlayer(player) }
