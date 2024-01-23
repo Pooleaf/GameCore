@@ -239,6 +239,9 @@ class GamePlayerService {
             // 참여 해제
             quitFromGame(gamePlayer)
 
+            // 참여 해제 후 게임이 종료되었다면 나머지 실행 안함
+            if (!GameCore.game.isRunning) return@launch
+
             // 리셋
             resetPlayer(gamePlayer)
 
