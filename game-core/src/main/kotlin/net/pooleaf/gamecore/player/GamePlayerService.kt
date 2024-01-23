@@ -229,6 +229,7 @@ class GamePlayerService {
 
         BukkitSyncScope.launch {
             val isJoined = GameCore.game.isGameStarted && gamePlayer.isJoined
+            val isGameRunning = GameCore.game.isRunning
 
             // 정보 업데이트
             gamePlayer.isSpectator = true
@@ -240,7 +241,7 @@ class GamePlayerService {
             quitFromGame(gamePlayer)
 
             // 참여 해제 후 게임이 종료되었다면 나머지 실행 안함
-            if (!GameCore.game.isRunning) return@launch
+            if (isGameRunning && !GameCore.game.isRunning) return@launch
 
             // 리셋
             resetPlayer(gamePlayer)
