@@ -82,7 +82,7 @@ class RebootManager {
 
         // 관리자가 아니면 메시지 출력
         if (sender?.hasPermission(GameCorePermission.ADMIN) != true) {
-            throwMessage("§a서버 재부팅이 예약되었습니다.")
+            sender?.sendMessage("§a서버 재부팅이 예약되었습니다.")
         }
 
         // 관리자에게 메시지 출력
@@ -94,7 +94,7 @@ class RebootManager {
         Logger.log("§a서버 재부팅이 예약되었습니다. (처리자: ${sender?.name ?: "알 수 없음"})")
 
         // 게임 중이 아니면 즉시 재부팅
-        if (!GameCore.game.isRunning) {
+        if (!GameCore.game.isCountingStarted) {
             reboot(sender)
         }
     }
@@ -118,7 +118,7 @@ class RebootManager {
 
         // 관리자가 아니면 메시지 출력
         if (sender?.hasPermission(GameCorePermission.ADMIN) != true) {
-            throwMessage("§c서버 재부팅 예약이 취소되었습니다.")
+            sender?.sendMessage("§c서버 재부팅 예약이 취소되었습니다.")
         }
 
         // 관리자에게 메시지 출력
@@ -136,7 +136,7 @@ class RebootManager {
     fun startAutoRebootTask() {
         // 0초 계산하여 스케줄러 시작
         val remainSecondUntilZero = 60L - LocalDateTime.now().second
-        rebootScheduleTask = Bukkit.getScheduler().runTaskTimerAsynchronously(GameCore.gamePlugin, RebootScheduleTask(), remainSecondUntilZero, 60 * 20L)
+        rebootScheduleTask = Bukkit.getScheduler().runTaskTimerAsynchronously(GameCore.gamePlugin, RebootScheduleTask(), remainSecondUntilZero * 20L, 60 * 20L)
     }
 
     /**
