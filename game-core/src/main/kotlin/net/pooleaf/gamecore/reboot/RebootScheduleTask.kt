@@ -26,7 +26,7 @@ class RebootScheduleTask : Runnable {
 
         // 현재 시간이 자동 재부팅 설정에 들어가 있는지 확인 후 재부팅 예약
         val now = LocalDateTime.now().minusMinutes(channelOffsetMinutes)
-        val dateFormat = now.format(DateTimeFormatter.ofPattern("hh:mm"))
+        val dateFormat = now.format(DateTimeFormatter.ofPattern("HH:mm"))
 
         if (GameCore.autoRebootConfig.autoRebootTimes.contains(dateFormat)) {
             try {
