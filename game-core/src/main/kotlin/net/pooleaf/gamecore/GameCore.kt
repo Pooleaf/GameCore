@@ -1,10 +1,7 @@
 package net.pooleaf.gamecore
 
 import net.pooleaf.core.modules.commonevent.CommonEventModule
-import net.pooleaf.gamecore.configs.GameConfig
-import net.pooleaf.gamecore.configs.QuickBarConfig
-import net.pooleaf.gamecore.configs.SpawnConfig
-import net.pooleaf.gamecore.configs.TeamConfig
+import net.pooleaf.gamecore.configs.*
 import net.pooleaf.gamecore.events.GameCoreInitializedEvent
 import net.pooleaf.gamecore.game.Game
 import net.pooleaf.gamecore.game.GameManager
@@ -19,6 +16,7 @@ import net.pooleaf.gamecore.player.GamePlayer
 import net.pooleaf.gamecore.player.GamePlayerManager
 import net.pooleaf.gamecore.player.GamePlayerService
 import net.pooleaf.gamecore.quickbar.QuickBarManager
+import net.pooleaf.gamecore.reboot.RebootManager
 import net.pooleaf.gamecore.sidebar.GameSideBarManager
 import net.pooleaf.gamecore.startitem.StartItemManager
 import net.pooleaf.gamecore.startitem.StartItemService
@@ -66,8 +64,7 @@ object GameCore {
         lateinit var supplyManager: SupplyManager
         lateinit var supplyService: SupplyService
 
-        // 재부팅 예약
-        var rebootScheduled = false
+        lateinit var rebootManager: RebootManager
 
 
         val gameConfig: GameConfig by lazy {
@@ -84,6 +81,10 @@ object GameCore {
 
         val teamConfig: TeamConfig by lazy {
             TeamConfig(File(GameCore.gamePlugin.dataFolder, "team-config.yml"))
+        }
+
+        val autoRebootConfig: AutoRebootConfig by lazy {
+            AutoRebootConfig(File(GameCore.gamePlugin.dataFolder, "auto-reboot-config.yml"))
         }
 
 
@@ -116,6 +117,8 @@ object GameCore {
             supplyManager = SupplyManager()
             supplyService = SupplyService()
 
+            rebootManager = RebootManager()
+
             loadConfig()
         }
 
@@ -131,6 +134,9 @@ object GameCore {
 
             teamConfig.load()
             teamConfig.save()
+
+            autoRebootConfig.load()
+            autoRebootConfig.save()
 
             mapService.loadMapConfigs()
 
@@ -154,6 +160,9 @@ object GameCore {
 
     val teamConfig
         get() = unsafe.teamConfig
+
+    val autoRebootConfig
+        get() = unsafe.autoRebootConfig
 
 
     val game

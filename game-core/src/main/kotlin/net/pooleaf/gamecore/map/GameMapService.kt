@@ -236,7 +236,7 @@ class GameMapService {
         if (!isWorldLoaded(map)) return true
 
         return BukkitSyncScope.async {
-            if (Bukkit.unloadWorld(map.centerWorldName, false)) {
+            if (Bukkit.unloadWorld(map.centerWorldName, true)) { // save를 true로 해주지 않으면 램 누수 있음
                 Logger.log("${map.centerWorldName} 월드가 언로드 되었습니다.")
                 return@async true
             } else {

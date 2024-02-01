@@ -25,6 +25,11 @@ class GameCorePlugin : BukkitCorePlugin(), CommonEventListener {
         registerEventListeners()
         registerCommands()
 
+        // 자동 재부팅 타이머 시작
+        if (GameCore.unsafe.autoRebootConfig.useAutoReboot) {
+            GameCore.unsafe.rebootManager.startAutoRebootTask()
+        }
+
         Logger.log("플러그인이 초기화되었습니다. (게임 타입: ${GameCore.game.gameTypeId})")
     }
 
@@ -37,6 +42,11 @@ class GameCorePlugin : BukkitCorePlugin(), CommonEventListener {
                     GameCore.unsafe.gameManager.cancelGame(null, "서버 종료")
                 }
             }
+        }
+
+        // 자동 재부팅 타이머 중지
+        if (GameCore.unsafe.autoRebootConfig.useAutoReboot) {
+            GameCore.unsafe.rebootManager.stopAutoRebootTask()
         }
     }
 
