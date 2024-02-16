@@ -30,6 +30,8 @@ class GameCorePlugin : BukkitCorePlugin(), CommonEventListener {
             GameCore.unsafe.rebootManager.startAutoRebootTask()
         }
 
+        GameCore.unsafe.antiCheatBypassService.init()
+
         Logger.log("플러그인이 초기화되었습니다. (게임 타입: ${GameCore.game.gameTypeId})")
     }
 

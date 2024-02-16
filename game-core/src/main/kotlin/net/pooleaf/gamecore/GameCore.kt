@@ -1,6 +1,7 @@
 package net.pooleaf.gamecore
 
 import net.pooleaf.core.modules.commonevent.CommonEventModule
+import net.pooleaf.gamecore.anticheat.AntiCheatBypassService
 import net.pooleaf.gamecore.configs.*
 import net.pooleaf.gamecore.events.GameCoreInitializedEvent
 import net.pooleaf.gamecore.game.Game
@@ -66,6 +67,8 @@ object GameCore {
 
         lateinit var rebootManager: RebootManager
 
+        lateinit var antiCheatBypassService: AntiCheatBypassService
+
 
         val gameConfig: GameConfig by lazy {
             GameConfig(File(GameCore.gamePlugin.dataFolder, "game-config.yml"))
@@ -118,6 +121,8 @@ object GameCore {
             supplyService = SupplyService()
 
             rebootManager = RebootManager()
+
+            antiCheatBypassService = AntiCheatBypassService()
 
             loadConfig()
         }
