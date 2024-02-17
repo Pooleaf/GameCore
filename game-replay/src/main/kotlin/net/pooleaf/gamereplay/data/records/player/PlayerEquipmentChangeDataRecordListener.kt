@@ -9,14 +9,15 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
+import java.util.UUID
 
 class PlayerEquipmentChangeDataRecordListener : Listener {
 
-    val beforeHands = hashMapOf<Player, ItemStack>()
-    val beforeHelmets = hashMapOf<Player, ItemStack>()
-    val beforeChestplates = hashMapOf<Player, ItemStack>()
-    val beforeLeggingses = hashMapOf<Player, ItemStack>()
-    val beforeBootses = hashMapOf<Player, ItemStack>()
+    val beforeHands = hashMapOf<UUID, ItemStack>()
+    val beforeHelmets = hashMapOf<UUID, ItemStack>()
+    val beforeChestplates = hashMapOf<UUID, ItemStack>()
+    val beforeLeggingses = hashMapOf<UUID, ItemStack>()
+    val beforeBootses = hashMapOf<UUID, ItemStack>()
 
 
     @EventHandler
@@ -25,7 +26,7 @@ class PlayerEquipmentChangeDataRecordListener : Listener {
             val player = Bukkit.getPlayer(uuid)
             if (player == null) return@forEach
 
-            val beforeHand = beforeHands.get(player)
+            val beforeHand = beforeHands.get(player.uniqueId)
             if (beforeHand != player.inventory.itemInHand) {
                 val recordData = PlayerEquipmentChangeData().apply {
                     playerUuid = player.uniqueId
@@ -34,9 +35,9 @@ class PlayerEquipmentChangeDataRecordListener : Listener {
                 }
                 GameReplayApi.unsafe.recordManager.record!!.addRecordData(recordData)
             }
-            beforeHands.put(player, player.inventory.itemInHand)
+            beforeHands.put(player.uniqueId, player.inventory.itemInHand)
 
-            val beforeHelmet = beforeHelmets.get(player)
+            val beforeHelmet = beforeHelmets.get(player.uniqueId)
             if (beforeHelmet != player.inventory.helmet) {
                 val recordData = PlayerEquipmentChangeData().apply {
                     playerUuid = player.uniqueId
@@ -45,9 +46,9 @@ class PlayerEquipmentChangeDataRecordListener : Listener {
                 }
                 GameReplayApi.unsafe.recordManager.record!!.addRecordData(recordData)
             }
-            beforeHelmets.put(player, player.inventory.helmet)
+            beforeHelmets.put(player.uniqueId, player.inventory.helmet)
 
-            val beforeChestplate = beforeChestplates.get(player)
+            val beforeChestplate = beforeChestplates.get(player.uniqueId)
             if (beforeChestplate != player.inventory.chestplate) {
                 val recordData = PlayerEquipmentChangeData().apply {
                     playerUuid = player.uniqueId
@@ -56,9 +57,9 @@ class PlayerEquipmentChangeDataRecordListener : Listener {
                 }
                 GameReplayApi.unsafe.recordManager.record!!.addRecordData(recordData)
             }
-            beforeChestplates.put(player, player.inventory.chestplate)
+            beforeChestplates.put(player.uniqueId, player.inventory.chestplate)
 
-            val beforeLeggings = beforeLeggingses.get(player)
+            val beforeLeggings = beforeLeggingses.get(player.uniqueId)
             if (beforeLeggings != player.inventory.leggings) {
                 val recordData = PlayerEquipmentChangeData().apply {
                     playerUuid = player.uniqueId
@@ -67,9 +68,9 @@ class PlayerEquipmentChangeDataRecordListener : Listener {
                 }
                 GameReplayApi.unsafe.recordManager.record!!.addRecordData(recordData)
             }
-            beforeLeggingses.put(player, player.inventory.leggings)
+            beforeLeggingses.put(player.uniqueId, player.inventory.leggings)
 
-            val beforeBoots = beforeBootses.get(player)
+            val beforeBoots = beforeBootses.get(player.uniqueId)
             if (beforeBoots != player.inventory.boots) {
                 val recordData = PlayerEquipmentChangeData().apply {
                     playerUuid = player.uniqueId
@@ -78,7 +79,7 @@ class PlayerEquipmentChangeDataRecordListener : Listener {
                 }
                 GameReplayApi.unsafe.recordManager.record!!.addRecordData(recordData)
             }
-            beforeBootses.put(player, player.inventory.boots)
+            beforeBootses.put(player.uniqueId, player.inventory.boots)
         }
     }
 
