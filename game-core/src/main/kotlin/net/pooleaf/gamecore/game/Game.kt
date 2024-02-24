@@ -61,6 +61,9 @@ abstract class Game {
     var currentGameMode: GameMode = GameMode.ADVENTURE
         internal set
 
+    // 노인챈전
+    var isNoEnchantMode: Boolean = false
+
     // 게임 Phase
     val phasePipeline: PhasePipeline
 

@@ -33,4 +33,13 @@ class GameConfig(file: File?) : SimpleAnnoConfig(file) {
     @ConfigName("퇴장 시 탈락 사망 체력 (이하)")
     var quitDeathHealth: Int = 6
 
+    @ConfigName("자동 노인챈트전.사용")
+    var useNoEnchantModeOnStart: Boolean = false
+
+    @ConfigName("무적 해제 투표.사용")
+    var useGodModeSkipVote: Boolean = false
+
+    @ConfigName("노인챈트전 투표.사용")
+    var useNoEnchantModeVote: Boolean = false
+
 }

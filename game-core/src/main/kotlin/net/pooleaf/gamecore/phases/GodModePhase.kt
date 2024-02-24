@@ -8,9 +8,9 @@ import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.phase.Phase
 import net.pooleaf.gamecore.utils.StringUtil
 
-abstract class GodModePhase() : Phase() {
+abstract class GodModePhase : Phase() {
 
-    var remainingGodModeSeconds: Int? = null
+    var remainingGodModeSeconds: Int = 0
 
 
     /**
@@ -19,7 +19,7 @@ abstract class GodModePhase() : Phase() {
     abstract fun getGodModeSeconds(): Int
 
     override fun onInit() {
-        remainingGodModeSeconds = null
+        remainingGodModeSeconds = getGodModeSeconds()
     }
 
     override suspend fun onStart() {
@@ -36,19 +36,18 @@ abstract class GodModePhase() : Phase() {
 
     override suspend fun onRun() {
         // 카운트
-        for (count in getGodModeSeconds() downTo 1) {
-            remainingGodModeSeconds = count
-
-            if (count <= 5) {
-                val remainingTime = StringUtil.buildTimeStringWithColor(count * 1000L, CommonChatColor.WHITE, CommonChatColor.YELLOW)
+        while (remainingGodModeSeconds >= 1) {
+            if (remainingGodModeSeconds <= 5) {
+                val remainingTime = StringUtil.buildTimeStringWithColor(remainingGodModeSeconds * 1000L, CommonChatColor.WHITE, CommonChatColor.YELLOW)
 
                 BukkitBroadcaster.broadcast("${remainingTime} §e후 무적 시간이 종료됩니다.")
                 BukkitBroadcaster.broadcastSound(XSound.UI_BUTTON_CLICK, 0.3F, 0.7F)
             }
 
-            GameCore.unsafe.sideBarManager.sideBar?.let { it.update() }
+            GameCore.unsafe.sideBarManager.sideBar?.update()
 
             delay(1000L)
+            remainingGodModeSeconds--
         }
     }
 

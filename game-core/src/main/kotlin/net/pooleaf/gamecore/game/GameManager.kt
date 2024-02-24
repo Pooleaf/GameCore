@@ -18,7 +18,9 @@ import net.pooleaf.gamecore.GameBroadcaster
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.game.*
 import net.pooleaf.gamecore.phases.EndPhase
+import net.pooleaf.gamecore.phases.GodModePhase
 import net.pooleaf.gamecore.team.Team
+import net.pooleaf.gamecore.utils.removeEnchantmentAll
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.command.CommandSender
@@ -52,6 +54,7 @@ class GameManager {
         game.endedAt = null
 
         game.currentGameMode = game.waitingGameMode
+        game.isNoEnchantMode = GameCore.gameConfig.useNoEnchantModeOnStart
 
         // 채널 상태 변경
         ChannelModule.getCurrentChannel().channelStatus = KnownChannelStatus.GAME_WAITING
@@ -137,6 +140,7 @@ class GameManager {
         GameCore.unsafe.startVoteManager.initVote()
         GameCore.unsafe.mapVoteManager.initVote()
         GameCore.unsafe.godModeSkipVoteManager.initVote()
+        GameCore.unsafe.noEnchantModeVoteManager.initVote()
 
         // 사이드바
         if (GameCore.unsafe.sideBarManager.isSideBarTimerRunning()) {
@@ -493,6 +497,36 @@ class GameManager {
                 }
             }
         }.join()
+    }
+
+    /**
+     * 노인챈트전을 시작합니다.
+     * 무적 시간일 경우 무적이 즉시 해제됩니다.
+     * 인챈트된 아이템을 줍거나 만지면 모두 인챈트가 해제됩니다.
+     */
+    fun startNoEnchantMode() {
+        BukkitSyncScope.launch {
+            if (GameCore.game.isNoEnchantMode) return@launch
+
+            GameCore.game.isNoEnchantMode = true
+
+            // 노인챈전 시작
+            GameCore.unsafe.playerManager.getOnlinePlayingPlayers().forEach { gamePlayer ->
+                val inventory = gamePlayer.player.inventory
+                inventory.forEach { it.removeEnchantmentAll() }
+            }
+
+            BukkitBroadcaster.broadcast("§e노인챈트전이 시작되었습니다.")
+            BukkitBroadcaster.broadcastSound(XSound.ENTITY_ITEM_PICKUP, 0.4F, 0.4F)
+
+            // 무적 해제
+            delay(1000L)
+            val currentPhase = GameCore.game.phasePipeline.currentPhase
+            if (currentPhase is GodModePhase && currentPhase.remainingGodModeSeconds > 10) {
+                BukkitBroadcaster.broadcast("§e잠시 후 무적이 해제됩니다.")
+                return@launch
+            }
+        }
     }
 
     private fun startMaxTimeStopTimer() {

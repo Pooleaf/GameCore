@@ -28,6 +28,7 @@ import net.pooleaf.gamecore.team.TeamNameTagManager
 import net.pooleaf.gamecore.team.TeamService
 import net.pooleaf.gamecore.vote.godmodeskip.GodModeSkipVoteManager
 import net.pooleaf.gamecore.vote.map.MapVoteManager
+import net.pooleaf.gamecore.vote.noenchantmode.NoEnchantModeVoteManager
 import net.pooleaf.gamecore.vote.start.StartVoteManager
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
@@ -52,6 +53,7 @@ object GameCore {
         lateinit var startVoteManager: StartVoteManager
         lateinit var mapVoteManager: MapVoteManager
         lateinit var godModeSkipVoteManager: GodModeSkipVoteManager
+        lateinit var noEnchantModeVoteManager: NoEnchantModeVoteManager
 
         lateinit var quickBarManager: QuickBarManager
         lateinit var sideBarManager: GameSideBarManager
@@ -107,6 +109,7 @@ object GameCore {
             startVoteManager = StartVoteManager()
             mapVoteManager = MapVoteManager()
             godModeSkipVoteManager = GodModeSkipVoteManager()
+            noEnchantModeVoteManager = NoEnchantModeVoteManager()
 
             quickBarManager = QuickBarManager()
             sideBarManager = GameSideBarManager()

@@ -6,14 +6,18 @@ import net.pooleaf.core.modules.support.common.component.SimpleComponentBuilder
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.phases.GodModePhase
 import net.pooleaf.gamecore.player.GamePlayer
+import net.pooleaf.gamecore.vote.noenchantmode.NoEnchantModeVote
 
 
 class GodModeSkipVoteManager {
 
-    var isGodModeSkipVoteStarted = false
+    var isVoteStarted = false
         private set
 
-    val godModeSkipVote = GodModeSkipVote()
+    var isVoteEnded = false
+        private set
+
+    val godModeSkipVote = NoEnchantModeVote()
 
 
     private fun isGodModePhase(): Boolean {
@@ -25,7 +29,8 @@ class GodModeSkipVoteManager {
      * 투표를 초기화합니다.
      */
     fun initVote() {
-        isGodModeSkipVoteStarted = false
+        isVoteStarted = false
+        isVoteEnded = false
         godModeSkipVote.clear()
     }
 
@@ -33,7 +38,7 @@ class GodModeSkipVoteManager {
      * 투표를 시작합니다.
      */
     fun startVote() {
-        if (isGodModeSkipVoteStarted) return
+        if (isVoteStarted) return
         if (!isGodModePhase()) return
 
         val agreeComponent = SimpleComponentBuilder("§2§l[ 찬성 ]")
@@ -49,11 +54,11 @@ class GodModeSkipVoteManager {
 
         BukkitBroadcaster.broadcast("")
         BukkitBroadcaster.broadcast("§e무적 해제 투표가 시작되었습니다.")
-        BukkitBroadcaster.broadcast("§e과반수 이상이 투표에 찬성할 경우 무적이 해제됩니다.")
+        BukkitBroadcaster.broadcast("§e과반수 이상이 투표에 찬성할 경우 §6§l무적이 해제§e됩니다.")
         BukkitBroadcaster.broadcast(agreeComponent)
         BukkitBroadcaster.broadcastSound(XSound.ENTITY_ITEM_PICKUP, 0.4F, 0.4F)
 
-        isGodModeSkipVoteStarted = true
+        isVoteStarted = true
     }
 
     /**
@@ -65,21 +70,23 @@ class GodModeSkipVoteManager {
             return
         }
 
-        if (!isGodModeSkipVoteStarted) {
-            startVote()
-        }
-
         if (gamePlayer.isSpectator) {
             gamePlayer.sendWarningSafely("관전 중에는 투표에 참여할 수 없습니다.")
             return
         }
+
         if (godModeSkipVote.isVoted(gamePlayer.uuid)) {
             gamePlayer.sendWarningSafely("이미 투표했습니다.")
             return
         }
-        if (godModeSkipVote.isAgree(gamePlayer.uuid)) {
-            gamePlayer.sendWarningSafely("이미 투표에 찬성했습니다.")
+
+        if (isVoteEnded) {
+            gamePlayer.sendWarningSafely("이미 무적 투표가 종료되었습니다.")
             return
+        }
+
+        if (!isVoteStarted) {
+            startVote()
         }
 
         godModeSkipVote.voteToAgree(gamePlayer.uuid)
@@ -90,10 +97,19 @@ class GodModeSkipVoteManager {
         // 과반수 동의 시 무적해제
         // 최소 2명 투표해야 무적해제됨
         if (isGodModePhase()
+            && !isVoteEnded
             && godModeSkipVote.agreePlayers.size >= 2
             && godModeSkipVote.agreePlayers.size >= GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size.toFloat() / 2) {
 
-            GameCore.game.phasePipeline.currentPhase?.end()
+            val godModePhase = GameCore.game.phasePipeline.currentPhase as GodModePhase
+            if (godModePhase.remainingGodModeSeconds > 10) {
+                godModePhase.remainingGodModeSeconds = 10
+
+                BukkitBroadcaster.broadcast("§e과반수 이상이 투표에 찬성하여 잠시 후 무적이 해제됩니다.")
+                BukkitBroadcaster.broadcastSound(XSound.ENTITY_ITEM_PICKUP, 0.4F, 0.4F)
+            }
+
+            isVoteEnded =  true
         }
     }
 
@@ -106,21 +122,23 @@ class GodModeSkipVoteManager {
             return
         }
 
-        if (!isGodModeSkipVoteStarted) {
-            startVote()
-        }
-
         if (gamePlayer.isSpectator) {
             gamePlayer.sendWarningSafely("관전 중에는 투표에 참여할 수 없습니다.")
             return
         }
+
         if (godModeSkipVote.isVoted(gamePlayer.uuid)) {
             gamePlayer.sendWarningSafely("이미 투표했습니다.")
             return
         }
-        if (godModeSkipVote.isDisagree(gamePlayer.uuid)) {
-            gamePlayer.sendWarningSafely("이미 투표에 반대했습니다.")
+
+        if (isVoteEnded) {
+            gamePlayer.sendWarningSafely("이미 무적 투표가 종료되었습니다.")
             return
+        }
+
+        if (!isVoteStarted) {
+            startVote()
         }
 
         godModeSkipVote.voteToDisagree(gamePlayer.uuid)

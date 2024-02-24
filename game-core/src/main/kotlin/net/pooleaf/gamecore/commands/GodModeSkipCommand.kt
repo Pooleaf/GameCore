@@ -46,11 +46,17 @@ class GodModeSkipCommand {
         description = "무적 해제 투표를 시작합니다."
     )
     fun game_godModeSkipVote(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
+        if (!GameCore.gameConfig.useGodModeSkipVote) {
+            sender.sendWarning("무적 해제 투표를 사용할 수 없습니다.")
+            return
+        }
+
         if (!isGodModePhase()) {
             sender.sendWarning("무적 시간이 아닙니다.")
             return
         }
-        if (GameCore.unsafe.godModeSkipVoteManager.isGodModeSkipVoteStarted) {
+
+        if (GameCore.unsafe.godModeSkipVoteManager.isVoteStarted) {
             sender.sendWarning("이미 무적 해제 투표가 시작되었습니다.")
             return
         }
@@ -64,6 +70,11 @@ class GodModeSkipCommand {
         description = "무적 해제 투표에 찬성합니다."
     )
     fun game_godModeSkipVote_agree(player: Player, result: CommandResult) {
+        if (!GameCore.gameConfig.useGodModeSkipVote) {
+            player.sendWarning("무적 해제 투표를 사용할 수 없습니다.")
+            return
+        }
+
         if (!isGodModePhase()) {
             player.sendWarning("무적 시간이 아닙니다.")
             return
@@ -79,6 +90,11 @@ class GodModeSkipCommand {
         description = "무적 해제 투표에 반대합니다."
     )
     fun game_godModeSkipVote_disagree(player: Player, result: CommandResult) {
+        if (!GameCore.gameConfig.useGodModeSkipVote) {
+            player.sendWarning("무적 해제 투표를 사용할 수 없습니다.")
+            return
+        }
+
         if (!isGodModePhase()) {
             player.sendWarning("무적 시간이 아닙니다.")
             return
