@@ -28,7 +28,7 @@ class NoEnchantModeVoteManager {
      */
     fun startVote() {
         if (isVoteStarted) return
-        if (GameCore.gameConfig.useNoEnchantModeVote) return
+        if (!GameCore.gameConfig.useNoEnchantModeVote) return
 
         val agreeComponent = SimpleComponentBuilder("§2§l[ 찬성 ]")
             .clickRunCommand("/노인챈트전투표 찬성")
@@ -86,7 +86,7 @@ class NoEnchantModeVoteManager {
 
         // 과반수 동의 시 노인챈트전 시작
         // 최소 2명 투표해야 노인챈트전 시작됨
-        if (GameCore.game.isNoEnchantMode
+        if (!GameCore.game.isNoEnchantMode
             && noEnchantModeVote.agreePlayers.size >= 2
             && noEnchantModeVote.agreePlayers.size >= GameCore.unsafe.playerManager.getOnlineJoinedPlayers().size.toFloat() / 2) {
 

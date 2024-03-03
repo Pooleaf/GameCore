@@ -26,7 +26,7 @@ class GameCorePlugin : BukkitCorePlugin(), CommonEventListener {
         registerCommands()
 
         // 자동 재부팅 타이머 시작
-        if (GameCore.unsafe.autoRebootConfig.useAutoReboot) {
+        if (GameCore.unsafe.autoRebootConfig.useAutoRebootReserve) {
             GameCore.unsafe.rebootManager.startAutoRebootTask()
         }
 
@@ -47,7 +47,7 @@ class GameCorePlugin : BukkitCorePlugin(), CommonEventListener {
         }
 
         // 자동 재부팅 타이머 중지
-        if (GameCore.unsafe.autoRebootConfig.useAutoReboot) {
+        if (GameCore.unsafe.autoRebootConfig.useAutoRebootReserve) {
             GameCore.unsafe.rebootManager.stopAutoRebootTask()
         }
     }

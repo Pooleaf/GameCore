@@ -10,12 +10,12 @@ import java.time.format.DateTimeFormatter
 class RebootScheduleTask : Runnable {
 
     override fun run() {
-        if (GameCore.autoRebootConfig.autoRebootTimes.isEmpty()) return
+        if (GameCore.autoRebootConfig.autoRebootReserveTimes.isEmpty()) return
 
         // 채널 명에서 숫자만 추출하여 분 offset으로 사용함
         var channelOffsetMinutes = 0L
 
-        if (GameCore.autoRebootConfig.useAutoRebootTimeOffsetByChannel) {
+        if (GameCore.autoRebootConfig.useAutoRebootReserveTimeOffsetByChannel) {
             val channelName = ChannelModule.getCurrentChannelName() ?: return
 
             val channelNumber = channelName.replace(Regex("[^0-9]"), "")
@@ -28,7 +28,7 @@ class RebootScheduleTask : Runnable {
         val now = LocalDateTime.now().minusMinutes(channelOffsetMinutes)
         val dateFormat = now.format(DateTimeFormatter.ofPattern("HH:mm"))
 
-        if (GameCore.autoRebootConfig.autoRebootTimes.contains(dateFormat)) {
+        if (GameCore.autoRebootConfig.autoRebootReserveTimes.contains(dateFormat)) {
             try {
                 GameCore.unsafe.rebootManager.scheduleReboot()
             } catch (exception: MessageException) {

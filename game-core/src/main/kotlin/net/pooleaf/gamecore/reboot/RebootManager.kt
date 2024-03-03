@@ -53,7 +53,7 @@ class RebootManager {
 
             // 로비로 이동
             delay(3000L)
-            Bukkit.getOnlinePlayers().forEach { ChannelModule.getLobbyChannelGroup().fastJoin(it.uniqueId) }
+            Bukkit.getOnlinePlayers().forEach { ChannelModule.getLobbyChannelGroup()?.fastJoin(it.uniqueId) }
 
             // 재부팅
             delay(7000L)

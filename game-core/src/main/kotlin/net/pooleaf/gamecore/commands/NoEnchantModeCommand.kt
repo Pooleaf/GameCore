@@ -9,6 +9,7 @@ import net.pooleaf.core.modules.support.bukkit.util.BukkitBroadcaster
 import net.pooleaf.core.modules.support.common.CommonChatColor
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.GameCorePermission
+import net.pooleaf.gamecore.phases.GodModePhase
 import net.pooleaf.gamecore.utils.toGamePlayer
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -49,6 +50,8 @@ class NoEnchantModeCommand {
                 return
             }
 
+            GameCore.game.isNoEnchantMode = false
+
             BukkitBroadcaster.broadcast("${sender.displayName} §b님께서 노인챈트전을 해제했습니다.")
             BukkitBroadcaster.broadcastSound(XSound.ENTITY_ITEM_PICKUP, 0.4F, 0.4F)
         }
@@ -70,7 +73,16 @@ class NoEnchantModeCommand {
             return
         }
 
-        if (!GameCore.game.isNoEnchantMode) {
+        // 현재 Phase가 무적 Phase 전일 경우 사용 불가
+        val currentPhase = GameCore.game.phasePipeline.currentPhase
+        if (currentPhase != null
+            && GameCore.game.phasePipeline.phases.find { it is GodModePhase } != null
+            && GameCore.game.phasePipeline.phases.indexOfFirst { it == currentPhase } < GameCore.game.phasePipeline.phases.indexOfFirst { it is GodModePhase }) {
+            sender.sendWarning("아직 투표할 수 없습니다.")
+            return
+        }
+
+        if (GameCore.game.isNoEnchantMode) {
             sender.sendWarning("이미 노인챈트전으로 진행 중입니다.")
             return
         }

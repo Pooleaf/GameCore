@@ -18,8 +18,10 @@ class NoEnchantModeListener : Listener {
     fun onJoin(event: GamePlayerJoinToGameEvent) {
         if (!GameCore.game.isGameStarted || !GameCore.game.isNoEnchantMode) return
 
-        val inventory = event.gamePlayer.player.inventory
-        inventory.forEach { it.removeEnchantmentAll() }
+        val player = event.gamePlayer.player
+        player.itemOnCursor = player.itemOnCursor?.removeEnchantmentAll()
+        player.inventory.armorContents.filterNotNull().forEach { it.removeEnchantmentAll() }
+        player.inventory.filterNotNull().forEach { it.removeEnchantmentAll() }
     }
 
     @EventHandler
@@ -49,7 +51,7 @@ class NoEnchantModeListener : Listener {
         val gamePlayer = (event.whoClicked as Player).toGamePlayer() ?: return
         if (!gamePlayer.isPlaying()) return
 
-        event.currentItem = event.currentItem.removeEnchantmentAll()
+        event.currentItem = event.currentItem?.removeEnchantmentAll()
     }
 
     @EventHandler
@@ -59,9 +61,7 @@ class NoEnchantModeListener : Listener {
         val gamePlayer = event.player.toGamePlayer() ?: return
         if (!gamePlayer.isPlaying()) return
 
-        if (event.player.itemInHand != null) {
-            event.player.itemInHand = event.player.itemInHand.removeEnchantmentAll()
-        }
+        event.player.itemInHand = event.player.itemInHand?.removeEnchantmentAll()
     }
 
 }

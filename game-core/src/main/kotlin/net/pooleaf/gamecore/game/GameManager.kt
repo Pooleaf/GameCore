@@ -508,12 +508,13 @@ class GameManager {
         BukkitSyncScope.launch {
             if (GameCore.game.isNoEnchantMode) return@launch
 
-            GameCore.game.isNoEnchantMode = true
-
             // 노인챈전 시작
+            GameCore.game.isNoEnchantMode = true
             GameCore.unsafe.playerManager.getOnlinePlayingPlayers().forEach { gamePlayer ->
-                val inventory = gamePlayer.player.inventory
-                inventory.forEach { it.removeEnchantmentAll() }
+                val player = gamePlayer.player
+                player.itemOnCursor = player.itemOnCursor?.removeEnchantmentAll()
+                player.inventory.armorContents.filterNotNull().forEach { it.removeEnchantmentAll() }
+                player.inventory.filterNotNull().forEach { it.removeEnchantmentAll() }
             }
 
             BukkitBroadcaster.broadcast("§e노인챈트전이 시작되었습니다.")
