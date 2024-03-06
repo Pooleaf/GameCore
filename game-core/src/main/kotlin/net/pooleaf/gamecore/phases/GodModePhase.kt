@@ -18,15 +18,12 @@ abstract class GodModePhase : Phase() {
      */
     abstract fun getGodModeSeconds(): Int
 
-    override fun onInit() {
-        remainingGodModeSeconds = getGodModeSeconds()
-    }
-
     override suspend fun onStart() {
         GameCore.game.isGodMode = true
+        remainingGodModeSeconds = getGodModeSeconds()
 
         // 무적 알림
-        val godModeTime = StringUtil.buildTimeStringWithColor(getGodModeSeconds() * 1000L, CommonChatColor.WHITE, CommonChatColor.YELLOW)
+        val godModeTime = StringUtil.buildTimeStringWithColor(remainingGodModeSeconds * 1000L, CommonChatColor.WHITE, CommonChatColor.YELLOW)
 
         BukkitBroadcaster.broadcast("")
         BukkitBroadcaster.broadcast("§e무적 시간이 시작되었습니다.")
