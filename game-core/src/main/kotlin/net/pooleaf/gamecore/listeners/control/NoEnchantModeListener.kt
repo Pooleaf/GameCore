@@ -2,6 +2,7 @@ package net.pooleaf.gamecore.listeners.control
 
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.events.player.GamePlayerJoinToGameEvent
+import net.pooleaf.gamecore.utils.hasEnchantment
 import net.pooleaf.gamecore.utils.removeEnchantmentAll
 import net.pooleaf.gamecore.utils.toGamePlayer
 import org.bukkit.entity.Player
@@ -31,7 +32,9 @@ class NoEnchantModeListener : Listener {
         val gamePlayer = event.player.toGamePlayer() ?: return
         if (!gamePlayer.isPlaying()) return
 
-        event.item.itemStack = event.item.itemStack.removeEnchantmentAll()
+        if (event.item.itemStack.hasEnchantment()) {
+            event.item.itemStack = event.item.itemStack.removeEnchantmentAll()
+        }
     }
 
     @EventHandler
@@ -41,7 +44,9 @@ class NoEnchantModeListener : Listener {
         val gamePlayer = event.player.toGamePlayer() ?: return
         if (!gamePlayer.isPlaying()) return
 
-        event.itemDrop.itemStack = event.itemDrop.itemStack.removeEnchantmentAll()
+        if (event.itemDrop.itemStack.hasEnchantment()) {
+            event.itemDrop.itemStack = event.itemDrop.itemStack.removeEnchantmentAll()
+        }
     }
 
     @EventHandler
@@ -51,7 +56,9 @@ class NoEnchantModeListener : Listener {
         val gamePlayer = (event.whoClicked as Player).toGamePlayer() ?: return
         if (!gamePlayer.isPlaying()) return
 
-        event.currentItem = event.currentItem?.removeEnchantmentAll()
+        if (event.currentItem?.hasEnchantment() == true) {
+            event.currentItem = event.currentItem?.removeEnchantmentAll()
+        }
     }
 
     @EventHandler
@@ -61,7 +68,9 @@ class NoEnchantModeListener : Listener {
         val gamePlayer = event.player.toGamePlayer() ?: return
         if (!gamePlayer.isPlaying()) return
 
-        event.player.itemInHand = event.player.itemInHand?.removeEnchantmentAll()
+        if (event.player.itemInHand?.hasEnchantment() == true) {
+            event.player.itemInHand = event.player.itemInHand?.removeEnchantmentAll()
+        }
     }
 
 }
