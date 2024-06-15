@@ -525,6 +525,7 @@ class GameManager {
             val currentPhase = GameCore.game.phasePipeline.currentPhase
             if (currentPhase is GodModePhase && currentPhase.remainingGodModeSeconds > 10) {
                 BukkitBroadcaster.broadcast("§e잠시 후 무적이 해제됩니다.")
+                currentPhase.remainingGodModeSeconds = 10
                 return@launch
             }
         }

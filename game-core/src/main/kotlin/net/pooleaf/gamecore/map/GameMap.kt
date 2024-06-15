@@ -58,10 +58,16 @@ open class GameMap {
     var showWorldBorder: Boolean = true
         internal set*/
 
-    // 현재 맵 범위 (지름) (경계선 줄일 때 사용)
+    // 현재 경계선 범위 (지름)
     @ConfigExclude
     var currentWorldBorderSize: Int = 0
         internal set
+
+    // 현재 경계선 중앙 위치
+    @ConfigExclude
+    var currentWorldBorderCenterLocation: Location? = null
+        internal set
+
 
     /**
      * 맵 중앙 위치를 반환합니다.
