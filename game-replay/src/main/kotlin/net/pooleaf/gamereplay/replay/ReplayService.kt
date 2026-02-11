@@ -9,6 +9,7 @@ import net.pooleaf.gamereplay.GameReplayPlugin
 import net.pooleaf.gamereplay.data.RecordData
 import net.pooleaf.gamereplay.sql.dtos.ReplayDto
 import net.pooleaf.gamereplay.sql.dtos.toDto
+import net.pooleaf.gamereplay.util.CompressionUtil
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.io.File
@@ -32,11 +33,12 @@ class ReplayService {
 
     fun saveReplayToFile(replay: Replay) {
         val json = gson.toJson(replay)
+        val compressed = CompressionUtil.compressGzip(json.toByteArray(Charsets.UTF_8))
 
         replayFolder.mkdirs()
 
-        val file = File(replayFolder, "${replay.gameId}.json")
-        Files.write(file.toPath(), json.toByteArray(), StandardOpenOption.CREATE_NEW)
+        val file = File(replayFolder, "${replay.gameId}.json.gz")
+        Files.write(file.toPath(), compressed, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
 
         Logger.log("${replay.gameId} 녹화 파일을 저장했습니다.")
     }
@@ -141,10 +143,12 @@ class ReplayService {
     }
 
     fun loadReplayFromFile(gameId: UUID): Replay? {
-        val file = File(replayFolder, "${gameId}.json")
-        if (!file.exists()) return null
+        val gzFile = File(replayFolder, "${gameId}.json.gz")
+        if (!gzFile.exists()) return null
 
-        val json = file.readLines().joinToString(" ")
+        val compressed = gzFile.readBytes()
+        val decompressed = CompressionUtil.decompressGzip(compressed)
+        val json = String(decompressed, Charsets.UTF_8)
         return gson.fromJson(json, Replay::class.java)
     }
 

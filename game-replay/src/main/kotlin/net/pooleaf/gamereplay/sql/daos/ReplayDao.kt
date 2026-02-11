@@ -55,12 +55,14 @@ class ReplayDao(sqlManager: AbstractSqlManager?) : SqlDao(sqlManager) {
         if (download) {
             GameReplayApi.unsafe.replayService.replayFolder.mkdirs()
 
+            val blob = result.rows.get(0).getBlob("replay_blob")
+            val blobBytes = blob.binaryStream.readBytes()
+
             if (replayDto.replayFile.exists()) {
                 replayDto.replayFile.delete()
             }
 
-            val blob = result.rows.get(0).getBlob("replay_blob")
-            Files.write(replayDto.replayFile.toPath(), blob.binaryStream.readBytes(), StandardOpenOption.CREATE_NEW)
+            Files.write(replayDto.replayFile.toPath(), blobBytes, StandardOpenOption.CREATE_NEW)
         }
 
         return replayDto

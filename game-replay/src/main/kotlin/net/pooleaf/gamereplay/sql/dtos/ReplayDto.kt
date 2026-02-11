@@ -13,7 +13,7 @@ data class ReplayDto(
 ) {
 
     val replayFile: File
-        get() = File(GameReplayApi.unsafe.replayService.replayFolder, "${gameId}.json")
+        get() = File(GameReplayApi.unsafe.replayService.replayFolder, "${gameId}.json.gz")
 
 }
 

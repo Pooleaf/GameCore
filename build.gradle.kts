@@ -30,7 +30,7 @@ allprojects {
 
         // Bukkit Library
         compileOnly("com.grinderwolf:slimeworldmanager-api:2.2.1")
-        compileOnly("com.comphenix.protocol:ProtocolLib:4.7.0")
+        compileOnly("com.comphenix.protocol:ProtocolLib:4.8.0")
         compileOnly("com.arcaniax:HeadDatabase-API:1.3.1")
         compileOnly("fr.neatmonster.nocheatplus:NoCheatPlus:3.16.0")
 
