@@ -88,6 +88,7 @@ class StartItemService {
             startItem.bootsItem = defaultStartItem.bootsItem
             startItem.items.addAll(defaultStartItem.items)
             startItem.level = defaultStartItem.level
+            startItem.giveMapItem = defaultStartItem.giveMapItem
         }
 
         val permissionPlayer = PermissionApi.getPlayer(gamePlayer.uuid)
@@ -101,6 +102,7 @@ class StartItemService {
             if (rankStartItem.bootsItem != null) startItem.bootsItem = rankStartItem.bootsItem
             startItem.items.addAll(rankStartItem.items)
             if (rankStartItem.level != 0) startItem.level = rankStartItem.level
+            if (rankStartItem.giveMapItem != null) startItem.giveMapItem = rankStartItem.giveMapItem
         }
 
         // 이벤트
@@ -117,6 +119,9 @@ class StartItemService {
 
         // 시작아이템 지급
         val player = gamePlayer.player
+        if (startItem.giveMapItem == true) {
+            GameCore.unsafe.mapItemService.give(player)
+        }
         player.inventory.helmet = startItem.helmetItem
         player.inventory.chestplate = startItem.chestplatItem
         player.inventory.leggings = startItem.leggingsItem

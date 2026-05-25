@@ -16,6 +16,7 @@ import net.pooleaf.core.modules.support.common.util.StringUtil
 import net.pooleaf.core.modules.support.common.util.toMillis
 import net.pooleaf.gamecore.GameBroadcaster
 import net.pooleaf.gamecore.GameCore
+import net.pooleaf.gamecore.GameCorePlugin
 import net.pooleaf.gamecore.events.game.*
 import net.pooleaf.gamecore.phases.EndPhase
 import net.pooleaf.gamecore.phases.GodModePhase
@@ -148,6 +149,10 @@ class GameManager {
             GameCore.unsafe.sideBarManager.sideBar?.update()
         }
 
+        // 지도 스냅샷/공유 MapView 정리
+        GameCore.unsafe.mapSnapshotService.clear()
+        GameCore.unsafe.mapItemService.disposeSharedMapView()
+
         // 보급품 데이터 삭제
         GameCore.unsafe.supplyManager.createdSupply.clear()
 
@@ -197,6 +202,8 @@ class GameManager {
                 if (!it.isWorldLoaded()) {
                     it.loadWorld()
                 }
+                // 초기 자기장 설정 (월드 로드 여부와 무관하게 항상 실행)
+                BukkitSyncScope.launch { it.initWorldBorder() }.join()
             } ?: run {
                 // 맵 없으면 중단
                 BukkitBroadcaster.broadcastTitle(
@@ -225,6 +232,14 @@ class GameManager {
             if (GameCore.unsafe.sideBarManager.sideBar != null && !GameCore.unsafe.sideBarManager.isSideBarTimerRunning()) {
                 GameCore.unsafe.sideBarManager.startSideBarTimer()
             }
+
+            // 지도 스냅샷 캡처 (게임 시작 전 1회, 정적 스냅샷 보장)
+            GameCore.currentMap?.let { currentMap ->
+                GameCore.unsafe.mapSnapshotService.captureCurrentMap(currentMap)
+            }
+            BukkitSyncScope.launch {
+                GameCore.unsafe.mapItemService.ensureSharedMapView()
+            }.join()
 
             // Phase 시작
             game.phasePipeline.runPhases()
@@ -284,8 +299,10 @@ class GameManager {
         // 관전 텔레포터 GUI 업데이트
         GameCore.unsafe.quickBarManager.spectatorQuickBar.spectatorTeleporterGui.updateAsynchronously()
 
-        // 시작 아이템 지급
-        GameCore.unsafe.playerManager.getOnlinePlayingPlayers().forEach { it.giveStartItem() }
+        // 시작 아이템 지급 (텔레포트 이후에 지급되도록 1틱 지연)
+        Bukkit.getScheduler().scheduleSyncDelayedTask(GameCore.gamePlugin, {
+            GameCore.unsafe.playerManager.getOnlinePlayingPlayers().forEach { it.giveStartItem() }
+        }, 1L)
 
         // 이벤트
         try {

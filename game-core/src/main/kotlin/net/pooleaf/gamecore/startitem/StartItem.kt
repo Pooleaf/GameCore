@@ -23,4 +23,7 @@ class StartItem {
     @ConfigName("레벨")
     var level = 0
 
+    @ConfigName("지도 지급")
+    var giveMapItem: Boolean? = null
+
 }

@@ -10,8 +10,10 @@ import net.pooleaf.gamecore.kit.KitManager
 import net.pooleaf.gamecore.kit.KitService
 import net.pooleaf.gamecore.map.DefaultGameMapManager
 import net.pooleaf.gamecore.map.GameMap
+import net.pooleaf.gamecore.map.GameMapItemService
 import net.pooleaf.gamecore.map.GameMapManager
 import net.pooleaf.gamecore.map.GameMapService
+import net.pooleaf.gamecore.map.GameMapSnapshotService
 import net.pooleaf.gamecore.player.DefaultGamePlayerManager
 import net.pooleaf.gamecore.player.GamePlayer
 import net.pooleaf.gamecore.player.GamePlayerManager
@@ -42,6 +44,8 @@ object GameCore {
 
         lateinit var mapManager: GameMapManager<GameMap>
         lateinit var mapService: GameMapService
+        lateinit var mapSnapshotService: GameMapSnapshotService
+        lateinit var mapItemService: GameMapItemService
 
         lateinit var playerManager: GamePlayerManager<GamePlayer>
         lateinit var playerService: GamePlayerService
@@ -98,6 +102,8 @@ object GameCore {
 
             mapManager = DefaultGameMapManager()
             mapService = GameMapService()
+            mapSnapshotService = GameMapSnapshotService()
+            mapItemService = GameMapItemService()
 
             playerManager = DefaultGamePlayerManager()
             playerService = GamePlayerService()

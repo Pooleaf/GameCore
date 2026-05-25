@@ -219,7 +219,6 @@ class GameMapService {
 
         BukkitSyncScope.async {
             swmPlugin.generateWorld(slimeWorld)
-            initWorldBorder(map)
         }.await()
     }
 

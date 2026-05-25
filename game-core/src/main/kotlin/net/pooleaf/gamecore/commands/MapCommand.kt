@@ -7,6 +7,7 @@ import net.pooleaf.core.modules.annocommand.common.HelpCommandResult
 import net.pooleaf.core.modules.commonsender.common.CommonCommandSender
 import net.pooleaf.core.modules.commonsender.common.CommonPlayer
 import net.pooleaf.core.modules.coroutine.bukkit.BukkitAsyncScope
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.support.bukkit.util.TeleportUtil
 import net.pooleaf.core.modules.support.common.CommonChatColor
 import net.pooleaf.core.modules.support.common.component.SimpleComponentBuilder
@@ -15,6 +16,7 @@ import net.pooleaf.core.plugin.CorePlugin
 import net.pooleaf.gamecore.GameCore
 import net.pooleaf.gamecore.GameCorePermission
 import net.pooleaf.gamecore.map.GameMap
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -26,8 +28,7 @@ class MapCommand {
         name = ["맵", "map"],
         helpCommand = true,
         description = "맵 명령어를 확인합니다.",
-        color = CommonChatColor.AQUA,
-        permission = GameCorePermission.ADMIN
+        color = CommonChatColor.AQUA
     )
     fun map(sender: CommonCommandSender<CommandSender>, result: HelpCommandResult) {
     }
@@ -240,6 +241,52 @@ class MapCommand {
 
             TeleportUtil.teleport(player.platformSender, centerLocation)
             player.sendMessage("${map.name} §b맵으로 텔레포트했습니다.")
+        }
+    }
+
+    @Command(
+        parent = ["맵", "게임 맵"],
+        name = ["아이템", "item"],
+        arguments = "",
+        description = "현재 맵을 보여주는 지도 아이템을 받습니다.",
+        color = CommonChatColor.AQUA
+    )
+    fun map_item(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
+        BukkitSyncScope.launch {
+            // 게임 진행 중이 아니면 거부
+            if (GameCore.unsafe.mapSnapshotService.currentSnapshot == null) {
+                sender.sendWarning("지금은 지도 아이템을 사용할 수 없습니다.")
+                return@launch
+            }
+
+            // 인자 없음: 본인에게 지급 (콘솔에서 실행 시 거부)
+            if (result.argumentsLength == 0) {
+                val platformSender = sender.platformSender
+                if (platformSender !is Player) {
+                    sender.sendWarning("플레이어만 사용할 수 있습니다.")
+                    return@launch
+                }
+
+                GameCore.unsafe.mapItemService.give(platformSender)
+                sender.sendMessage("§b게임 지도를 받았습니다.")
+                return@launch
+            }
+
+            // 인자 있음: 관리자만 다른 플레이어에게 지급
+            if (!sender.platformSender.hasPermission(GameCorePermission.ADMIN)) {
+                sender.sendWarning("해당 명령어를 사용할 수 없습니다.")
+                return@launch
+            }
+
+            val targetName = result.getArgument(0)
+            val target = Bukkit.getPlayerExact(targetName)
+            if (target == null || !target.isOnline) {
+                sender.sendWarning("해당 플레이어를 찾을 수 없습니다.")
+                return@launch
+            }
+
+            GameCore.unsafe.mapItemService.give(target)
+            sender.sendMessage("§f${target.name} §b님에게 게임 지도를 지급했습니다.")
         }
     }
 
