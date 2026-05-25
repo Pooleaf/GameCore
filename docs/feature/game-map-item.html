@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>지도 아이템 기능 요구사항</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --panel-2: #273449;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent-2: #a78bfa;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --ok: #22c55e;
+    --border: #334155;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+                 "Noto Sans KR", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 48px 24px 80px; }
+  header { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 32px; }
+  .eyebrow { color: var(--accent); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; font-size: 12px; }
+  h1 { font-size: 32px; margin: 8px 0 12px; }
+  h2 { font-size: 22px; margin: 40px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 17px; margin: 24px 0 10px; color: var(--accent-2); }
+  .meta { color: var(--muted); font-size: 14px; }
+  .meta span + span::before { content: " · "; margin: 0 6px; color: var(--border); }
+  p, li { font-size: 15px; }
+  ul, ol { padding-left: 20px; }
+  li { margin-bottom: 6px; }
+  code { background: var(--panel-2); padding: 2px 6px; border-radius: 4px; font-size: 13px; color: #f0abfc; }
+  pre { background: var(--panel); padding: 16px; border-radius: 8px; overflow-x: auto; border: 1px solid var(--border); }
+  pre code { background: transparent; padding: 0; color: var(--text); }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; }
+  .card.warn { border-left: 4px solid var(--warn); }
+  .card.danger { border-left: 4px solid var(--danger); }
+  .card.ok { border-left: 4px solid var(--ok); }
+  .card.info { border-left: 4px solid var(--accent); }
+  .tag {
+    display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px;
+    font-weight: 600; background: var(--panel-2); color: var(--accent); border: 1px solid var(--border);
+    margin-right: 6px;
+  }
+  .tag.warn { color: var(--warn); }
+  .tag.danger { color: var(--danger); }
+  .tag.ok { color: var(--ok); }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 8px; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; background: var(--panel); }
+  tr:hover td { background: rgba(56, 189, 248, 0.04); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .grid-2 { grid-template-columns: 1fr; } }
+  .flow {
+    background: var(--panel);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+    white-space: pre;
+    border: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .kbd {
+    background: var(--panel-2); padding: 2px 8px; border-radius: 4px;
+    font-family: ui-monospace, monospace; font-size: 12px;
+    border: 1px solid var(--border);
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+  .toc { background: var(--panel); border-radius: 10px; padding: 16px 24px; border: 1px solid var(--border); }
+  .toc ol { margin: 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div class="eyebrow">Pooleaf · game-core · Feature Spec</div>
+  <h1>게임 지도 아이템 기능</h1>
+  <p class="meta">
+    <span>대상 모듈: <code>game-core</code></span>
+    <span>플랫폼: Paper 1.8.8 (Minecraft 1.8.9)</span>
+    <span>작성일: 2026-05-25</span>
+  </p>
+</header>
+
+<div class="toc">
+  <strong>목차</strong>
+  <ol>
+    <li><a href="#overview">개요</a></li>
+    <li><a href="#commands">명령어 사양</a></li>
+    <li><a href="#functional">기능 요구사항</a></li>
+    <li><a href="#nonfunctional">비기능 요구사항 (보안/성능)</a></li>
+    <li><a href="#technical">기술 설계</a></li>
+    <li><a href="#integration">기존 코드 연동 포인트</a></li>
+    <li><a href="#risks">리스크 및 검증 계획</a></li>
+  </ol>
+</div>
+
+<!-- =================== Overview =================== -->
+<h2 id="overview">1. 개요</h2>
+<div class="card info">
+  <p>
+    현재 진행 중인 game map의 전체 지형을 보여주는 지도 아이템을 제작하고,
+    <strong>자기장(WorldBorder) phase가 진행 중일 때는 현재 자기장과 다음 자기장의 위치/크기를 실시간으로 오버레이</strong>하여
+    플레이어에게 전장 상황을 시각적으로 전달한다.
+  </p>
+  <p>
+    명령어로 즉시 지급할 수 있어야 하고, 기존 <code>StartItem</code> 시스템에 지도 아이템을
+    시작 아이템으로 추가할 수 있는 옵션을 제공한다.
+  </p>
+</div>
+
+<h3>핵심 가치</h3>
+<ul>
+  <li>BR(배틀로얄) 장르 특성상 지형 인지 + 자기장 위치 파악이 게임 흐름의 핵심</li>
+  <li>관전자 외 일반 플레이어에게 적의 위치 정보가 새지 않아야 함</li>
+  <li>관리자가 임의 플레이어에게 지급 가능 (테스트/운영 편의)</li>
+</ul>
+
+<!-- =================== Commands =================== -->
+<h2 id="commands">2. 명령어 사양</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>항목</th>
+      <th>값</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>명령어</td>
+      <td><code>/게임 맵 아이템</code> (alias: <code>/game map item</code>)</td>
+    </tr>
+    <tr>
+      <td>일반 플레이어 사용법</td>
+      <td><code>/게임 맵 아이템</code> — 본인에게 지도 아이템 지급</td>
+    </tr>
+    <tr>
+      <td>관리자 사용법</td>
+      <td><code>/게임 맵 아이템 &lt;플레이어&gt;</code> — 지정 플레이어에게 지도 지급</td>
+    </tr>
+    <tr>
+      <td>도움말 노출</td>
+      <td>
+        <span class="tag warn">중요</span>
+        도움말(<code>helpCommand</code>)에는 <code>(플레이어)</code> 인자를 표시하지 않는다.<br>
+        일반 유저에게도 노출되는 명령어이므로 관리자 전용 인자임을 숨긴다.
+      </td>
+    </tr>
+    <tr>
+      <td>권한</td>
+      <td>
+        인자 없음: 권한 없음 (전체 공개)<br>
+        인자 있음(타 플레이어 지정): <code>GameCorePermission.ADMIN</code>
+      </td>
+    </tr>
+    <tr>
+      <td>위치</td>
+      <td>
+        <code>net.pooleaf.gamecore.commands.MapCommand</code> 에 추가<br>
+        <span class="tag">parent</span> <code>["맵", "게임 맵"]</code>
+        <span class="tag">name</span> <code>["아이템", "item"]</code>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>기존 MapCommand 구조와의 일관성</h3>
+<p>
+  현재 <code>MapCommand</code>는 모든 서브커맨드를 <code>parent = ["맵", "게임 맵"]</code> 하위로 두고 있어
+  관리자 명령(<code>생성</code>, <code>삭제</code>, <code>목록</code>, <code>이동</code> 등)과 동일한 패턴으로 등록한다.
+</p>
+<p>
+  단, 기존 서브커맨드는 모두 <code>permission = GameCorePermission.ADMIN</code>이 명시되어 있지만,
+  <code>아이템</code>은 <strong>일반 플레이어에게도 노출</strong>되어야 하므로 <code>permission</code> 속성을 생략하고
+  본문에서 인자 유무에 따라 권한을 직접 분기 처리한다.
+</p>
+
+<h3>명령어 흐름</h3>
+<div class="flow">/게임 맵 아이템
+  ├─ argumentsLength == 0  → sender 본인에게 지급
+  └─ argumentsLength >= 1  → ADMIN 권한 체크
+                             ├─ 권한 있음: 지정 플레이어에게 지급
+                             └─ 권한 없음: "해당 명령어를 사용할 수 없습니다" 경고
+</div>
+
+<h3>@Command 어노테이션 예시</h3>
+<pre><code>@Command(
+    parent = ["맵", "게임 맵"],
+    name = ["아이템", "item"],
+    arguments = "",   // 도움말에서 (플레이어) 인자 숨김
+    description = "현재 맵을 보여주는 지도 아이템을 받습니다.",
+    color = CommonChatColor.AQUA
+    // permission 생략 (일반 플레이어 사용 가능)
+)
+fun map_item(sender: CommonCommandSender&lt;CommandSender&gt;, result: CommandResult) {
+    // 1) 인자 없음 → 본인에게 지급 (Player가 아니면 거부)
+    // 2) 인자 있음 → ADMIN 권한 체크 후 대상 플레이어에게 지급
+}</code></pre>
+
+<!-- =================== Functional =================== -->
+<h2 id="functional">3. 기능 요구사항</h2>
+
+<div class="card">
+  <h3>F-1. 지도 베이스 (지형) 표시</h3>
+  <ul>
+    <li>현재 진행 중인 <code>GameCore.currentMap</code>의 <strong>전체 worldBorderSize 영역</strong>을 128×128 픽셀에 매핑하여 표시</li>
+    <li>지형 색상은 vanilla 마인크래프트 지도와 동일한 팔레트(<code>MaterialMapColor</code>)를 사용</li>
+    <li>각 픽셀은 해당 좌표의 <strong>최상단 블록</strong>(<code>world.getHighestBlockYAt</code>) 색상을 채택</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>F-2. 자기장 오버레이 (실시간)</h3>
+  <ul>
+    <li><strong>현재 자기장</strong>: <code>GameMap.currentWorldBorderCenterLocation</code> / <code>currentWorldBorderSize</code> 기준 사각형 테두리 (예: 흰색)</li>
+    <li><strong>다음 자기장</strong>: <code>WorldBorderUpdatePhase</code>가 진행 중인 동안만 표시.
+        <code>phase.getNewWorldBorderSize()</code>로 크기 획득, 점선/빨간색 사각형으로 표시</li>
+    <li>자기장이 축소/이동 중이면 매 렌더 시점에 최신 값으로 갱신</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>F-3. 본인 위치 표시</h3>
+  <ul>
+    <li>지도 위에 본인 현재 위치를 점(또는 <code>MapCursor</code>의 화살표)으로 표시</li>
+    <li><strong>다른 플레이어의 위치는 절대 표시하지 않는다</strong> (보안 요구사항 N-1 참조)</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>F-4. 시작 아이템 통합</h3>
+  <ul>
+    <li>기존 <code>StartItemManager</code> / <code>StartItemEditGui</code>에 "지도 아이템" 옵션을 추가</li>
+    <li>관리자가 시작 아이템 목록에 추가하면, 게임 시작 시 자동 지급</li>
+  </ul>
+</div>
+
+<!-- =================== Non-Functional =================== -->
+<h2 id="nonfunctional">4. 비기능 요구사항 (보안 / 성능)</h2>
+
+<div class="card danger">
+  <h3>N-1. 정보 비공개 보안 (Critical)</h3>
+  <p>
+    <span class="tag danger">필수</span>
+    지도는 <strong>게임 시작 시점에 1회 캡처한 정적 스냅샷</strong>만 사용한다.
+    실시간으로 지형/엔티티/플레이어를 다시 스캔해서 그리지 않는다.
+  </p>
+  <p><strong>이유</strong>: 실시간 렌더링 시 플레이어가 이동하지 않고도 다른 플레이어의 행동(블록 변경, 위치)을 지도에서 유추할 수 있다.
+     이는 BR 장르에서 치명적인 정보 누출이다.</p>
+  <p><strong>구현 규칙</strong>:</p>
+  <ul>
+    <li>게임 시작 시 worldBorder 전체 영역을 1회 비동기 스캔 → <code>byte[16384]</code> 캐싱</li>
+    <li>이후 모든 렌더는 캐시된 베이스 위에 자기장/본인 위치만 오버레이</li>
+    <li>다른 플레이어의 위치/이름/방향은 어떤 형태로도 표시 금지</li>
+    <li>vanilla <code>MapView</code>의 기본 렌더러는 반드시 제거 (다른 플레이어 커서 자동 노출 방지)</li>
+  </ul>
+</div>
+
+<div class="card warn">
+  <h3>N-2. 성능</h3>
+  <ul>
+    <li>스냅샷 캡처는 메인 스레드에서 블록 접근(1.8 World API는 not thread-safe) — 청크 단위로 쪼개거나 <code>delay</code>를 끼워 분산</li>
+    <li>worldBorderSize 200 기준 약 40,000 블록 스캔 → 1초 내 완료 목표</li>
+    <li><code>MapRenderer.render()</code>는 매 틱 호출되므로 베이스 픽셀 복사는 <code>System.arraycopy</code> 수준으로 최소화</li>
+    <li><code>MapPalette.matchColor()</code> 결과는 모두 상수로 사전 계산</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>N-3. 메모리</h3>
+  <ul>
+    <li>스냅샷 크기: 128 × 128 = 16,384 byte ≈ 16KB / 맵 1개</li>
+    <li>모든 플레이어가 <strong>동일한 스냅샷 인스턴스를 공유</strong> (플레이어별 복제 금지)</li>
+  </ul>
+</div>
+
+<!-- =================== Technical =================== -->
+<h2 id="technical">5. 기술 설계</h2>
+
+<h3>T-1. 블록 → 지도 색상 매핑 방식</h3>
+<div class="card info">
+  <p>
+    <strong>NMS <code>MaterialMapColor</code> 직접 호출 방식 채택.</strong>
+  </p>
+  <p>
+    하드코딩 RGB 테이블 대신, vanilla 마인크래프트가 사용하는 색 테이블을 그대로 가져온다.
+    이미 프로젝트는 ProtocolLib 등으로 NMS 의존이 허용된 패턴이며, 1.8.9 (<code>v1_8_R3</code>)에 해당 API가 분명히 존재한다.
+  </p>
+<pre><code>// 의사 코드
+val nmsBlock = CraftMagicNumbers.getBlock(material)
+val iBlockData = nmsBlock.fromLegacyData(data.toInt())
+val mapColor = iBlockData.block.g(iBlockData)  // obfuscated: getMapColor
+val brightness = 2  // 0=darkest, 3=brightest
+val paletteByte = (mapColor.M * 4 + brightness).toByte()  // M: colorIndex</code></pre>
+  <p><strong>장점</strong>: vanilla와 동일한 색감, 색상 테이블 노가다 불필요. <strong>단점</strong>: <code>v1_8_R3</code> obfuscated 이름 의존.</p>
+</div>
+
+<h3>T-2. 데이터 구조</h3>
+<pre><code>class GameMapSnapshot(
+    val baseColors: ByteArray,      // 128*128 = 16384, 지형 베이스
+    val centerX: Double,            // 스냅샷 기준 월드 중심 X
+    val centerZ: Double,            // 스냅샷 기준 월드 중심 Z
+    val worldBorderSize: Int        // 스냅샷 시점의 맵 최대 크기
+)</code></pre>
+
+<h3>T-3. 좌표 → 픽셀 매핑</h3>
+<pre><code>val blocksPerPixel = worldBorderSize / 128.0
+val worldX = centerX - worldBorderSize / 2 + (px + 0.5) * blocksPerPixel
+val worldZ = centerZ - worldBorderSize / 2 + (py + 0.5) * blocksPerPixel</code></pre>
+
+<h3>T-4. 렌더 파이프라인 (매 틱)</h3>
+<div class="flow">render(map, canvas, player):
+  1. baseColors (스냅샷) → canvas 전체 페인트
+  2. 현재 자기장 사각형 오버레이 (WHITE)
+  3. WorldBorderUpdatePhase 진행 중이면 다음 자기장 사각형 (RED)
+  4. player.location → 픽셀 변환 → 본인 위치 점 (YELLOW)
+  5. cursors는 본인 화살표만 add (다른 플레이어 제거)
+</div>
+
+<h3>T-5. 신규 파일 구조</h3>
+<pre><code>net.pooleaf.gamecore.map/
+  ├─ GameMapItem.kt           # 지도 ItemStack 생성/지급 헬퍼
+  ├─ GameMapSnapshot.kt       # 스냅샷 데이터 클래스 + 좌표 변환
+  ├─ GameMapSnapshotService.kt # 게임 시작 시 스냅샷 캡처 로직
+  ├─ GameMapRenderer.kt       # MapRenderer 구현체 (오버레이 그리기)
+  └─ NmsMapColor.kt           # NMS MaterialMapColor 래퍼
+
+net.pooleaf.gamecore.commands/
+  └─ MapCommand.kt            # /게임 맵 아이템 서브커맨드 추가</code></pre>
+
+<!-- =================== Integration =================== -->
+<h2 id="integration">6. 기존 코드 연동 포인트</h2>
+
+<table>
+  <thead>
+    <tr><th>대상</th><th>연동 내용</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>GameMap</code></td>
+      <td><code>currentWorldBorderCenterLocation</code> / <code>currentWorldBorderSize</code> / <code>centerLocation</code> / <code>worldBorderSize</code> 읽기 전용 참조</td>
+    </tr>
+    <tr>
+      <td><code>WorldBorderUpdatePhase</code></td>
+      <td><code>getNewWorldBorderSize()</code>, <code>updateRemainingSeconds</code>, <code>updateDurationSeconds</code> 참조하여 "다음 자기장" 오버레이 결정</td>
+    </tr>
+    <tr>
+      <td><code>PhasePipeline</code></td>
+      <td>현재 phase가 <code>WorldBorderUpdatePhase</code> 인스턴스인지 확인하는 진입점</td>
+    </tr>
+    <tr>
+      <td><code>Game</code> / <code>GameManager</code></td>
+      <td>게임 시작 시점(<code>StartCountPhase</code> 완료 직후 ~ <code>GodModePhase</code> 진입 전)에 스냅샷 캡처 트리거</td>
+    </tr>
+    <tr>
+      <td><code>StartItemManager</code> / <code>StartItemEditGui</code> / <code>StartItem</code></td>
+      <td>"지도 아이템" 타입을 시작 아이템으로 추가 가능하도록 enum/팩토리 확장</td>
+    </tr>
+    <tr>
+      <td><code>MapCommand</code></td>
+      <td><code>아이템</code> 서브커맨드 추가 (parent: <code>["맵", "게임 맵"]</code>). 도움말 표시는 인자 없는 시그니처만</td>
+    </tr>
+    <tr>
+      <td><code>GameCorePermission</code></td>
+      <td>관리자 인자 사용 시 <code>ADMIN</code> 권한 체크</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- =================== Risks =================== -->
+<h2 id="risks">7. 리스크 및 검증 계획</h2>
+
+<div class="card warn">
+  <h3>R-1. NMS 의존 (v1_8_R3)</h3>
+  <p>
+    <code>MaterialMapColor</code>의 obfuscated 필드/메서드 이름(<code>g()</code>, <code>M</code>)은 매핑에 따라 달라질 수 있다.
+    Paper 1.8.8 빌드의 obfuscation 매핑이 표준 <code>v1_8_R3</code>인지 사전 확인 필요.
+  </p>
+  <p><strong>검증 PoC</strong>: 다음 한 줄을 게임 시작 시 1회 실행해 성공/실패 로그 확인</p>
+<pre><code>val grassColor = NmsMapColor.get(Material.GRASS)
+Logger.log("grass map color byte = $grassColor")</code></pre>
+</div>
+
+<div class="card warn">
+  <h3>R-2. 청크 미로드 영역</h3>
+  <p>
+    worldBorder가 매우 크고 SlimeWorld가 lazy load되는 경우, 스냅샷 캡처 시 청크가 강제 로드되며 부하 발생.
+    필요 시 worldBorderSize 상한을 두거나, 캡처 진행률을 관리자에게 표시하는 안을 고려.
+  </p>
+</div>
+
+<div class="card warn">
+  <h3>R-3. 다른 플레이어 커서 자동 노출</h3>
+  <p>
+    vanilla <code>MapView</code>는 같은 mapID를 든 모든 플레이어의 화살표를 자동 표시한다.
+    이를 방지하려면 (1) 기본 vanilla 렌더러 제거 + (2) <code>MapRenderer.render()</code>에서 <code>canvas.cursors</code>를 본인 것만 add 하도록 명시.
+  </p>
+</div>
+
+<div class="card ok">
+  <h3>R-4. MapID 관리</h3>
+  <p>
+    <code>Bukkit.createMap()</code>는 호출마다 새 mapID를 발급한다.
+    게임마다 새로 만들거나, 1개 고정 mapID를 재사용하는 방식 중 선택. 재사용 시 <code>mapview.world</code> 등 상태 관리 주의.
+  </p>
+  <p><strong>권장</strong>: 게임 시작 시점에 새 mapID를 발급해 사용 → 게임 종료 시 폐기 (구현 단순)</p>
+</div>
+
+<hr>
+
+<p class="meta">
+  본 문서는 구현 착수 전 합의된 요구사항/설계 기준선이다. 구현 중 발견되는 제약은 본 문서에 반영하여 갱신한다.
+</p>
+
+</div>
+</body>
+</html>
