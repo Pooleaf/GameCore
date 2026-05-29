@@ -476,7 +476,7 @@ class GameManager {
                 GameCore.unsafe.teamManager.teams.forEach { team ->
                     // 팀 스폰이 설정되어있지 않을 경우 스폰을 랜덤 위치로 설정
                     if (team.spawnLocation == null) {
-                        val randomLocation = map.getRandomLocation() ?: error("Random location cannot be null")
+                        val randomLocation = map.getRandomLocation(useCurrentWorldBorder = true) ?: error("Random location cannot be null")
 
                         team.spawnLocation = randomLocation
                         team.teleport(randomLocation)
