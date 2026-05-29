@@ -84,19 +84,19 @@ class SupplyService {
         if (!Bukkit.isPrimaryThread()) error("createSupply() can only be used in primary thread")
         if (!GameCore.game.isGameStarted) error("Game is not started")
 
-        var location = location
+        var supplyLocation = location.block.location
 
         // 해당 위치에 보급품이 존재할 경우 한칸 위에 생성
-        if (GameCore.unsafe.supplyManager.getCreatedSupply(location) != null){
-            location.add(0.0 , 1.0, 0.0)
+        if (GameCore.unsafe.supplyManager.getCreatedSupply(supplyLocation) != null){
+            supplyLocation.add(0.0 , 1.0, 0.0)
         }
 
         BukkitSyncScope.launch {
             // 생성
-            location.block.setType(Material.CHEST)
+            supplyLocation.block.setType(Material.CHEST)
 
             // 폭죽
-            val fireworkLocation = location.clone().add(0.5, 0.0, 0.5)
+            val fireworkLocation = supplyLocation.clone().add(0.5, 0.0, 0.5)
             for (i in 1..3) {
                 if (!GameCore.game.isGameStarted) return@launch
 
@@ -106,11 +106,11 @@ class SupplyService {
         }
 
         // 보급품 정보
-        val supplyBlock = SupplyBlock(supply, location)
+        val supplyBlock = SupplyBlock(supply, supplyLocation)
         GameCore.unsafe.supplyManager.createdSupply.add(supplyBlock)
 
         // 메시지
-        BukkitBroadcaster.broadcast("§b[X: §f${location.x.toInt()}§b, Y: §f${location.y.toInt()}§b, Z: §f${location.z.toInt()}§b] 위치에 보급품이 생성되었습니다.")
+        BukkitBroadcaster.broadcast("§b[X: §f${supplyLocation.x.toInt()}§b, Y: §f${supplyLocation.y.toInt()}§b, Z: §f${supplyLocation.z.toInt()}§b] 위치에 보급품이 생성되었습니다.")
         BukkitBroadcaster.broadcast(
             SimpleComponentBuilder("§b보급품 위치는 §f'/보급품 기록' §b명령어로 다시 확인할 수 있습니다.")
                 .hoverShowText("클릭 시 보급품 기록을 확인합니다.")

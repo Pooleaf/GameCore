@@ -1,10 +1,12 @@
 package net.pooleaf.gamecore.commands
 
+import kotlinx.coroutines.launch
 import net.pooleaf.core.modules.annocommand.common.Command
 import net.pooleaf.core.modules.annocommand.common.CommandResult
 import net.pooleaf.core.modules.annocommand.common.HelpCommandResult
 import net.pooleaf.core.modules.commonsender.common.CommonCommandSender
 import net.pooleaf.core.modules.commonsender.common.CommonPlayer
+import net.pooleaf.core.modules.coroutine.bukkit.BukkitSyncScope
 import net.pooleaf.core.modules.support.common.CommonChatColor
 import net.pooleaf.core.modules.support.common.component.SimpleComponentBuilder
 import net.pooleaf.core.modules.support.common.pageable.PageableCommand
@@ -85,6 +87,69 @@ class SupplyCommand {
         GameCore.unsafe.supplyManager.set(supply.name, supply)
 
         sender.sendMessage("${supply.name} §b보급품을 생성했습니다.")
+    }
+
+    @Command(
+        parent = ["보급품", "게임 보급품"],
+        name = ["소환", "spawn"],
+        arguments = "<보급품이름>",
+        description = "현재 위치에 보급품을 소환합니다.",
+        color = CommonChatColor.AQUA,
+        permission = GameCorePermission.ADMIN
+    )
+    fun supply_spawn(player: CommonPlayer<Player>, result: CommandResult) {
+        if (!GameCore.game.isGameStarted) {
+            player.sendWarning("아직 게임이 시작되지 않았습니다.")
+            return
+        }
+
+        val supplyName = result.getArgument(0)
+        if (!GameCore.unsafe.supplyManager.exists(supplyName)) {
+            player.sendWarning("존재하지 않는 보급품입니다.")
+            return
+        }
+
+        val supply = GameCore.unsafe.supplyManager.get(supplyName)
+        val location = player.platformSender.location
+        BukkitSyncScope.launch {
+            GameCore.unsafe.supplyService.createSupply(supply, location)
+        }
+    }
+
+    @Command(
+        parent = ["보급품", "게임 보급품"],
+        name = ["랜덤소환", "spawnRandom"],
+        arguments = "(보급품이름)",
+        description = "현재 맵의 랜덤 위치에 보급품을 소환합니다.",
+        color = CommonChatColor.AQUA,
+        permission = GameCorePermission.ADMIN
+    )
+    fun supply_spawnRandom(sender: CommonCommandSender<CommandSender>, result: CommandResult) {
+        if (!GameCore.game.isGameStarted) {
+            sender.sendWarning("아직 게임이 시작되지 않았습니다.")
+            return
+        }
+
+        val supply = if (result.argumentsLength > 0) {
+            val supplyName = result.getArgument(0)
+            if (!GameCore.unsafe.supplyManager.exists(supplyName)) {
+                sender.sendWarning("존재하지 않는 보급품입니다.")
+                return
+            }
+
+            GameCore.unsafe.supplyManager.get(supplyName)
+        } else {
+            GameCore.unsafe.supplyManager.getRandomSupply()
+        }
+
+        if (supply == null) {
+            sender.sendWarning("생성된 보급품이 없습니다.")
+            return
+        }
+
+        BukkitSyncScope.launch {
+            GameCore.unsafe.supplyService.createSupplyRandomLocation(supply)
+        }
     }
 
     @Command(
