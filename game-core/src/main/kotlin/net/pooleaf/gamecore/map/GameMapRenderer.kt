@@ -70,9 +70,11 @@ class GameMapRenderer : MapRenderer(true) {
             }
 
             // 3) 다음 자기장 (WorldBorderUpdatePhase 진행 중)
+            // 다음 자기장도 실제 자기장 중심(currentWorldBorderCenterLocation)을 기준으로 그린다.
+            // (현재 자기장과 동일한 중심을 사용해야 미리보기가 실제 줄어들 영역과 일치한다.)
             val currentPhase = GameCore.game.phasePipeline.currentPhase
             if (currentPhase is WorldBorderUpdatePhase) {
-                val center = currentMap.centerLocation
+                val center = currentMap.currentWorldBorderCenterLocation ?: currentMap.centerLocation
                 if (center != null) {
                     drawBorderRect(
                         canvas,

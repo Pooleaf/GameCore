@@ -123,7 +123,8 @@ abstract class WorldBorderUpdatePhase(): Phase() {
     fun startParticleTimer() {
         particleJob = BukkitAsyncScope.launch {
             GameCore.currentMap?.let { map ->
-                val centerLocation = map.centerLocation!!
+                // 다음 자기장 미리보기는 실제 자기장 중심(currentWorldBorderCenterLocation)을 기준으로 그린다.
+                val centerLocation = map.currentWorldBorderCenterLocation ?: map.centerLocation!!
                 val newWorldBorderSize = getNewWorldBorderSize()
 
                 val startX = (centerLocation.x - (newWorldBorderSize / 2)).toInt()

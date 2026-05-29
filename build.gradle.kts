@@ -11,7 +11,6 @@ allprojects {
 
         maven("https://repo.s8u.kr/repository/maven-minecraft/") // Bukkit
         maven("https://repo.s8u.kr/repository/maven-pooleaf/") // Core
-        maven("https://repo.dmulloy2.net/repository/public/") // ProtocolLib
         maven("https://repo.glaremasters.me/repository/concuncan/") // SWM
         maven("https://maven.citizensnpcs.co/repo") // Citizens
     }

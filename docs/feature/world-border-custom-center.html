@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>월드보더 중심 커스터마이즈 요구사항</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --panel-2: #273449;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent-2: #a78bfa;
+    --warn: #f59e0b;
+    --danger: #ef4444;
+    --ok: #22c55e;
+    --border: #334155;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+                 "Noto Sans KR", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+  }
+  .container { max-width: 960px; margin: 0 auto; padding: 48px 24px 80px; }
+  header { border-bottom: 1px solid var(--border); padding-bottom: 24px; margin-bottom: 32px; }
+  .eyebrow { color: var(--accent); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; font-size: 12px; }
+  h1 { font-size: 32px; margin: 8px 0 12px; }
+  h2 { font-size: 22px; margin: 40px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 17px; margin: 24px 0 10px; color: var(--accent-2); }
+  .meta { color: var(--muted); font-size: 14px; }
+  .meta span + span::before { content: " · "; margin: 0 6px; color: var(--border); }
+  p, li { font-size: 15px; }
+  ul, ol { padding-left: 20px; }
+  li { margin-bottom: 6px; }
+  code { background: var(--panel-2); padding: 2px 6px; border-radius: 4px; font-size: 13px; color: #f0abfc; }
+  pre { background: var(--panel); padding: 16px; border-radius: 8px; overflow-x: auto; border: 1px solid var(--border); }
+  pre code { background: transparent; padding: 0; color: var(--text); }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; }
+  .card.warn { border-left: 4px solid var(--warn); }
+  .card.danger { border-left: 4px solid var(--danger); }
+  .card.ok { border-left: 4px solid var(--ok); }
+  .card.info { border-left: 4px solid var(--accent); }
+  .tag {
+    display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px;
+    font-weight: 600; background: var(--panel-2); color: var(--accent); border: 1px solid var(--border);
+    margin-right: 6px;
+  }
+  .tag.warn { color: var(--warn); }
+  .tag.danger { color: var(--danger); }
+  .tag.ok { color: var(--ok); }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0 8px; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; background: var(--panel); }
+  tr:hover td { background: rgba(56, 189, 248, 0.04); }
+  .flow {
+    background: var(--panel);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+    white-space: pre;
+    border: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+  .toc { background: var(--panel); border-radius: 10px; padding: 16px 24px; border: 1px solid var(--border); }
+  .toc ol { margin: 0; }
+  .toc a { color: var(--accent); text-decoration: none; }
+  .toc a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div class="eyebrow">Pooleaf · game-core · Feature Spec</div>
+  <h1>월드보더 중심 커스터마이즈</h1>
+  <p class="meta">
+    <span>대상 모듈: <code>game-core</code></span>
+    <span>사용처 예시: <code>ability-core</code></span>
+    <span>작성일: 2026-05-25</span>
+  </p>
+</header>
+
+<div class="toc">
+  <strong>목차</strong>
+  <ol>
+    <li><a href="#overview">개요</a></li>
+    <li><a href="#problem">문제 정의</a></li>
+    <li><a href="#constraint">마인크래프트 월드보더 제약</a></li>
+    <li><a href="#scope">범위</a></li>
+    <li><a href="#functional">기능 요구사항</a></li>
+    <li><a href="#technical">기술 설계</a></li>
+    <li><a href="#replay">리플레이 호환성</a></li>
+    <li><a href="#integration">사용처 연동 가이드</a></li>
+    <li><a href="#risks">리스크 및 검증 계획</a></li>
+  </ol>
+</div>
+
+<h2 id="overview">1. 개요</h2>
+<div class="card info">
+  <p>
+    <code>game-core</code>의 월드보더 시스템이 <strong>맵 원본 중심(<code>GameMap.centerLocation</code>)이 아닌
+    별도의 자기장 중심 좌표</strong>를 사용할 수 있도록 확장한다.
+  </p>
+  <p>
+    구체적으로는 <code>GameMap</code>에 이미 선언만 되어 있고 사용되지 않던
+    <code>currentWorldBorderCenterLocation</code> 필드를 실제 자기장 중심 좌표로 활용한다.
+    <code>GameMapService.updateWorldBorder</code>가 이 필드를 읽어 <code>worldBorder.center</code>로 사용하고,
+    <code>WorldBorderUpdatePhase</code>의 파티클 표시도 이 필드를 기준으로 그린다.
+  </p>
+  <p>
+    "게임마다 자기장 위치를 다르게" 같은 정책은 본 모듈이 결정하지 않는다.
+    <code>ability-core</code> 같은 게임 모드 구현체가 게임 시작 시 이 필드를 세팅하면
+    <code>game-core</code>는 그 좌표로 자기장을 그려준다.
+  </p>
+</div>
+
+<h2 id="problem">2. 문제 정의</h2>
+<ul>
+  <li>현재 모든 자기장 단계는 <code>GameMap.centerLocation</code>(맵 원본 중심)을 기준으로 줄어든다.</li>
+  <li>그 결과 자기장이 줄어들면서 최종적으로 모이는 위치가 <strong>매 게임 항상 동일</strong>하다.</li>
+  <li>게임 모드 구현체가 게임마다 자기장 중심을 바꾸고 싶어도, <code>game-core</code> API가 이를 허용하지 않는다.</li>
+  <li>한편 <code>GameMap</code>에는 <code>currentWorldBorderCenterLocation</code> 필드가 정의되어 있으나 어디서도 참조되지 않는다.</li>
+</ul>
+
+<h2 id="constraint">3. 마인크래프트 월드보더 제약</h2>
+<div class="card warn">
+  <p>본 기능의 설계는 다음 제약 위에서 결정되었다.</p>
+  <ul>
+    <li><strong>월드보더는 정사각형이며 월드당 1개만 존재한다.</strong></li>
+    <li><strong>중심 좌표 변경은 즉시 반영된다(보간 없음).</strong> 자기장이 줄어드는 도중에 중심을 바꾸면 자기장이 순간이동하듯 옮겨진다.</li>
+    <li>크기 변화는 <code>setSize(size, duration)</code>으로 선형 보간이 가능하지만, 중심에는 동일한 보간 API가 없다.</li>
+  </ul>
+  <p>
+    따라서 PUBG 식으로 "맵 전체에서 시작해 다른 한 점으로 자연스럽게 수렴"하는 연출은 바닐라 월드보더로 불가능하다.
+    이 한계를 받아들이고 <strong>자기장 중심은 게임 시작 시 한 번만 정해지고 게임 내내 고정</strong>되는 모델을 따른다.
+  </p>
+</div>
+
+<h2 id="scope">4. 범위</h2>
+<h3>포함</h3>
+<ul>
+  <li><code>GameMap.currentWorldBorderCenterLocation</code> 필드를 실제 자기장 중심으로 활용한다.</li>
+  <li><code>GameMapService.updateWorldBorder</code>의 두 오버로드가 이 필드를 사용해 <code>worldBorder.center</code>를 설정한다.</li>
+  <li><code>GameMapService.initWorldBorder</code>는 호출 시점에 <code>currentWorldBorderCenterLocation</code>을 <code>centerLocation</code>으로 초기화한다.</li>
+  <li><code>GameWorldBorderChangeEvent.centerLocation</code>이 <code>currentWorldBorderCenterLocation</code> 값으로 전달된다.</li>
+  <li><code>WorldBorderUpdatePhase</code>의 파티클 표시가 <code>currentWorldBorderCenterLocation</code>을 기준으로 그려진다.</li>
+</ul>
+
+<h3>제외</h3>
+<ul>
+  <li>"게임마다 자기장 중심을 어떻게 정하는가"라는 정책은 본 모듈에서 결정하지 않는다.</li>
+  <li>자기장 크기 단계(현재 <code>2/3</code>, <code>1/3</code>, <code>20</code>) 자체는 변경하지 않는다.</li>
+  <li>리플레이 모듈은 변경하지 않는다(자세한 이유는 <a href="#replay">7. 리플레이 호환성</a> 참조).</li>
+  <li>자기장 중심을 좌표 후보 리스트에서 뽑는 등의 고급 정책은 본 범위에 포함하지 않는다.</li>
+</ul>
+
+<h2 id="functional">5. 기능 요구사항</h2>
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>요구사항</th>
+      <th>상세</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>FR-1</td>
+      <td>중심 좌표 보관</td>
+      <td><code>GameMap</code>은 현재 자기장의 중심 좌표를 <code>currentWorldBorderCenterLocation</code>에 보관한다. 기본값은 <code>centerLocation</code>과 동일하게 동작한다.</td>
+    </tr>
+    <tr>
+      <td>FR-2</td>
+      <td>초기화 동작</td>
+      <td><code>initWorldBorder(map)</code> 호출 시 <code>currentWorldBorderCenterLocation</code>은 <code>centerLocation</code>으로 리셋된다. 모드가 별도로 세팅하지 않으면 기존 동작과 완전히 동일하다.</td>
+    </tr>
+    <tr>
+      <td>FR-3</td>
+      <td>월드보더 적용</td>
+      <td><code>updateWorldBorder</code>의 두 오버로드는 <code>worldBorder.center</code>로 <code>currentWorldBorderCenterLocation</code>(혹은 그 fallback인 <code>centerLocation</code>)을 사용한다.</td>
+    </tr>
+    <tr>
+      <td>FR-4</td>
+      <td>이벤트 일관성</td>
+      <td><code>GameWorldBorderChangeEvent.centerLocation</code>은 실제 적용된 자기장 중심 좌표를 그대로 전달한다.</td>
+    </tr>
+    <tr>
+      <td>FR-5</td>
+      <td>파티클 일관성</td>
+      <td><code>WorldBorderUpdatePhase.startParticleTimer</code>가 그리는 다음 자기장 미리보기 파티클은 실제 자기장 중심(<code>currentWorldBorderCenterLocation</code>)을 기준으로 한다.</td>
+    </tr>
+    <tr>
+      <td>FR-6</td>
+      <td>좌표 검사 일관성</td>
+      <td><code>GameMap.isInWorldBorder</code>는 <code>currentWorldBorderCenterLocation</code>을 기준으로 자기장 안/밖을 판정한다. <code>isInMap</code>은 맵 원본 영역을 판정하므로 <code>centerLocation</code>을 그대로 사용한다.</td>
+    </tr>
+    <tr>
+      <td>FR-7</td>
+      <td>외부에서의 중심 갱신</td>
+      <td>모드 구현체가 <code>currentWorldBorderCenterLocation</code>을 직접 세팅할 수 있어야 한다(예: <code>internal set</code> → 모듈 외부에서도 가능한 가시성으로 조정). 별도 setter 메서드를 제공해도 된다.</td>
+    </tr>
+    <tr>
+      <td>FR-8</td>
+      <td>안전한 폴백</td>
+      <td><code>currentWorldBorderCenterLocation</code>이 <code>null</code>인 경우 <code>centerLocation</code>으로 자동 대체한다. 둘 다 <code>null</code>이면 기존과 동일하게 예외를 던진다.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="technical">6. 기술 설계</h2>
+
+<h3>변경 1 — <code>GameMap</code></h3>
+<p>
+  <code>currentWorldBorderCenterLocation</code> 필드의 가시성을 외부 모듈에서 세팅 가능한 수준으로 조정한다.
+  부가적으로 <code>isInWorldBorder</code>가 이 필드를 사용하도록 수정한다.
+</p>
+<pre><code>// GameMap.kt (변경 후 의도)
+
+@ConfigExclude
+var currentWorldBorderCenterLocation: Location? = null
+    // 모드 구현체가 세팅 가능하도록 가시성을 외부 모듈에 허용한다.
+    // 예: public set 또는 dedicated setter
+
+fun isInWorldBorder(location: Location, worldBorderSize: Int = currentWorldBorderSize): Boolean {
+    val center = currentWorldBorderCenterLocation ?: centerLocation ?: return false
+    return location.world.equals(center.world)
+            && Math.abs(center.x - location.x) <= worldBorderSize / 2
+            && Math.abs(center.z - location.z) <= worldBorderSize / 2
+}</code></pre>
+
+<h3>변경 2 — <code>GameMapService.initWorldBorder</code></h3>
+<p>
+  자기장 초기화 시 자기장 중심 또한 맵 원본 중심으로 리셋한다.
+  이로써 모드가 별도로 세팅하지 않으면 기존 동작과 완전히 동일하다.
+</p>
+<pre><code>fun initWorldBorder(map: GameMap) {
+    map.currentWorldBorderSize = map.worldBorderSize
+    map.currentWorldBorderCenterLocation = map.centerLocation
+    updateWorldBorder(map, map.currentWorldBorderSize)
+}</code></pre>
+
+<h3>변경 3 — <code>GameMapService.updateWorldBorder</code> (두 오버로드 모두)</h3>
+<p>
+  <code>worldBorder.center</code>와 이벤트 발행 시 사용하는 좌표를 모두
+  <code>currentWorldBorderCenterLocation</code>(없으면 <code>centerLocation</code>)으로 통일한다.
+</p>
+<pre><code>fun updateWorldBorder(map: GameMap, newSize: Int) {
+    val center = map.currentWorldBorderCenterLocation ?: map.centerLocation
+        ?: error("centerLocation cannot be null")
+
+    val beforeSize = map.currentWorldBorderSize
+    val worldBorder = center.world.worldBorder
+    worldBorder.center = center
+    worldBorder.size = newSize.toDouble()
+    worldBorder.damageBuffer = 0.0
+
+    map.currentWorldBorderSize = newSize
+
+    try {
+        Bukkit.getPluginManager().callEvent(
+            GameWorldBorderChangeEvent(center, beforeSize, newSize, 0)
+        )
+    } catch (exception: Exception) {
+        exception.printStackTrace()
+    }
+}
+
+fun updateWorldBorder(map: GameMap, newSize: Int, updateSizePerSeconds: Int): Int {
+    // 동일하게 currentWorldBorderCenterLocation을 우선 사용
+    ...
+}</code></pre>
+
+<h3>변경 4 — <code>WorldBorderUpdatePhase.startParticleTimer</code></h3>
+<p>
+  현재는 <code>map.centerLocation</code>을 기준으로 다음 자기장 영역을 파티클로 그리고 있다.
+  이를 <code>currentWorldBorderCenterLocation</code> 기준으로 변경한다.
+</p>
+<pre><code>val centerLocation = map.currentWorldBorderCenterLocation ?: map.centerLocation!!
+val newWorldBorderSize = getNewWorldBorderSize()
+
+val startX = (centerLocation.x - (newWorldBorderSize / 2)).toInt()
+val endX   = (centerLocation.x + (newWorldBorderSize / 2)).toInt()
+val startZ = (centerLocation.z - (newWorldBorderSize / 2)).toInt()
+val endZ   = (centerLocation.z + (newWorldBorderSize / 2)).toInt()</code></pre>
+
+<h3>호출 흐름</h3>
+<div class="flow">[게임 시작]
+  GameCore.unsafe.mapService.initWorldBorder(map)
+    -> map.currentWorldBorderSize = map.worldBorderSize
+    -> map.currentWorldBorderCenterLocation = map.centerLocation  (기본값 리셋)
+    -> updateWorldBorder(map, map.worldBorderSize)
+
+[모드 정책 적용 (선택)]
+  ability-core 등의 GameStartedEvent 리스너가
+  map.currentWorldBorderCenterLocation = (게임 랜덤 중심) 으로 덮어쓴다.
+
+[자기장 단계 진행]
+  WorldBorderUpdatePhase
+    -> updateWorldBorder(map, newSize, sizePerSec)
+        -> worldBorder.center = map.currentWorldBorderCenterLocation
+        -> worldBorder.setSize(...)
+        -> GameWorldBorderChangeEvent(center=게임 중심, ...)
+    -> startParticleTimer
+        -> 게임 중심 기준으로 다음 자기장 파티클 표시</div>
+
+<h2 id="replay">7. 리플레이 호환성</h2>
+<div class="card ok">
+  <p>
+    <code>game-replay</code> 모듈은 본 변경에 대해 <strong>수정이 필요 없다.</strong>
+  </p>
+  <p>
+    <code>GameWorldBorderChangeDataRecordListener</code>는 <code>GameWorldBorderChangeEvent.centerLocation</code>의
+    x, z 좌표를 그대로 기록하고, <code>GameWorldBorderChangeDataReplayHandler</code>는 기록된 중심 좌표를 기준으로
+    파티클을 그린다. 즉, 리플레이는 맵 중심을 직접 참조하지 않고
+    <strong>이벤트가 전달한 중심 좌표만 신뢰</strong>하므로 본 변경이 그대로 호환된다.
+  </p>
+  <p>
+    옛 리플레이 파일을 재생할 때에도 그 당시 기록된 중심 좌표가 그대로 사용되므로,
+    이전 게임과 중심이 다른 새 게임이 동일한 재생기에서 정상 표시된다.
+  </p>
+</div>
+
+<h2 id="integration">8. 사용처 연동 가이드</h2>
+<p>
+  본 모듈은 메커니즘만 제공한다. 게임별 중심 결정 정책은 모드 구현체에 위임한다.
+</p>
+
+<h3>일반적인 사용 패턴</h3>
+<pre><code>// 게임 시작 시점 (예: ability-core의 GameStartedEvent 리스너)
+@EventHandler
+fun onGameStarted(event: GameStartedEvent) {
+    val map = GameCore.currentMap ?: return
+    val newCenter = computeGameCenter(map)  // 모드별 정책으로 계산
+    map.currentWorldBorderCenterLocation = newCenter
+
+    // 이후의 자기장 단계(WorldBorderUpdatePhase)는 자동으로
+    // newCenter를 기준으로 줄어든다. 추가 호출 불필요.
+}</code></pre>
+<p>
+  세팅 시점은 <code>GameStartedEvent</code>가 적절하다. 해당 이벤트는 플레이어가 맵에 텔레포트 되기 전,
+  그리고 1차 <code>WorldBorderUpdatePhase</code>가 시작되기 한참 전에 발행되므로 안전하다.
+</p>
+
+<h3>모드 구현체가 지켜야 할 규약</h3>
+<ul>
+  <li>중심 변경은 <strong>자기장이 줄어들기 시작하기 전</strong>(혹은 단계 사이의 안정 구간)에 수행해야 한다. 줄어드는 도중에 바꾸면 자기장이 순간이동한다.</li>
+  <li>중심 좌표는 같은 월드여야 한다(<code>centerLocation.world</code>와 일치).</li>
+  <li>중심을 맵 영역 밖으로 너무 멀리 두면 자기장이 맵 밖으로 삐져나간다. 이 검증은 모드 구현체가 책임진다.</li>
+  <li>게임 종료 후 새 게임을 시작할 때 모드 구현체가 다시 세팅하지 않으면 <code>initWorldBorder</code>가 자동으로 맵 중심으로 리셋한다.</li>
+</ul>
+
+<h2 id="risks">9. 리스크 및 검증 계획</h2>
+
+<div class="card danger">
+  <p>
+    <strong>자기장이 줄어드는 도중에 중심을 변경하면 즉시 순간이동한다.</strong>
+    모드 구현체는 단계 전환 시점이나 시작 시점에만 중심을 바꿔야 한다.
+    이 규약 위반에 대한 가드는 본 모듈에서 강제하지 않는다.
+  </p>
+</div>
+
+<div class="card warn">
+  <p>
+    자기장 중심이 맵 영역 밖에 가까우면 자기장이 슬라임 월드의 미생성 청크 영역까지 침범할 수 있다.
+    각 모드 구현체는 자체적으로 안전 범위를 보장해야 한다.
+  </p>
+</div>
+
+<h3>검증 항목</h3>
+<ul>
+  <li>모드가 <code>currentWorldBorderCenterLocation</code>을 세팅하지 않은 경우, 자기장 동작이 기존과 완전히 동일한지 확인한다.</li>
+  <li>모드가 게임 시작 시점에 중심을 다른 좌표로 세팅하면, 모든 자기장 단계가 그 좌표를 기준으로 줄어드는지 확인한다.</li>
+  <li><code>WorldBorderUpdatePhase</code>의 파티클이 세팅한 중심을 기준으로 표시되는지 확인한다.</li>
+  <li><code>GameWorldBorderChangeEvent</code> 구독자(특히 <code>game-replay</code>)가 세팅한 중심 좌표를 정확히 수신하는지 확인한다.</li>
+  <li>게임 재시작(<code>initWorldBorder</code>) 시 <code>currentWorldBorderCenterLocation</code>이 <code>centerLocation</code>으로 정상 리셋되는지 확인한다.</li>
+  <li>리플레이 녹화 → 재생 시 자기장 중심이 녹화 시점과 동일한 좌표로 그려지는지 확인한다.</li>
+  <li><code>isInWorldBorder</code>가 새 중심을 기준으로 판정하는지(자기장 밖 데미지 처리 등이 정상 작동하는지) 확인한다.</li>
+</ul>
+
+</div>
+</body>
+</html>

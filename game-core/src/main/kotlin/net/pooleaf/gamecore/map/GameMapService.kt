@@ -115,6 +115,8 @@ class GameMapService {
      */
     fun initWorldBorder(map: GameMap) {
         map.currentWorldBorderSize = map.worldBorderSize
+        // 자기장 중심을 맵 원본 중심으로 리셋한다. 모드가 별도로 세팅하지 않으면 기존 동작과 동일하다.
+        map.currentWorldBorderCenterLocation = map.centerLocation
         updateWorldBorder(map, map.currentWorldBorderSize)
     }
 
@@ -122,7 +124,8 @@ class GameMapService {
      * 경계선을 [newSize]로 즉시 업데이트합니다.
      */
     fun updateWorldBorder(map: GameMap, newSize: Int) {
-        map.centerLocation?.let { centerLocation ->
+        // 자기장 중심은 currentWorldBorderCenterLocation을 우선 사용하고, 없으면 맵 원본 중심으로 폴백한다.
+        (map.currentWorldBorderCenterLocation ?: map.centerLocation)?.let { centerLocation ->
             val beforeSize = map.currentWorldBorderSize
 
             val worldBorder = centerLocation.world.worldBorder
@@ -149,7 +152,8 @@ class GameMapService {
         if (newSize < 0) error("newSize cannot be less than 0 (value: ${newSize})")
         if (updateSizePerSeconds < 1) error("updateSizePerSeconds cannot be less than 1 (value: ${updateSizePerSeconds}")
 
-        map.centerLocation?.let { centerLocation ->
+        // 자기장 중심은 currentWorldBorderCenterLocation을 우선 사용하고, 없으면 맵 원본 중심으로 폴백한다.
+        (map.currentWorldBorderCenterLocation ?: map.centerLocation)?.let { centerLocation ->
             val beforeSize = map.currentWorldBorderSize
 
             // 줄어드는 데 걸리는 시간

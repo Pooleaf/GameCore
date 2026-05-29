@@ -64,9 +64,10 @@ open class GameMap {
         internal set
 
     // 현재 경계선 중앙 위치
+    // 모드 구현체가 게임마다 자기장 중심을 다르게 세팅할 수 있도록 외부 모듈에서도 set 가능하다.
+    // null인 경우 centerLocation으로 폴백한다.
     @ConfigExclude
     var currentWorldBorderCenterLocation: Location? = null
-        internal set
 
 
     /**
@@ -115,12 +116,13 @@ open class GameMap {
 
     /**
      * 해당 위치가 경계선 안인지 확인합니다.
+     * 경계선 중앙은 [currentWorldBorderCenterLocation]을 기준으로 하며, null인 경우 [centerLocation]으로 폴백합니다.
      */
     fun isInWorldBorder(location: Location, worldBorderSize: Int = currentWorldBorderSize): Boolean {
-        return centerLocation?.let { centerLocation ->
-            location.world.equals(centerLocation.world)
-                    && Math.abs(centerLocation.x - location.x) <= worldBorderSize / 2
-                    && Math.abs(centerLocation.z - location.z) <= worldBorderSize / 2
+        return (currentWorldBorderCenterLocation ?: centerLocation)?.let { center ->
+            location.world.equals(center.world)
+                    && Math.abs(center.x - location.x) <= worldBorderSize / 2
+                    && Math.abs(center.z - location.z) <= worldBorderSize / 2
         } == true
     }
 
