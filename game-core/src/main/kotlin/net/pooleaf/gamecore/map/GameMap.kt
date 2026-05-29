@@ -135,8 +135,13 @@ open class GameMap {
         if (!Bukkit.isPrimaryThread()) error("getRandomLocation() can only be used in primary thread")
 
         val referenceWorldBorderSize = if (useCurrentWorldBorder) currentWorldBorderSize else worldBorderSize
+        val referenceCenterLocation = if (useCurrentWorldBorder) {
+            currentWorldBorderCenterLocation ?: centerLocation
+        } else {
+            centerLocation
+        }
 
-        return centerLocation?.let { centerLocation ->
+        return referenceCenterLocation?.let { centerLocation ->
             // 랜덤 x, z
             val x = ((centerLocation.x - referenceWorldBorderSize / 2) + Random.nextInt(referenceWorldBorderSize)).toInt()
             val z = ((centerLocation.z - referenceWorldBorderSize / 2) + Random.nextInt(referenceWorldBorderSize)).toInt()
