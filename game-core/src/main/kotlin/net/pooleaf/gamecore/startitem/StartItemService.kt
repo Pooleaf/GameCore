@@ -119,15 +119,15 @@ class StartItemService {
 
         // 시작아이템 지급
         val player = gamePlayer.player
-        if (startItem.giveMapItem == true) {
-            GameCore.unsafe.mapItemService.give(player)
-        }
         player.inventory.helmet = startItem.helmetItem
         player.inventory.chestplate = startItem.chestplatItem
         player.inventory.leggings = startItem.leggingsItem
         player.inventory.boots = startItem.bootsItem
         startItem.items.forEach { player.inventory.addItem(it) }
         player.level = startItem.level
+        if (startItem.giveMapItem == true) {
+            GameCore.unsafe.mapItemService.give(player)
+        }
 
         gamePlayer.isReceiveStartItems = true
     }
